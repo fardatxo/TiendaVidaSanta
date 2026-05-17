@@ -30,6 +30,15 @@ export default function Footer() {
         </div>
       </div>
 
+      {!isMinimalPage && (
+        <div className="footer-newsletter-mobile">
+          <p className="fnm-title">Be the first to access Tonet Paris Giftings and presales</p>
+          <div className="fnm-form">
+            <input type="email" placeholder="Your Email*" className="fnm-input" />
+            <button type="submit" className="fnm-submit">SIGN UP</button>
+          </div>
+        </div>
+      )}
 
       <div className="footer-links-container">
 
@@ -89,16 +98,6 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Column 6: Newsletter */}
-        {!isMinimalPage && (
-          <div className="footer-col footer-col-newsletter">
-            <p className="fnc-title">Be the first to access Tonet Paris Giftings and presales</p>
-            <div className="fnc-form">
-              <input type="email" placeholder="Enter your email address" className="fnc-input" />
-              <button type="submit" className="fnc-submit">SIGN UP</button>
-            </div>
-          </div>
-        )}
 
       </div>
 
