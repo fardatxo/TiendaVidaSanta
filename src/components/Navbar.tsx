@@ -117,7 +117,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className={`acne-header ${solid ? "solid" : "transparent"} ${isHome && !pastVideo ? "home-top" : ""} ${isHome && pastVideo ? "home-dark" : ""} ${!headerVisible ? "header-hidden" : ""} ${overDark ? "over-dark" : ""}`} style={{top: `${navTop}px`}}>
+      <header className={`acne-header ${solid ? "solid" : "transparent"} ${isHome && !pastVideo ? "home-top" : ""} ${isHome && pastVideo ? "home-dark" : ""} ${isFullbleed && !scrolledPast ? "fullbleed-top" : ""} ${!headerVisible ? "header-hidden" : ""} ${overDark ? "over-dark" : ""}`} style={{top: `${navTop}px`}}>
         <div className="acne-header-inner">
           {/* LEFT: Hamburger + Search */}
           <div className="acne-nav-left">
@@ -218,6 +218,20 @@ export default function Navbar() {
         }
         .acne-header.transparent svg {
           stroke: #000;
+        }
+
+        /* Fullbleed pages (collection/product) at top: white icons over hero image */
+        .acne-header.fullbleed-top .acne-nav-links a,
+        .acne-header.fullbleed-top .acne-mob-icon,
+        .acne-header.fullbleed-top .acne-right-icon,
+        .acne-header.fullbleed-top .acne-logo-text {
+          color: #fff;
+        }
+        .acne-header.fullbleed-top .acne-icon-sep {
+          background: rgba(255,255,255,0.3);
+        }
+        .acne-header.fullbleed-top svg {
+          stroke: #fff;
         }
 
         /* Home page at top: transparent with WHITE icons/text (over video) */
