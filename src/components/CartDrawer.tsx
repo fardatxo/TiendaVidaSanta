@@ -298,7 +298,7 @@ export default function CartDrawer() {
           font-size: 10px;
           font-weight: 400;
           letter-spacing: 0.04em;
-          color: #b8920a;
+          color: #1a3a5c;
           margin-top: auto;
         }
 
@@ -326,7 +326,7 @@ export default function CartDrawer() {
           font-size: 11px;
           font-weight: 400;
           letter-spacing: 0.04em;
-          color: #b8920a;
+          color: #1a3a5c;
         }
         .cd-cta-group {
           display: flex;
