@@ -89,28 +89,6 @@ export default function HeroSection() {
         </Link>
       </section>
 
-      {/* Viewport 4: World of Tonet Paris */}
-      <section className="hero-world-section">
-        <h2 className="hero-world-title">WORLD OF TONET PARIS</h2>
-        <div className="hero-world-grid">
-          <Link href="/about" className="hero-world-panel">
-            <img src={imgs[5]} alt="About" className="hero-world-img" loading="lazy" decoding="async" />
-            <span className="hero-world-text">ABOUT</span>
-          </Link>
-          <Link href="/collections" className="hero-world-panel">
-            <img src={imgs[6]} alt="Collections" className="hero-world-img" loading="lazy" decoding="async" />
-            <span className="hero-world-text">COLLECTIONS</span>
-          </Link>
-          <Link href="/stores" className="hero-world-panel">
-            <img src={imgs[7]} alt="Stores" className="hero-world-img" loading="lazy" decoding="async" />
-            <div className="hero-world-text-group">
-              <span className="hero-world-text" style={{marginBottom: '6px'}}>STORES</span>
-              <span className="hero-world-subtext">STORE LOCATOR</span>
-              <span className="hero-world-subtext">STOCKISTS</span>
-            </div>
-          </Link>
-        </div>
-      </section>
 
       <style>{`
         /* Scroll snap — applied at page level via hero-wrapper parent */
@@ -342,97 +320,6 @@ export default function HeroSection() {
           border-color: rgba(255,255,255,0.9);
         }
 
-        /* ═══ VIEWPORT 4: World Section ═══ */
-        .hero-world-section {
-          background: #fff;
-          height: 100vh;
-          height: 100dvh;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          scroll-snap-align: start;
-          padding: 0 40px;
-          box-sizing: border-box;
-        }
-
-        .hero-world-title {
-          font-family: var(--font-primary);
-          font-size: 20px;
-          font-weight: 400;
-          letter-spacing: 0.1em;
-          margin-bottom: 60px;
-          text-align: center;
-          color: #000;
-          text-transform: uppercase;
-        }
-
-        .hero-world-grid {
-          display: flex;
-          gap: 40px;
-          width: 100%;
-          max-width: 1100px;
-        }
-
-        .hero-world-panel {
-          position: relative;
-          flex: 1;
-          aspect-ratio: 1 / 1;
-          display: block;
-          text-decoration: none;
-          color: inherit;
-          overflow: hidden;
-        }
-
-        .hero-world-img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
-        }
-
-        .hero-world-panel::after {
-          content: "";
-          position: absolute;
-          inset: 0;
-          background: rgba(0, 0, 0, 0.15);
-          transition: background 0.3s ease;
-        }
-
-        .hero-world-panel:hover::after {
-          background: rgba(0, 0, 0, 0.25);
-        }
-
-        .hero-world-text, .hero-world-text-group {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          z-index: 2;
-          color: #fff;
-          text-align: center;
-        }
-
-        .hero-world-text {
-          font-family: var(--font-primary);
-          font-size: 17px;
-          font-weight: 500;
-          letter-spacing: 0.05em;
-        }
-
-        .hero-world-text-group {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          width: 100%;
-        }
-
-        .hero-world-subtext {
-          font-family: var(--font-primary);
-          font-size: 13px;
-          font-weight: 500;
-          letter-spacing: 0.05em;
-        }
 
         @media (max-width: 767px) {
           .hero-triple-section, .hero-dual-section {
@@ -459,28 +346,6 @@ export default function HeroSection() {
           }
           .hero-triple-cta, .hero-dual-cta {
             bottom: 40px;
-          }
-          .hero-world-section {
-            height: 100vh;
-            height: 100dvh;
-            padding: 100px 20px 20px 20px;
-            scroll-snap-align: start;
-          }
-          .hero-world-title {
-            margin-bottom: 24px;
-            font-size: 18px;
-            flex: none;
-          }
-          .hero-world-grid {
-            flex-direction: column;
-            gap: 12px;
-            flex: 1;
-            height: 0;
-          }
-          .hero-world-panel {
-            aspect-ratio: unset;
-            height: auto;
-            flex: 1;
           }
         }
       `}</style>
