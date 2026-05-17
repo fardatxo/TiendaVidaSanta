@@ -254,11 +254,11 @@ export default function Footer() {
         /* Columns Desktop */
         .footer-links-container {
           display: grid;
-          grid-template-columns: repeat(4, 1fr) 1.8fr;
-          padding: 60px 20px 80px 20px;
+          grid-template-columns: repeat(4, 1fr);
+          padding: 60px 60px 80px 60px;
           border-bottom: none;
-          max-width: 1400px;
-          margin: 0 auto;
+          width: 100%;
+          box-sizing: border-box;
         }
 
         .footer-col {
