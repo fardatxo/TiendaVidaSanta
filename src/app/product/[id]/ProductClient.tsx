@@ -682,7 +682,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         <section className="ymal-section">
           <h2 className="ymal-label">YOU MAY ALSO LIKE</h2>
           <div className="ymal-grid">
-            {recommended.slice(0, 16).map((p) => (
+            {[...completeOutfit, ...recommended.filter(r => !completeOutfit.some(o => o.handle === r.handle))].slice(0, 16).map((p) => (
               <div className="ymal-item" key={p.handle}>
                 <RecommendedCard product={p} />
               </div>
