@@ -130,7 +130,6 @@ export default function CartDrawer() {
               >
                 CHECKOUT
               </button>
-              <span className="cd-cta-or">or</span>
               <button className="cd-favorites-btn">
                 ADD TO FAVORITES
               </button>
@@ -331,21 +330,19 @@ export default function CartDrawer() {
         }
         .cd-cta-group {
           display: flex;
-          flex-direction: column;
+          flex-direction: row;
           gap: 0;
-          align-items: center;
           width: 100%;
         }
         .cd-checkout-btn, .cd-favorites-btn {
-          display: block;
-          width: 100%;
+          flex: 1;
           border: none;
-          padding: 15px;
-          font-size: 10px;
+          padding: 15px 8px;
+          font-size: 9px;
           font-family: inherit;
           font-weight: 500;
           text-transform: uppercase;
-          letter-spacing: 0.14em;
+          letter-spacing: 0.12em;
           cursor: pointer;
           transition: background 0.15s;
         }
@@ -360,12 +357,6 @@ export default function CartDrawer() {
           border: 1px solid #111;
         }
         .cd-favorites-btn:hover { background: #f5f5f5; }
-        .cd-cta-or {
-          font-size: 8px;
-          color: #aaa;
-          letter-spacing: 0.08em;
-          padding: 6px 0;
-        }
 
         /* ── MOBILE ── */
         @media (max-width: 767px) {
