@@ -121,14 +121,20 @@ export default function CartDrawer() {
               <span className="cd-subtotal-label">SUBTOTAL</span>
               <span className="cd-subtotal-price">{totalFormatted}</span>
             </div>
-            <button
-              className="cd-checkout-btn"
-              onClick={() => {
-                if (cart.checkoutUrl) window.location.href = cart.checkoutUrl;
-              }}
-            >
-              CHECKOUT
-            </button>
+            <div className="cd-cta-group">
+              <button
+                className="cd-checkout-btn"
+                onClick={() => {
+                  if (cart.checkoutUrl) window.location.href = cart.checkoutUrl;
+                }}
+              >
+                CHECKOUT
+              </button>
+              <span className="cd-cta-or">or</span>
+              <button className="cd-favorites-btn">
+                ADD TO FAVORITES
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -323,12 +329,16 @@ export default function CartDrawer() {
           letter-spacing: 0.04em;
           color: #b8920a;
         }
-        .cd-checkout-btn {
+        .cd-cta-group {
+          display: flex;
+          flex-direction: column;
+          gap: 0;
+          align-items: center;
+          width: 100%;
+        }
+        .cd-checkout-btn, .cd-favorites-btn {
           display: block;
-          width: calc(100% - 48px);
-          margin: 0 auto;
-          background: #111;
-          color: #fff;
+          width: 100%;
           border: none;
           padding: 15px;
           font-size: 10px;
@@ -339,7 +349,23 @@ export default function CartDrawer() {
           cursor: pointer;
           transition: background 0.15s;
         }
+        .cd-checkout-btn {
+          background: #111;
+          color: #fff;
+        }
         .cd-checkout-btn:hover { background: #333; }
+        .cd-favorites-btn {
+          background: #fff;
+          color: #111;
+          border: 1px solid #111;
+        }
+        .cd-favorites-btn:hover { background: #f5f5f5; }
+        .cd-cta-or {
+          font-size: 8px;
+          color: #aaa;
+          letter-spacing: 0.08em;
+          padding: 6px 0;
+        }
 
         /* ── MOBILE ── */
         @media (max-width: 767px) {
