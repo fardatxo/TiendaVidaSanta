@@ -450,14 +450,16 @@ export default function Navbar() {
           }
           .acne-logo {
             gap: 0;
-            max-width: calc(100vw - 144px);
-            overflow: visible;
+            max-width: calc(100vw - 120px);
+            overflow: hidden;
           }
           .acne-logo-text {
-            font-size: 32px;
+            font-size: 24px;
             letter-spacing: 0.01em;
             white-space: nowrap;
             line-height: 48px;
+            overflow: hidden;
+            text-overflow: clip;
           }
           .acne-mob-icon {
             width: 28px;

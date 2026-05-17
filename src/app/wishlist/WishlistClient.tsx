@@ -62,7 +62,7 @@ export default function WishlistClient() {
         .wl-wrap {
           max-width: 960px;
           margin: 0 auto;
-          padding: 24px 24px 80px;
+          padding: 106px 24px 80px;
           font-family: 'Creato Display', sans-serif;
           font-size: 11px;
           color: #111;
@@ -195,7 +195,7 @@ export default function WishlistClient() {
         }
 
         @media (max-width: 767px) {
-          .wl-wrap { padding: 16px 16px 100px; }
+          .wl-wrap { padding: 86px 16px 100px; }
           .wl-tabs { gap: 16px; margin-bottom: 24px; }
           .wl-grid { grid-template-columns: repeat(2, 1fr); }
           .wl-remove { opacity: 1; }
