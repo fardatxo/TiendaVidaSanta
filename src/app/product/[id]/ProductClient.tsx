@@ -1268,6 +1268,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           .ss-pdp-layout {
             flex-direction: row;
             min-height: 100vh;
+            background: #EEEDED;
           }
 
           /* Desktop: hide mobile carousel, show stacked images */
