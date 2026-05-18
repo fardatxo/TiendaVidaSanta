@@ -790,7 +790,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         ══════════════════════════════════════ */
 
         html, body {
-          background: #EEEDED !important;
+          background: #ffffff !important;
         }
 
         .ss-pdp-layout {
@@ -1328,7 +1328,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
         /* ── COMPLETE THE OUTFIT ── */
         .outfit-section {
-          background: #EEEDED;
+          background: #ffffff;
         }
         .outfit-label {
           font-size: 16px;
