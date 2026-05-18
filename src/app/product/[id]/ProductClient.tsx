@@ -175,26 +175,36 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   useEffect(() => {
     const el = outfitCarouselRef.current;
     if (!el) return;
+    let snapTimer: ReturnType<typeof setTimeout>;
     const handler = (e: WheelEvent) => {
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
       e.preventDefault();
-      el.scrollLeft += e.deltaY;
+      el.style.scrollSnapType = 'none';
+      const delta = e.deltaMode === 1 ? e.deltaY * 40 : e.deltaMode === 2 ? e.deltaY * 800 : e.deltaY;
+      el.scrollLeft += delta;
+      clearTimeout(snapTimer);
+      snapTimer = setTimeout(() => { el.style.scrollSnapType = ''; }, 120);
     };
     el.addEventListener('wheel', handler, { passive: false });
-    return () => el.removeEventListener('wheel', handler);
+    return () => { el.removeEventListener('wheel', handler); clearTimeout(snapTimer); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [completeOutfit.length]);
 
   useEffect(() => {
     const el = recentCarouselRef.current;
     if (!el) return;
+    let snapTimer: ReturnType<typeof setTimeout>;
     const handler = (e: WheelEvent) => {
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
       e.preventDefault();
-      el.scrollLeft += e.deltaY;
+      el.style.scrollSnapType = 'none';
+      const delta = e.deltaMode === 1 ? e.deltaY * 40 : e.deltaMode === 2 ? e.deltaY * 800 : e.deltaY;
+      el.scrollLeft += delta;
+      clearTimeout(snapTimer);
+      snapTimer = setTimeout(() => { el.style.scrollSnapType = ''; }, 120);
     };
     el.addEventListener('wheel', handler, { passive: false });
-    return () => el.removeEventListener('wheel', handler);
+    return () => { el.removeEventListener('wheel', handler); clearTimeout(snapTimer); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recentlyViewed.length]);
 
