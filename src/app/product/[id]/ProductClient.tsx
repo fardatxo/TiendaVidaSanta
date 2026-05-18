@@ -184,12 +184,16 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
     };
     const handler = (e: WheelEvent) => {
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      const delta = e.deltaMode === 1 ? e.deltaY * 40 : e.deltaMode === 2 ? e.deltaY * 800 : e.deltaY;
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      const atStart = target <= 0 && delta < 0;
+      const atEnd = target >= maxScroll && delta > 0;
+      if (atStart || atEnd) return;
       e.preventDefault();
       el.style.scrollSnapType = 'none';
       clearTimeout(snapTimer);
       cancelAnimationFrame(rafId);
-      const delta = e.deltaMode === 1 ? e.deltaY * 40 : e.deltaMode === 2 ? e.deltaY * 800 : e.deltaY;
-      target = Math.max(0, Math.min(el.scrollWidth - el.clientWidth, target + delta));
+      target = Math.max(0, Math.min(maxScroll, target + delta));
       rafId = requestAnimationFrame(animate);
     };
     el.addEventListener('wheel', handler, { passive: false });
