@@ -201,33 +201,27 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   }, []);
 
   function makeSmoothWheelCarousel(el: HTMLDivElement) {
-    let vel = 0;
+    let target = el.scrollLeft;
     let rafId = 0;
     let snapTimer: ReturnType<typeof setTimeout>;
     const animate = () => {
-      if (Math.abs(vel) < 0.3) {
-        vel = 0;
-        clearTimeout(snapTimer);
-        snapTimer = setTimeout(() => { el.style.scrollSnapType = ''; }, 100);
-        return;
-      }
-      el.scrollLeft += vel;
-      vel *= 0.88;
+      const diff = target - el.scrollLeft;
+      if (Math.abs(diff) < 0.5) { el.scrollLeft = target; clearTimeout(snapTimer); snapTimer = setTimeout(() => { el.style.scrollSnapType = ''; }, 250); return; }
+      el.scrollLeft += diff * 0.065;
       rafId = requestAnimationFrame(animate);
     };
     const handler = (e: WheelEvent) => {
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-      const rawDelta = e.deltaMode === 1 ? e.deltaY * 40 : e.deltaMode === 2 ? e.deltaY * 800 : e.deltaY;
+      const delta = e.deltaMode === 1 ? e.deltaY * 40 : e.deltaMode === 2 ? e.deltaY * 800 : e.deltaY;
       const maxScroll = el.scrollWidth - el.clientWidth;
-      const atStart = el.scrollLeft <= 0 && rawDelta < 0;
-      const atEnd = el.scrollLeft >= maxScroll - 1 && rawDelta > 0;
-      if (atStart || atEnd) { vel = 0; return; }
+      const atStart = target <= 0 && delta < 0;
+      const atEnd = target >= maxScroll && delta > 0;
+      if (atStart || atEnd) return;
       e.preventDefault();
       el.style.scrollSnapType = 'none';
       clearTimeout(snapTimer);
       cancelAnimationFrame(rafId);
-      vel += rawDelta * 0.3;
-      vel = Math.max(-40, Math.min(40, vel));
+      target = Math.max(0, Math.min(maxScroll, target + delta));
       rafId = requestAnimationFrame(animate);
     };
     el.addEventListener('wheel', handler, { passive: false });
