@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { Menu, User, ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
+import { Menu, ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUI } from "@/context/UIContext";
@@ -133,7 +133,10 @@ export default function Navbar() {
           {/* RIGHT: Account, Wishlist, Cart */}
           <div className="acne-nav-right">
             <Link href={accountHref} className="acne-right-icon" aria-label="Account">
-              <User size={18} strokeWidth={1} fill="none" />
+              <svg width="18" height="18" viewBox="0 0 16 16" fill="none" style={{stroke:'none'}}>
+                <path d="M8 7C9.65685 7 11 5.65685 11 4C11 2.34315 9.65685 1 8 1C6.34315 1 5 2.34315 5 4C5 5.65685 6.34315 7 8 7Z" fill="currentColor"/>
+                <path d="M14 12C14 10.3431 12.6569 9 11 9H5C3.34315 9 2 10.3431 2 12V15H14V12Z" fill="currentColor"/>
+              </svg>
             </Link>
 
             <Link href="/wishlist" className="acne-right-icon" aria-label="Wishlist">
