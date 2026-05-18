@@ -696,6 +696,10 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
            SUITSUPPLY-STYLE PRODUCT PAGE
         ══════════════════════════════════════ */
 
+        html, body {
+          background: #EEEDED !important;
+        }
+
         .ss-pdp-layout {
           display: flex;
           flex-direction: column;
