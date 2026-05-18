@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { Bookmark, ChevronLeft, ChevronRight, Check, X, Plus, Minus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, X, Plus, Minus } from 'lucide-react';
 import { useUI } from '@/context/UIContext';
 import { useCart } from '@/context/CartContext';
 import { useTranslation } from '@/lib/i18n';
@@ -506,7 +506,15 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
               aria-label="Add to wishlist"
               onClick={() => toggle(wishlistItem)}
             >
-              <Bookmark size={14} strokeWidth={1.4} fill={inWishlist ? '#111' : 'none'} color="#111" />
+              <svg width="14" height="14" viewBox="0 0 12 12" fill="none">
+                <polygon
+                  fill={inWishlist ? 'currentColor' : 'none'}
+                  stroke="currentColor"
+                  strokeWidth="0.8"
+                  strokeLinejoin="round"
+                  points="1.5,0 1.5,12 6,9.8181763 10.5,12 10.5,0"
+                />
+              </svg>
               <span className="ss-bookmark-label">{inWishlist ? 'SAVED' : 'ADD TO FAVORITES'}</span>
             </button>
           </div>
