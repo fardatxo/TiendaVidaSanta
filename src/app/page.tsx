@@ -26,9 +26,6 @@ export default async function Home() {
               href={`/product/${product.handle}`}
               className="shop-col shop-col-link"
             >
-              <div className="shop-col-label">
-                {product.title}<span className="shop-now-suffix"> › SHOP NOW</span>
-              </div>
               {product.imageUrl && (
                 <div className="shop-product shop-product--collection">
                   <div className="shop-product-img">
@@ -36,6 +33,9 @@ export default async function Home() {
                   </div>
                 </div>
               )}
+              <div className="shop-col-label">
+                {product.title}<span className="shop-now-suffix"> › SHOP NOW</span>
+              </div>
             </Link>
           ))}
         </div>
