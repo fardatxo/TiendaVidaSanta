@@ -398,6 +398,29 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
     }
   }
 
+  function colorNameToCSS(name: string): string {
+    const n = name.toLowerCase().trim();
+    const map: Record<string, string> = {
+      black: '#111111', white: '#ffffff', grey: '#888888', gray: '#888888',
+      'light gray': '#c8c8c8', 'dark gray': '#444444', 'dark grey': '#444444',
+      navy: '#1a2744', blue: '#2a5caa', 'light blue': '#7ab3e0', 'sky blue': '#87ceeb',
+      red: '#cc2222', burgundy: '#6e1520', wine: '#722f37', maroon: '#7b0020',
+      green: '#2d6a2d', 'olive green': '#6b7c3b', olive: '#6b7c3b', khaki: '#c3b091',
+      brown: '#6b3a2a', camel: '#c19a6b', tan: '#d2b48c', beige: '#f5f0e8',
+      yellow: '#e8c832', gold: '#cfaa3c', orange: '#e07020', pink: '#e87090',
+      purple: '#6a3090', lavender: '#b090d0', cream: '#fffdd0', ivory: '#fffff0',
+      sand: '#c2b280', stone: '#928e85', ecru: '#c2b280', off_white: '#f5f0e8',
+      'off white': '#f5f0e8', charcoal: '#3c3c3c', slate: '#708090',
+      mint: '#98d8c8', teal: '#2a9090', cobalt: '#0047ab',
+      'dark brown': '#3b1a0a', 'light brown': '#a0704a',
+    };
+    if (map[n]) return map[n];
+    for (const key of Object.keys(map)) {
+      if (n.includes(key) || key.includes(n)) return map[key];
+    }
+    return '#888888';
+  }
+
   function findVariant(color: string, size: string): ShopifyVariant | undefined {
     return product.variants.find(v => {
       const c = colorOptionName ? v.selectedOptions.find(o => o.name === colorOptionName)?.value : undefined;
@@ -528,7 +551,20 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           <div className="ss-price-row">
             <span className="ss-price">{priceFormatted}</span>
             {(selectedColor || descriptionFirstLine) && (
-              <span className="ss-subtitle">{selectedColor || descriptionFirstLine}</span>
+              <span className="ss-subtitle" style={{display:'inline-flex', alignItems:'center', gap: 6}}>
+                {selectedColor && (
+                  <span style={{
+                    display: 'inline-block',
+                    width: 11,
+                    height: 11,
+                    borderRadius: 2,
+                    background: colorNameToCSS(selectedColor),
+                    border: '1px solid rgba(0,0,0,0.15)',
+                    flexShrink: 0,
+                  }} />
+                )}
+                {selectedColor || descriptionFirstLine}
+              </span>
             )}
           </div>
 
