@@ -1039,7 +1039,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           transition: background 0.15s;
           font-family: inherit;
           font-size: 10px;
-          font-weight: 700;
+          font-weight: 400;
           text-transform: uppercase;
           letter-spacing: 0.10em;
           color: #111;
