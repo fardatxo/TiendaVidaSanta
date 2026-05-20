@@ -911,16 +911,13 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
 
         .ss-title {
-          font-size: 24px;
+          font-size: 18px;
           font-weight: 400;
-          line-height: 1.15;
-          margin: 0 0 10px 0;
+          line-height: 1.2;
+          margin: 0 0 8px 0;
           letter-spacing: 0.04em;
           text-transform: uppercase;
           text-align: center;
-        }
-        @media (min-width: 768px) {
-          .ss-title { font-size: 22px; }
         }
         .ss-price-row {
           display: flex;
