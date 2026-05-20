@@ -1363,6 +1363,11 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
 
 
+        /* ── CAROUSEL IMAGE BLOCKS ── */
+        .rec-img-wrap {
+          background: #EEEDED;
+        }
+
         /* ── COMPLETE THE OUTFIT ── */
         .outfit-section {
           background: #ffffff;
