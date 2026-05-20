@@ -912,7 +912,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
         .ss-title {
           font-size: 24px;
-          font-weight: 700;
+          font-weight: 400;
           line-height: 1.15;
           margin: 0 0 10px 0;
           letter-spacing: 0.04em;
@@ -931,7 +931,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
         .ss-price {
           font-size: 16px;
-          font-weight: 500;
+          font-weight: 400;
+          color: #555;
           white-space: nowrap;
           letter-spacing: 0;
         }
