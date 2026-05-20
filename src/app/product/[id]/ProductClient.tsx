@@ -1454,7 +1454,6 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           .ss-info,
           .outfit-section,
           .rec-section,
-          .rec-img-wrap,
           .ss-mobile-img-cell { background: #ffffff !important; }
           .rec-section { padding: 40px 0 60px; }
           .rec-label { font-size: 14px; }
