@@ -123,7 +123,7 @@
 
   /* ── Typography system ─────────────────────────────────── */
   --font-brand: 'Twilight New Moon', serif;
-  --font-primary: var(--font-josefin), 'Josefin Sans', -apple-system, Helvetica, Arial, sans-serif;
+  --font-primary: var(--font-outfit), 'Outfit', -apple-system, Helvetica, Arial, sans-serif;
 
   /* Scale */
   --t-hero:  60px;  /* hero display */

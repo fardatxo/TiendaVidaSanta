@@ -29,7 +29,7 @@ export default function OrdersClient() {
           max-width: 960px;
           margin: 0 auto;
           padding: 24px 24px 80px;
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Outfit', sans-serif;
           color: #111;
         }
         .ord-tabs {

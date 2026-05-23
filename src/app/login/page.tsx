@@ -194,7 +194,7 @@ export default function LoginPage() {
           padding: 80px 20px 60px;
           background: #fff;
           color: #111;
-          font-family: 'Josefin Sans', Arial, sans-serif;
+          font-family: 'Outfit', Arial, sans-serif;
         }
 
         .ss-login-container {
