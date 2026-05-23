@@ -832,7 +832,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .ss-pdp-layout {
           display: flex;
           flex-direction: column;
-          font-family: 'Outfit', sans-serif;
+          font-family: 'JUST Sans', sans-serif;
           color: #111;
           background: #ffffff;
         }
@@ -1059,7 +1059,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           flex-direction: column;
           transform: translateX(100%);
           transition: transform 0.72s cubic-bezier(0.16, 1, 0.3, 1);
-          font-family: var(--font-primary, 'Outfit', sans-serif);
+          font-family: var(--font-primary, 'JUST Sans', sans-serif);
         }
         .ss-size-drawer.open { transform: translateX(0); }
 
@@ -1382,7 +1382,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         /* ── RECOMMENDED ── */
         .rec-section {
           padding: 60px 0 80px;
-          font-family: 'Outfit', sans-serif;
+          font-family: 'JUST Sans', sans-serif;
           overflow: hidden;
         }
         .rec-label {

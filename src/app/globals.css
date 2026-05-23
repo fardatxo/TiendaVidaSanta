@@ -1,4 +1,21 @@
 @font-face {
+  font-family: 'JUST Sans';
+  src: url('/fonts/JustSans-Regular.woff2') format('woff2'),
+       url('/fonts/JustSans-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'JUST Sans';
+  src: url('/fonts/JustSans-ExBold.woff2') format('woff2'),
+       url('/fonts/JustSans-ExBold.woff') format('woff');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: 'Twilight New Moon';
   src: url('/fonts/TwilightNewMoon.ttf') format('truetype');
   font-weight: normal;
@@ -123,7 +140,7 @@
 
   /* ── Typography system ─────────────────────────────────── */
   --font-brand: 'Twilight New Moon', serif;
-  --font-primary: var(--font-outfit), 'Outfit', -apple-system, Helvetica, Arial, sans-serif;
+  --font-primary: 'JUST Sans', -apple-system, Helvetica, Arial, sans-serif;
 
   /* Scale */
   --t-hero:  60px;  /* hero display */

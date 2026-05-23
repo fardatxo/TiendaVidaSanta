@@ -126,7 +126,7 @@ export default function LocaleSelectorModal() {
           display: flex;
           flex-direction: column;
           gap: 0;
-          font-family: 'Outfit', sans-serif;
+          font-family: 'JUST Sans', sans-serif;
           box-shadow: 0 8px 40px rgba(0,0,0,0.18);
         }
         .ls-logo {
