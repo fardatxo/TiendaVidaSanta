@@ -67,7 +67,7 @@ export default function WishlistClient() {
           max-width: 960px;
           margin: 0 auto;
           padding: 106px 24px 80px;
-          font-family: 'Coolvetica', sans-serif;
+          font-family: 'Josefin Sans', sans-serif;
           font-size: 11px;
           color: #111;
         }

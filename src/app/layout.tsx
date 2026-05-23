@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Analytics } from '@vercel/analytics/next';
-import { Inter } from "next/font/google";
+import { Josefin_Sans } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -13,7 +13,11 @@ import { AuthProvider } from "@/context/AuthContext";
 import CartDrawer from "@/components/CartDrawer";
 import MenuDrawer from "@/components/MenuDrawer";
 
-const inter = Inter({ subsets: ["latin"] });
+const josefinSans = Josefin_Sans({
+  subsets: ["latin"],
+  weight: ["100", "300", "400", "600", "700"],
+  variable: "--font-josefin",
+});
 
 export const metadata: Metadata = {
   title: "TONET",
@@ -29,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.className} suppressHydrationWarning>
+    <html lang="en" className={josefinSans.variable} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <LocaleProvider>
           <UIProvider>
