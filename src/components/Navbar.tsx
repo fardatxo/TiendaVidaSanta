@@ -295,18 +295,15 @@ export default function Navbar() {
         .acne-header-inner {
           display: flex;
           align-items: stretch;
-          justify-content: space-between;
+          justify-content: flex-start;
           height: 60px;
           padding: 0 20px;
           position: relative;
         }
 
         .acne-logo {
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          transform: translate(-50%, -50%);
-          z-index: 1;
+          position: static;
+          transform: none;
           text-decoration: none;
           display: flex;
           align-items: baseline;
@@ -314,6 +311,7 @@ export default function Navbar() {
           color: #000;
           white-space: nowrap;
           line-height: 1;
+          order: 0;
         }
         .acne-logo-star {
           font-size: 34px;
@@ -334,7 +332,7 @@ export default function Navbar() {
           letter-spacing: 0.04em;
         }
 
-        .acne-nav-left { display: flex; align-items: center; flex: 1; justify-content: flex-end; }
+        .acne-nav-left { display: flex; align-items: center; flex: 0 0 auto; justify-content: flex-start; order: -1; }
         .acne-nav-links { display: flex; align-items: center; gap: 28px; }
         .acne-nav-links a {
           font-size: 12px;
@@ -355,25 +353,25 @@ export default function Navbar() {
           .acne-mobile-only { display: none !important; }
           .acne-desktop-only { display: flex !important; }
           .acne-logo {
-            position: static;
-            transform: none;
             order: -1;
             margin-right: 24px;
           }
           .acne-nav-left {
             flex: 0 0 auto;
             justify-content: flex-start;
+            order: 0;
           }
           .acne-nav-right {
             flex: 1;
             justify-content: flex-start;
+            margin-left: 0;
           }
           .acne-nav-right > .acne-nav-links {
             margin-left: 28px;
           }
         }
 
-        .acne-nav-right { flex: 1; display: flex; align-items: center; justify-content: flex-start; gap: 6px; }
+        .acne-nav-right { flex: 0 0 auto; display: flex; align-items: center; justify-content: flex-start; gap: 6px; margin-left: auto; }
         .acne-nav-right .acne-right-icons { display: flex; align-items: center; gap: 6px; margin-left: auto; }
         .acne-right-icon {
           display: flex; align-items: center; justify-content: center;
