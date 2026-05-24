@@ -629,6 +629,10 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             </button>
           </div>
 
+          {/* Description — uppercase below actions */}
+          {product.description && (
+            <p className="ss-desc-plain">{product.description.toUpperCase()}</p>
+          )}
 
           {/* Delivery info */}
           {/* <div className="ss-delivery">
@@ -999,6 +1003,17 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .ss-thumbs-arrow-left { left: -14px; }
         .ss-thumbs-arrow-right { right: -14px; }
         .ss-thumbs-arrow:hover { background: #f5f5f5; }
+
+        /* Description plain */
+        .ss-desc-plain {
+          font-size: 11px;
+          font-family: var(--font-primary);
+          font-weight: 400;
+          color: #111;
+          line-height: 1.7;
+          margin: 20px 0 0;
+          letter-spacing: 0.03em;
+        }
 
         /* Action row */
         .ss-actions {
