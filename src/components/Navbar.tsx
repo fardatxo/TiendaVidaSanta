@@ -133,11 +133,6 @@ export default function Navbar() {
 
           {/* RIGHT: Nav links (desktop) + Search (desktop) + Account, Wishlist, Cart */}
           <div className="acne-nav-right">
-            <nav className="acne-nav-links acne-desktop-only">
-              <Link href="/collection/pantalones" onClick={closeMenu}>pantalones</Link>
-              <Link href="/collection/camisetas" onClick={closeMenu}>camisetas</Link>
-              <Link href="/collection/all" onClick={closeMenu}>todo</Link>
-            </nav>
             <div className="acne-right-icons">
               <button className="acne-right-icon" aria-label="Search" onClick={openMenuWithSearch}>
                 <svg width="18" height="18" viewBox="-1 -1 19 19" fill="none" stroke="currentColor" strokeWidth="0.7">
