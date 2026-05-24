@@ -686,6 +686,15 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             </div>
           </div>
 
+          {/* Estimated delivery */}
+          <p className="ss-delivery-estimate">
+            {(() => {
+              const d = new Date();
+              d.setDate(d.getDate() + 25);
+              return `Estimated delivery: ${d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+            })()}
+          </p>
+
         </div>
 
         {/* ── MOBILE IMAGE GRID ── */}
@@ -1003,6 +1012,16 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .ss-thumbs-arrow-left { left: -14px; }
         .ss-thumbs-arrow-right { right: -14px; }
         .ss-thumbs-arrow:hover { background: #f5f5f5; }
+
+        /* Estimated delivery */
+        .ss-delivery-estimate {
+          font-size: 11px;
+          font-family: var(--font-primary);
+          font-weight: 400;
+          color: #888;
+          margin: 20px 0 0;
+          letter-spacing: 0.03em;
+        }
 
         /* Description plain */
         .ss-desc-plain {
