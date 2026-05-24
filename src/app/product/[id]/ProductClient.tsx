@@ -689,7 +689,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           <div className="ss-mobile-img-grid">
             {gridImages.map((img, i) => (
               <div key={i} className="ss-mobile-img-cell">
-                <img src={img} alt={`${product.title} – ${i + 1}`} draggable={false} />
+                <img src={img} alt={`${product.title} – ${i + 1}`} draggable={false} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}} />
               </div>
             ))}
           </div>
