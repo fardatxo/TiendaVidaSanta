@@ -919,7 +919,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
         /* ── INFO PANEL ── */
         .ss-info {
-          padding: 24px 20px 28px 20px;
+          padding: 24px 20px 0 20px;
           background: #EEEDED;
         }
 
@@ -1032,7 +1032,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           font-weight: 400;
           color: #111;
           line-height: 1.7;
-          margin: 20px 0 0;
+          margin: 52px 0 0;
           letter-spacing: 0.03em;
           overflow-wrap: anywhere;
           word-break: break-word;
@@ -1386,12 +1386,12 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             top: 60px;
             height: calc(100vh - 60px);
             overflow-y: auto;
-            padding: 60px 70px;
+            padding: 60px 70px 0;
             scrollbar-width: none;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             background: #EEEDED;
           }
           .ss-info::-webkit-scrollbar { display: none; }
@@ -1401,7 +1401,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
         @media (min-width: 1200px) {
           .ss-info {
-            padding: 80px 80px;
+            padding: 80px 80px 0;
           }
         }
 
