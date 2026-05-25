@@ -915,13 +915,13 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
         .ss-title {
           font-size: 18px;
-          font-weight: 400;
+          font-weight: 300;
           line-height: 1.2;
           margin: 0 0 8px 0;
-          letter-spacing: 0.02em;
+          letter-spacing: 0.06em;
           text-transform: none;
           text-align: center;
-          font-family: var(--font-serif);
+          font-family: var(--font-primary);
         }
         .ss-price-row {
           display: flex;
@@ -1020,13 +1020,13 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
         /* Description plain */
         .ss-desc-plain {
-          font-size: 12px;
+          font-size: 11px;
           font-family: var(--font-primary);
-          font-weight: 400;
-          color: #888;
+          font-weight: 300;
+          color: #999;
           line-height: 1.5;
           margin: 16px 0 0;
-          letter-spacing: 0.04em;
+          letter-spacing: 0.05em;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -1270,10 +1270,10 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           padding-bottom: 16px;
         }
         .ss-accordion-text {
-          font-size: 14px;
-          font-family: var(--font-serif);
-          font-weight: 400;
-          line-height: 1.7;
+          font-size: 13px;
+          font-family: var(--font-primary);
+          font-weight: 300;
+          line-height: 1.8;
           color: #555;
           margin: 0;
         }

@@ -118,11 +118,11 @@ export default async function Home() {
           transform: translateY(0);
         }
         .shop-card-name {
-          font-size: 12px;
-          font-family: var(--font-serif);
-          font-weight: 400;
+          font-size: 11px;
+          font-family: var(--font-primary);
+          font-weight: 300;
           text-transform: none;
-          letter-spacing: 0.01em;
+          letter-spacing: 0.04em;
           color: #111;
           white-space: nowrap;
           overflow: hidden;
@@ -160,10 +160,10 @@ export default async function Home() {
           box-sizing: border-box;
         }
         .hero-world-title {
-          font-family: var(--font-serif);
-          font-size: 24px;
+          font-family: var(--font-primary);
+          font-size: 13px;
           font-weight: 400;
-          letter-spacing: 0.04em;
+          letter-spacing: 0.14em;
           margin-bottom: 60px;
           text-align: center;
           color: #000;
@@ -208,9 +208,9 @@ export default async function Home() {
           text-align: center;
         }
         .hero-world-text {
-          font-family: var(--font-serif);
-          font-size: 16px;
-          font-weight: 400;
+          font-family: var(--font-primary);
+          font-size: 12px;
+          font-weight: 300;
           letter-spacing: 0.08em;
         }
         .hero-world-text-group {
@@ -220,10 +220,10 @@ export default async function Home() {
           width: 100%;
         }
         .hero-world-subtext {
-          font-family: var(--font-serif);
-          font-size: 12px;
-          font-weight: 400;
-          letter-spacing: 0.08em;
+          font-family: var(--font-primary);
+          font-size: 11px;
+          font-weight: 300;
+          letter-spacing: 0.06em;
         }
         @media (max-width: 767px) {
           .hero-world-section {

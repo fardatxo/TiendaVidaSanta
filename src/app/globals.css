@@ -1,149 +1,11 @@
 @font-face {
-  font-family: 'JUST Sans';
-  src: url('/fonts/JustSans-Regular.woff2') format('woff2'),
-       url('/fonts/JustSans-Regular.woff') format('woff');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'JUST Sans';
-  src: url('/fonts/JustSans-ExBold.woff2') format('woff2'),
-       url('/fonts/JustSans-ExBold.woff') format('woff');
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
   font-family: 'Saint Carell';
   src: url('/fonts/SaintCarellClean.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
-@font-face {
-  font-family: 'Saint Carell Alt';
-  src: url('/fonts/SaintCarell.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
 
-@font-face {
-  font-family: 'Twilight New Moon';
-  src: url('/fonts/TwilightNewMoon.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Coolvetica';
-  src: url('/fonts/Coolvetica Rg.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Coolvetica';
-  src: url('/fonts/Coolvetica Rg It.otf') format('opentype');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Coolvetica';
-  src: url('/fonts/Coolvetica Hv Comp.otf') format('opentype');
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Creato Display';
-  src: url('/fonts/CreatoDisplay-Thin.otf') format('opentype');
-  font-weight: 100;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Creato Display';
-  src: url('/fonts/CreatoDisplay-ThinItalic.otf') format('opentype');
-  font-weight: 100;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Creato Display';
-  src: url('/fonts/CreatoDisplay-Light.otf') format('opentype');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Creato Display';
-  src: url('/fonts/CreatoDisplay-LightItalic.otf') format('opentype');
-  font-weight: 300;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Creato Display';
-  src: url('/fonts/CreatoDisplay-Regular.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Creato Display';
-  src: url('/fonts/CreatoDisplay-RegularItalic.otf') format('opentype');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Creato Display';
-  src: url('/fonts/CreatoDisplay-Medium.otf') format('opentype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Creato Display';
-  src: url('/fonts/CreatoDisplay-MediumItalic.otf') format('opentype');
-  font-weight: 500;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Creato Display';
-  src: url('/fonts/CreatoDisplay-Bold.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Creato Display';
-  src: url('/fonts/CreatoDisplay-BoldItalic.otf') format('opentype');
-  font-weight: 700;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Creato Display';
-  src: url('/fonts/CreatoDisplay-ExtraBold.otf') format('opentype');
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Creato Display';
-  src: url('/fonts/CreatoDisplay-Black.otf') format('opentype');
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
-}
 
 :root {
   --background-color: #ffffff;
@@ -154,10 +16,9 @@
   --error-color: #d32f2f;
 
   /* ── Typography system ─────────────────────────────────── */
-  --font-brand: 'Saint Carell', 'Twilight New Moon', serif;
+  --font-brand: 'Saint Carell', sans-serif;
   --font-primary: var(--font-jost), 'Jost', system-ui, sans-serif;
-  --font-serif: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
-  --font-display: var(--font-playfair), 'Playfair Display', Georgia, serif;
+  --font-serif: var(--font-jost), 'Jost', system-ui, sans-serif;
   --font-ui: var(--font-jost), 'Jost', system-ui, sans-serif;
 
   /* Scale */
