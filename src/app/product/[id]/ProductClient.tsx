@@ -1034,10 +1034,6 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           line-height: 1.7;
           margin: 20px 0 0;
           letter-spacing: 0.03em;
-          display: -webkit-box;
-          -webkit-line-clamp: 3;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
         }
 
         /* Action row */
