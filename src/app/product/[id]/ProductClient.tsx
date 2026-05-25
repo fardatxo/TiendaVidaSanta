@@ -846,7 +846,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         /* ── GALLERY ── */
         .ss-gallery {
           position: relative;
-          background: #ffffff;
+          background: #EEEDED;
           overflow: hidden;
         }
         /* Mobile: show carousel, hide desktop stack */
@@ -868,7 +868,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           display: flex;
           align-items: center;
           justify-content: center;
-          background: #ffffff;
+          background: #EEEDED;
           overflow: hidden;
         }
         .ss-gallery-img {
@@ -1020,19 +1020,16 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
         /* Description plain */
         .ss-desc-plain {
-          font-size: 14px;
-          font-family: var(--font-serif);
+          font-size: 12px;
+          font-family: var(--font-primary);
           font-weight: 400;
-          color: #111;
-          line-height: 1.6;
-          margin: 20px 0 0;
-          letter-spacing: 0;
-          overflow-wrap: anywhere;
-          word-break: break-word;
-          display: -webkit-box;
-          -webkit-line-clamp: 1;
-          -webkit-box-orient: vertical;
+          color: #888;
+          line-height: 1.5;
+          margin: 16px 0 0;
+          letter-spacing: 0.04em;
+          white-space: nowrap;
           overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         /* Action row */
@@ -1368,7 +1365,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           .ss-desktop-img-block {
             width: 100%;
             aspect-ratio: 3 / 4;
-            background: #ffffff;
+            background: #EEEDED;
             overflow: hidden;
             display: flex;
             align-items: center;
