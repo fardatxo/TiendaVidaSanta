@@ -65,11 +65,6 @@ export default async function Home() {
       </section>
 
       <style>{`
-        /* Scroll-snap at page level for homepage — mandatory snapping */
-        html {
-          scroll-snap-type: y mandatory;
-        }
-
         /* ═══════════════════════════════════════════════════
            PRODUCT SECTION — 4 columns, Tonet Paris style
         ═══════════════════════════════════════════════════ */
@@ -78,13 +73,10 @@ export default async function Home() {
           background: #ffffff;
           position: relative;
           z-index: 10;
-          scroll-snap-align: start;
-          scroll-snap-stop: always;
-          height: 100vh;
-          height: 100dvh;
           display: flex;
           align-items: center;
           overflow: hidden;
+          padding: 60px 0;
         }
 
         .shop-grid {
@@ -98,7 +90,6 @@ export default async function Home() {
         .shop-col {
           flex: 0 0 25vw;
           width: 25vw;
-          scroll-snap-align: start;
           min-width: 0;
         }
         .shop-col-link {
@@ -202,15 +193,11 @@ export default async function Home() {
         /* ═══ WORLD OF TONET ═══ */
         .hero-world-section {
           background: #fff;
-          height: 100vh;
-          height: 100dvh;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          scroll-snap-align: start;
-          scroll-snap-stop: always;
-          padding: 0 40px;
+          padding: 80px 40px;
           box-sizing: border-box;
         }
         .hero-world-title {
@@ -281,10 +268,7 @@ export default async function Home() {
         }
         @media (max-width: 767px) {
           .hero-world-section {
-            height: 100vh;
-            height: 100dvh;
-            padding: 100px 20px 20px;
-            scroll-snap-align: start;
+            padding: 60px 20px 40px;
           }
           .hero-world-title { margin-bottom: 24px; font-size: 18px; flex: none; }
           .hero-world-grid { flex-direction: column; gap: 12px; flex: 1; height: 0; }

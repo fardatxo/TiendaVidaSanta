@@ -91,8 +91,6 @@ export default function HeroSection() {
 
 
       <style>{`
-        /* Scroll snap — applied at page level via hero-wrapper parent */
-
         /* ═══ VIEWPORT 1: Video Hero ═══ */
         .hero-video-section {
           position: relative;
@@ -101,8 +99,6 @@ export default function HeroSection() {
           height: calc(100dvh + 48px);
           overflow: hidden;
           margin-top: -48px;
-          scroll-snap-align: start;
-          scroll-snap-stop: always;
         }
 
         .hero-video {
@@ -168,8 +164,6 @@ export default function HeroSection() {
           box-sizing: border-box;
           align-items: center;
           justify-content: center;
-          scroll-snap-align: start;
-          scroll-snap-stop: always;
         }
 
         .hero-dual-panel {
@@ -223,8 +217,6 @@ export default function HeroSection() {
           height: 100vh;
           height: 100dvh;
           overflow: hidden;
-          scroll-snap-align: start;
-          scroll-snap-stop: always;
         }
         .hero-single-panel {
           display: block;
@@ -277,8 +269,6 @@ export default function HeroSection() {
           box-sizing: border-box;
           align-items: center;
           justify-content: center;
-          scroll-snap-align: start;
-          scroll-snap-stop: always;
         }
 
         .hero-triple-panel {
@@ -332,7 +322,6 @@ export default function HeroSection() {
             padding: 0;
             height: calc(2 * 100dvh);
             align-items: stretch;
-            scroll-snap-align: none;
           }
           .hero-triple-section {
             flex-direction: column;
@@ -340,7 +329,6 @@ export default function HeroSection() {
             padding: 0;
             height: calc(3 * 100dvh);
             align-items: stretch;
-            scroll-snap-align: none;
           }
           .hero-triple-panel, .hero-dual-panel {
             aspect-ratio: unset;
@@ -352,8 +340,6 @@ export default function HeroSection() {
             padding-left: 8vw;
             padding-right: 8vw;
             box-sizing: border-box;
-            scroll-snap-align: start;
-            scroll-snap-stop: always;
             background: #fff;
           }
           .hero-triple-cta, .hero-dual-cta {
