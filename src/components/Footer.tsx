@@ -5,6 +5,14 @@ import { useState } from "react";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
+  const [openSections, setOpenSections] = useState<Set<number>>(new Set());
+  const toggleSection = (idx: number) => {
+    setOpenSections(prev => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx); else next.add(idx);
+      return next;
+    });
+  };
 
   return (
     <footer className="ft">
@@ -61,8 +69,8 @@ export default function Footer() {
         </div>
 
         {/* Col 2: Contact */}
-        <div className="ft-col">
-          <p className="ft-heading">CONTÃCTENOS</p>
+        <div className={`ft-col${openSections.has(0) ? ' ft-col--open' : ''}`}>
+          <p className="ft-heading" onClick={() => toggleSection(0)}>CONTÁCTENOS <span className="ft-chevron" /></p>
           <ul className="ft-links">
             <li><Link href="mailto:info@tonetparis.com">EscrÃ­benos por Email</Link></li>
             <li><Link href="#">EscrÃ­benos por WhatsApp</Link></li>
@@ -72,8 +80,8 @@ export default function Footer() {
         </div>
 
         {/* Col 3: Services */}
-        <div className="ft-col">
-          <p className="ft-heading">SERVICIOS</p>
+        <div className={`ft-col${openSections.has(1) ? ' ft-col--open' : ''}`}>
+          <p className="ft-heading" onClick={() => toggleSection(1)}>SERVICIOS <span className="ft-chevron" /></p>
           <ul className="ft-links">
             <li><Link href="#">Seguimiento del pedido</Link></li>
             <li><Link href="#">Devoluciones</Link></li>
@@ -83,8 +91,8 @@ export default function Footer() {
         </div>
 
         {/* Col 4: Company */}
-        <div className="ft-col">
-          <p className="ft-heading">EMPRESA</p>
+        <div className={`ft-col${openSections.has(2) ? ' ft-col--open' : ''}`}>
+          <p className="ft-heading" onClick={() => toggleSection(2)}>EMPRESA <span className="ft-chevron" /></p>
           <ul className="ft-links">
             <li><Link href="#">Sobre Tonet</Link></li>
             <li><Link href="#">Press</Link></li>
@@ -94,8 +102,8 @@ export default function Footer() {
         </div>
 
         {/* Col 5: Legal */}
-        <div className="ft-col">
-          <p className="ft-heading">TÃ‰RMINOS Y CONDICIONES LEGALES</p>
+        <div className={`ft-col${openSections.has(3) ? ' ft-col--open' : ''}`}>
+          <p className="ft-heading" onClick={() => toggleSection(3)}>TÉRMINOS Y CONDICIONES LEGALES <span className="ft-chevron" /></p>
           <ul className="ft-links">
             <li><Link href="#">Aviso legal</Link></li>
             <li><Link href="#">PolÃ­tica de Privacidad</Link></li>
@@ -273,9 +281,33 @@ export default function Footer() {
             padding: 28px 20px 24px;
           }
           .ft-col:not(.ft-col--wide) .ft-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 18px 20px;
             margin: 0;
             cursor: pointer;
+            user-select: none;
+          }
+          .ft-chevron {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-right: 1px solid rgba(255,255,255,0.5);
+            border-bottom: 1px solid rgba(255,255,255,0.5);
+            transform: rotate(45deg);
+            transition: transform 0.25s;
+            flex-shrink: 0;
+            margin-left: 8px;
+          }
+          .ft-col--open .ft-chevron {
+            transform: rotate(-135deg);
+          }
+          .ft-col:not(.ft-col--wide) .ft-links {
+            display: none;
+          }
+          .ft-col--open .ft-links {
+            display: flex;
           }
           .ft-links {
             padding: 0 20px 16px;
