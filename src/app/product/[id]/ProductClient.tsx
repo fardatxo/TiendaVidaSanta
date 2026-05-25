@@ -914,13 +914,14 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
 
         .ss-title {
-          font-size: 18px;
+          font-size: 22px;
           font-weight: 400;
-          line-height: 1.2;
+          line-height: 1.15;
           margin: 0 0 8px 0;
-          letter-spacing: 0.04em;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
           text-align: center;
+          font-family: var(--font-serif);
         }
         .ss-price-row {
           display: flex;
