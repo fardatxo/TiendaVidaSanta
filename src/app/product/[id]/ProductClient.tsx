@@ -75,6 +75,12 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   const [adding, setAdding] = useState(false);
   const [sizeOpen, setSizeOpen] = useState(false);
   const [expandedAccordion, setExpandedAccordion] = useState<string | null>(null);
+  const [titleStyle, setTitleStyle] = useState<'upper' | 'lower' | 'bold'>('upper');
+  const titleStyleMap = {
+    upper: { textTransform: 'uppercase' as const, fontWeight: 400 },
+    lower: { textTransform: 'lowercase' as const, fontWeight: 400 },
+    bold:  { textTransform: 'uppercase' as const, fontWeight: 700 },
+  };
   const { t } = useTranslation();
   useLocale();
   const { toggle, has } = useWishlist();
@@ -545,7 +551,12 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         {/* ── INFO PANEL ── */}
         <div className="ss-info" ref={infoRef}>
           {/* Title */}
-          <h1 className="ss-title">{product.title}</h1>
+          <h1 className="ss-title" style={titleStyleMap[titleStyle]}>{product.title}</h1>
+          <div className="ss-title-style">
+            <button className={`ss-ts-btn${titleStyle === 'upper' ? ' active' : ''}`} onClick={() => setTitleStyle('upper')}>AA</button>
+            <button className={`ss-ts-btn${titleStyle === 'lower' ? ' active' : ''}`} onClick={() => setTitleStyle('lower')}>aa</button>
+            <button className={`ss-ts-btn ss-ts-bold${titleStyle === 'bold'  ? ' active' : ''}`} onClick={() => setTitleStyle('bold')}>AB</button>
+          </div>
 
           {/* Price + variant name on second line */}
           <div className="ss-price-row">
@@ -914,15 +925,37 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
 
         .ss-title {
-          font-size: 24px;
+          font-size: 18px;
           font-weight: 400;
-          line-height: 1.15;
-          margin: 0 0 8px 0;
+          line-height: 1.2;
+          margin: 0 0 4px 0;
           letter-spacing: 0.04em;
           text-transform: uppercase;
           text-align: center;
           font-family: var(--font-serif);
         }
+        .ss-title-style {
+          display: flex;
+          gap: 2px;
+          justify-content: center;
+          margin: 0 0 10px 0;
+        }
+        .ss-ts-btn {
+          background: none;
+          border: 1px solid transparent;
+          padding: 1px 5px;
+          font-size: 9px;
+          font-family: var(--font-primary);
+          font-weight: 400;
+          cursor: pointer;
+          color: #aaa;
+          letter-spacing: 0.04em;
+          transition: all 0.15s;
+          outline: none;
+        }
+        .ss-ts-btn.active { border-color: #111; color: #111; }
+        .ss-ts-btn:hover:not(.active) { color: #555; }
+        .ss-ts-bold { font-weight: 700; }
         .ss-price-row {
           display: flex;
           align-items: baseline;
