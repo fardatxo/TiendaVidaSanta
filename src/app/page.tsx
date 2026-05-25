@@ -21,21 +21,18 @@ export default async function Home() {
       <section className="shop-section" id="gallery">
         <div className="shop-grid">
           {shuffled.slice(0, 4).map((product) => (
-            <Link
-              key={product.handle}
-              href={`/product/${product.handle}`}
-              className="shop-col shop-col-link"
-            >
-              <div className="shop-col-label">
-                {product.title}<span className="shop-now-suffix"> › SHOP NOW</span>
+            <Link key={product.handle} href={`/product/${product.handle}`} className="shop-card">
+              <div className="shop-card-img-wrap">
+                {product.imageUrl && (
+                  <img src={product.imageUrl} alt={product.title} className="shop-card-img" loading="lazy" decoding="async" />
+                )}
               </div>
-              {product.imageUrl && (
-                <div className="shop-product shop-product--collection">
-                  <div className="shop-product-img">
-                    <img src={product.imageUrl} alt={product.title} loading="lazy" decoding="async" />
-                  </div>
-                </div>
-              )}
+              <div className="shop-card-info">
+                <span className="shop-card-name">{product.title}</span>
+                <span className="shop-card-price">
+                  {(() => { const sym = product.currencyCode === 'USD' ? '$' : '€'; const n = Number(product.price); return `${sym}${Number.isInteger(n) ? n : n.toFixed(2)} ${product.currencyCode}`; })()}
+                </span>
+              </div>
             </Link>
           ))}
         </div>
@@ -65,76 +62,27 @@ export default async function Home() {
       </section>
 
       <style>{`
-        /* ═══════════════════════════════════════════════════
-           PRODUCT SECTION — 4 columns, Tonet Paris style
-        ═══════════════════════════════════════════════════ */
-
+        /* ═══ PRODUCT GRID ═══ */
         .shop-section {
-          background: #ffffff;
-          position: relative;
-          z-index: 10;
-          display: flex;
-          align-items: center;
-          overflow: hidden;
-          padding: 60px 0;
+          background: #fff;
+          width: 100%;
         }
-
         .shop-grid {
           display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
+          grid-template-columns: repeat(4, 1fr);
+          width: 100%;
         }
-        .shop-grid::-webkit-scrollbar {
-          display: none;
-        }
-
-        .shop-col {
-          flex: 0 0 25vw;
-          width: 25vw;
-          min-width: 0;
-        }
-        .shop-col-link {
+        .shop-card {
           display: block;
           text-decoration: none;
           color: inherit;
-        }
-        .shop-col-link:hover { opacity: 1; }
-        .shop-product--collection { cursor: pointer; }
-
-        .shop-col-label {
           position: relative;
-          padding: 12px 16px;
-          font-size: 0.82rem;
-          font-weight: 500;
-          text-transform: uppercase;
-          letter-spacing: 0.04em;
-          color: #000;
-          text-align: left;
-          white-space: nowrap;
+          background: #f5f4f0;
           overflow: hidden;
-          text-overflow: ellipsis;
+          cursor: pointer;
         }
-
-        .shop-now-suffix {
-          display: none;
-        }
-
-        .shop-col:hover .shop-now-suffix {
-          display: inline;
-        }
-
-        .shop-product {
-          display: block;
-          padding: 48px 15% 32px;
-          text-decoration: none;
-          transition: background 0.2s ease;
-        }
-
-        .shop-product:hover {
-          background: #e8e8e8;
-        }
-
-        /* Image wrapper: portrait 3:4 ratio, float-like appearance */
-        .shop-product-img {
+        .shop-card:hover { opacity: 1; }
+        .shop-card-img-wrap {
           width: 100%;
           aspect-ratio: 3 / 4;
           display: flex;
@@ -142,51 +90,62 @@ export default async function Home() {
           justify-content: center;
           overflow: hidden;
         }
-
-        .shop-product-img img {
+        .shop-card-img {
           width: 100%;
           height: 100%;
-          object-fit: contain;   /* show full product, floating look */
-          transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+          object-fit: contain;
+          display: block;
+          transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .shop-product:hover .shop-product-img img {
-          transform: scale(1.04);
+        .shop-card:hover .shop-card-img { transform: scale(1.03); }
+        .shop-card-info {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          padding: 12px 14px 14px;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          gap: 8px;
+          background: linear-gradient(to top, rgba(245,244,240,0.95) 60%, transparent 100%);
+          opacity: 0;
+          transform: translateY(6px);
+          transition: opacity 0.25s ease, transform 0.25s ease;
         }
-
-
-
-        .shop-col-empty {
-          height: 400px;
+        .shop-card:hover .shop-card-info {
+          opacity: 1;
+          transform: translateY(0);
         }
-
-        /* ═══════════════════════════════════════════════════
-           MOBILE — 2 columns, labels not sticky
-        ═══════════════════════════════════════════════════ */
+        .shop-card-name {
+          font-size: 11px;
+          font-family: var(--font-primary);
+          font-weight: 400;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: #111;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .shop-card-price {
+          font-size: 11px;
+          font-family: var(--font-primary);
+          font-weight: 400;
+          color: #111;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+        @media (max-width: 1024px) {
+          .shop-grid { grid-template-columns: repeat(2, 1fr); }
+        }
         @media (max-width: 767px) {
-          .shop-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-          .shop-col {
-            width: 100%;
-          }
-
-          .shop-col-label {
-            font-size: 0.6875rem;
-            padding: 10px 12px;
-          }
-
-          .shop-product {
-            padding: 24px 10% 20px;
-          }
-        }
-
-        @media (min-width: 768px) and (max-width: 1024px) {
-          .shop-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-          .shop-col {
-            width: 100%;
+          .shop-card-info {
+            position: static;
+            opacity: 1;
+            transform: none;
+            background: none;
+            padding: 8px 10px 12px;
           }
         }
 
