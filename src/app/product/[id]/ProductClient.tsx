@@ -684,6 +684,20 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                 </div>
               )}
             </div>
+
+            <div className="ss-accordion-item">
+              <button className="ss-accordion-header" onClick={() => toggleAccordion('needtoknow')}>
+                <span>You Need to Know</span>
+                <span className={`ss-accordion-icon${expandedAccordion === 'needtoknow' ? ' open' : ''}`}><Plus size={12} strokeWidth={1.4} /></span>
+              </button>
+              {expandedAccordion === 'needtoknow' && (
+                <div className="ss-accordion-body">
+                  <p className="ss-accordion-text">
+                    This piece is crafted with premium materials and designed for longevity. Handle with care and refer to the care label for specific instructions. Each item is quality-checked before dispatch.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Estimated delivery */}
@@ -919,7 +933,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
         /* ── INFO PANEL ── */
         .ss-info {
-          padding: 24px 20px 0 20px;
+          padding: 24px 20px 28px 20px;
           background: #EEEDED;
         }
 
@@ -1032,7 +1046,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           font-weight: 400;
           color: #111;
           line-height: 1.7;
-          margin: 104px 0 0;
+          margin: 20px 0 0;
           letter-spacing: 0.03em;
           overflow-wrap: anywhere;
           word-break: break-word;
@@ -1386,12 +1400,12 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             top: 60px;
             height: calc(100vh - 60px);
             overflow-y: auto;
-            padding: 60px 70px 0;
+            padding: 60px 70px;
             scrollbar-width: none;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: center;
             background: #EEEDED;
           }
           .ss-info::-webkit-scrollbar { display: none; }
@@ -1401,7 +1415,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
         @media (min-width: 1200px) {
           .ss-info {
-            padding: 80px 80px 0;
+            padding: 80px 80px;
           }
         }
 
