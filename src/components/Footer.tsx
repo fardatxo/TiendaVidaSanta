@@ -109,7 +109,7 @@ export default function Footer() {
           font-size: 10px;
           font-weight: 400;
           letter-spacing: 0.22em;
-          color: #424242;
+          color: #333333;
           margin: 0 0 56px;
           text-transform: uppercase;
         }
@@ -133,11 +133,11 @@ export default function Footer() {
           padding: 0;
           letter-spacing: 0.02em;
         }
-        .ft-nl-input::placeholder { color: #3a3a3a; }
+        .ft-nl-input::placeholder { color: #282828; }
         .ft-nl-btn {
           background: transparent;
           border: none;
-          color: #424242;
+          color: #333333;
           font-size: 18px;
           cursor: pointer;
           padding: 0 0 0 12px;
@@ -148,7 +148,7 @@ export default function Footer() {
         .ft-nl-sub {
           font-size: 10px;
           font-weight: 300;
-          color: #383838;
+          color: #2c2c2c;
           margin: 0;
           letter-spacing: 0.05em;
         }
@@ -161,7 +161,7 @@ export default function Footer() {
           margin-top: auto;
         }
         .ft-socials a {
-          color: #3e3e3e;
+          color: #303030;
           display: flex;
           align-items: center;
           transition: color 0.4s;
@@ -180,7 +180,7 @@ export default function Footer() {
           font-size: 10px;
           font-weight: 400;
           letter-spacing: 0.2em;
-          color: #3e3e3e;
+          color: #303030;
           margin: 0 0 44px;
           text-transform: uppercase;
         }
@@ -195,7 +195,7 @@ export default function Footer() {
         .ft-links li a {
           font-size: 12px;
           font-weight: 300;
-          color: #4e4e4e;
+          color: #3c3c3c;
           letter-spacing: 0.03em;
           transition: color 0.4s;
         }
@@ -211,13 +211,13 @@ export default function Footer() {
         .ft-copy {
           font-size: 10px;
           font-weight: 300;
-          color: #323232;
+          color: #262626;
           letter-spacing: 0.08em;
         }
         .ft-locale {
           font-size: 10px;
           font-weight: 300;
-          color: #323232;
+          color: #262626;
           letter-spacing: 0.12em;
           cursor: pointer;
           transition: color 0.4s;
