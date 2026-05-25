@@ -914,11 +914,11 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
 
         .ss-title {
-          font-size: 22px;
+          font-size: 24px;
           font-weight: 400;
           line-height: 1.15;
           margin: 0 0 8px 0;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.04em;
           text-transform: uppercase;
           text-align: center;
           font-family: var(--font-serif);
@@ -933,13 +933,15 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .ss-price {
           font-size: 16px;
           font-weight: 400;
+          font-family: var(--font-primary);
           color: #555;
           white-space: nowrap;
           letter-spacing: 0;
         }
         .ss-subtitle {
-          font-size: 13px;
+          font-size: 12px;
           font-weight: 400;
+          font-family: var(--font-primary);
           color: #555;
           line-height: 1.5;
           letter-spacing: 0;
@@ -1006,25 +1008,25 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
         /* Estimated delivery */
         .ss-delivery-estimate {
-          font-size: 11px;
+          font-size: 12px;
           font-family: var(--font-primary);
           font-weight: 400;
           color: #888;
           margin: 20px 0 0;
-          letter-spacing: 0.06em;
+          letter-spacing: 0.08em;
           text-align: center;
           text-transform: uppercase;
         }
 
         /* Description plain */
         .ss-desc-plain {
-          font-size: 11px;
-          font-family: var(--font-primary);
+          font-size: 14px;
+          font-family: var(--font-serif);
           font-weight: 400;
           color: #111;
-          line-height: 1.7;
+          line-height: 1.6;
           margin: 20px 0 0;
-          letter-spacing: 0.03em;
+          letter-spacing: 0;
           overflow-wrap: anywhere;
           word-break: break-word;
           display: -webkit-box;
@@ -1047,11 +1049,11 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           color: #fff;
           border: 1px solid #111;
           border-radius: 0;
-          font-family: inherit;
-          font-size: 11px;
+          font-family: var(--font-primary);
+          font-size: 12px;
           font-weight: 500;
           text-transform: uppercase;
-          letter-spacing: 0.12em;
+          letter-spacing: 0.14em;
           cursor: pointer;
           transition: background 0.15s;
         }
@@ -1070,11 +1072,11 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           cursor: pointer;
           border-radius: 0;
           transition: background 0.15s;
-          font-family: inherit;
-          font-size: 10px;
+          font-family: var(--font-primary);
+          font-size: 12px;
           font-weight: 400;
           text-transform: uppercase;
-          letter-spacing: 0.10em;
+          letter-spacing: 0.08em;
           color: #111;
         }
         .ss-bookmark:hover { background: #f5f5f5; }
@@ -1106,9 +1108,9 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           gap: 12px;
         }
         .ss-size-drawer-title {
-          font-size: 10px;
+          font-size: 12px;
           font-weight: 500;
-          letter-spacing: 0.06em;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
           flex: 1;
           overflow: hidden;
@@ -1122,7 +1124,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           flex-shrink: 0;
         }
         .ss-size-guide {
-          font-size: 9px;
+          font-size: 10px;
           letter-spacing: 0.08em;
           text-transform: uppercase;
           color: #888;
@@ -1157,9 +1159,9 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
         .ss-size-row.oos { cursor: default; }
         .ss-size-row-name {
-          font-size: 11px;
+          font-size: 12px;
           font-weight: 400;
-          letter-spacing: 0.06em;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
           color: #111;
           display: flex;
@@ -1174,14 +1176,14 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           gap: 2px;
         }
         .ss-sold-out {
-          font-size: 9px;
+          font-size: 10px;
           letter-spacing: 0.08em;
           text-transform: uppercase;
           color: #bbb;
         }
         .ss-get-notified {
-          font-size: 9px;
-          letter-spacing: 0.06em;
+          font-size: 10px;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
           color: #111;
           text-decoration: underline;
@@ -1199,8 +1201,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           color: #fff;
           border: none;
           padding: 15px;
-          font-size: 10px;
-          font-family: inherit;
+          font-size: 12px;
+          font-family: var(--font-primary);
           font-weight: 500;
           text-transform: uppercase;
           letter-spacing: 0.14em;
@@ -1240,8 +1242,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           padding: 16px 0;
           background: none;
           border: none;
-          font-family: inherit;
-          font-size: 11px;
+          font-family: var(--font-primary);
+          font-size: 12px;
           font-weight: 500;
           color: #111;
           cursor: pointer;
@@ -1262,7 +1264,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           padding: 0 0 16px 0;
         }
         .ss-accordion-text {
-          font-size: 13px;
+          font-size: 14px;
+          font-family: var(--font-serif);
           font-weight: 400;
           line-height: 1.7;
           color: #555;
@@ -1278,8 +1281,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
         .ss-inline-size {
           padding: 8px 14px;
-          font-family: inherit;
-          font-size: 11px;
+          font-family: var(--font-primary);
+          font-size: 12px;
           font-weight: 500;
           border: 1px solid #d0d0d0;
           background: #fff;
