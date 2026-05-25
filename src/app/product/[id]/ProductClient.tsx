@@ -846,7 +846,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         /* ── GALLERY ── */
         .ss-gallery {
           position: relative;
-          background: #EEEDED;
+          background: #ffffff;
           overflow: hidden;
         }
         /* Mobile: show carousel, hide desktop stack */
@@ -868,7 +868,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           display: flex;
           align-items: center;
           justify-content: center;
-          background: #EEEDED;
+          background: #ffffff;
           overflow: hidden;
         }
         .ss-gallery-img {
@@ -1368,7 +1368,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           .ss-desktop-img-block {
             width: 100%;
             aspect-ratio: 3 / 4;
-            background: #EEEDED;
+            background: #ffffff;
             overflow: hidden;
             display: flex;
             align-items: center;
