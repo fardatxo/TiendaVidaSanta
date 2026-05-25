@@ -1032,7 +1032,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           font-weight: 400;
           color: #111;
           line-height: 1.7;
-          margin: 52px 0 0;
+          margin: 104px 0 0;
           letter-spacing: 0.03em;
           overflow-wrap: anywhere;
           word-break: break-word;
