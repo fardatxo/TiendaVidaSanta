@@ -75,12 +75,6 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   const [adding, setAdding] = useState(false);
   const [sizeOpen, setSizeOpen] = useState(false);
   const [expandedAccordion, setExpandedAccordion] = useState<string | null>(null);
-  const [titleStyle, setTitleStyle] = useState<'upper' | 'lower' | 'bold'>('upper');
-  const titleStyleMap = {
-    upper: { textTransform: 'uppercase' as const, fontWeight: 400 },
-    lower: { textTransform: 'lowercase' as const, fontWeight: 400 },
-    bold:  { textTransform: 'uppercase' as const, fontWeight: 700 },
-  };
   const { t } = useTranslation();
   useLocale();
   const { toggle, has } = useWishlist();
@@ -551,12 +545,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         {/* ── INFO PANEL ── */}
         <div className="ss-info" ref={infoRef}>
           {/* Title */}
-          <h1 className="ss-title" style={titleStyleMap[titleStyle]}>{product.title}</h1>
-          <div className="ss-title-style">
-            <button className={`ss-ts-btn${titleStyle === 'upper' ? ' active' : ''}`} onClick={() => setTitleStyle('upper')}>AA</button>
-            <button className={`ss-ts-btn${titleStyle === 'lower' ? ' active' : ''}`} onClick={() => setTitleStyle('lower')}>aa</button>
-            <button className={`ss-ts-btn ss-ts-bold${titleStyle === 'bold'  ? ' active' : ''}`} onClick={() => setTitleStyle('bold')}>AB</button>
-          </div>
+          <h1 className="ss-title">{product.title}</h1>
 
           {/* Price + variant name on second line */}
           <div className="ss-price-row">
@@ -642,7 +631,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
           {/* Description — uppercase below actions */}
           {product.description && (
-            <p className="ss-desc-plain">{product.description.toUpperCase()}</p>
+            <p className="ss-desc-plain">{product.description}</p>
           )}
 
           {/* Delivery info */}
@@ -928,34 +917,12 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           font-size: 18px;
           font-weight: 400;
           line-height: 1.2;
-          margin: 0 0 4px 0;
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
+          margin: 0 0 8px 0;
+          letter-spacing: 0.02em;
+          text-transform: none;
           text-align: center;
           font-family: var(--font-serif);
         }
-        .ss-title-style {
-          display: flex;
-          gap: 2px;
-          justify-content: center;
-          margin: 0 0 10px 0;
-        }
-        .ss-ts-btn {
-          background: none;
-          border: 1px solid transparent;
-          padding: 1px 5px;
-          font-size: 9px;
-          font-family: var(--font-primary);
-          font-weight: 400;
-          cursor: pointer;
-          color: #aaa;
-          letter-spacing: 0.04em;
-          transition: all 0.15s;
-          outline: none;
-        }
-        .ss-ts-btn.active { border-color: #111; color: #111; }
-        .ss-ts-btn:hover:not(.active) { color: #555; }
-        .ss-ts-bold { font-weight: 700; }
         .ss-price-row {
           display: flex;
           align-items: baseline;
@@ -965,9 +932,9 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
         .ss-price {
           font-size: 16px;
-          font-weight: 400;
+          font-weight: 600;
           font-family: var(--font-primary);
-          color: #555;
+          color: #111;
           white-space: nowrap;
           letter-spacing: 0;
         }

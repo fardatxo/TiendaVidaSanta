@@ -121,8 +121,8 @@ export default async function Home() {
           font-size: 12px;
           font-family: var(--font-serif);
           font-weight: 400;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
+          text-transform: none;
+          letter-spacing: 0.01em;
           color: #111;
           white-space: nowrap;
           overflow: hidden;
@@ -131,7 +131,7 @@ export default async function Home() {
         .shop-card-price {
           font-size: 12px;
           font-family: var(--font-primary);
-          font-weight: 400;
+          font-weight: 600;
           color: #111;
           white-space: nowrap;
           flex-shrink: 0;

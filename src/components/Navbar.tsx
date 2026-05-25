@@ -333,7 +333,7 @@ export default function Navbar() {
           font-size: 12px;
           font-family: var(--font-ui);
           font-weight: 400;
-          text-transform: lowercase;
+          text-transform: uppercase;
           text-decoration: none;
           color: #000;
           letter-spacing: 0.04em;
