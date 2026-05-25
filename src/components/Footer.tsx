@@ -94,33 +94,32 @@ export default function Footer() {
         /* ── BODY ── */
         .ft-body {
           display: flex;
-          padding: 100px 80px 80px;
+          padding: 120px 100px 100px;
           border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
         /* ── LEFT ── */
         .ft-left {
-          flex: 0 0 38%;
-          padding-right: 80px;
-          border-right: 1px solid rgba(255,255,255,0.05);
+          flex: 0 0 40%;
+          padding-right: 100px;
           display: flex;
           flex-direction: column;
         }
         .ft-nl-label {
           font-size: 10px;
           font-weight: 400;
-          letter-spacing: 0.18em;
-          color: #333;
-          margin: 0 0 44px;
+          letter-spacing: 0.22em;
+          color: #424242;
+          margin: 0 0 56px;
           text-transform: uppercase;
         }
-        .ft-nl { margin-bottom: 56px; }
+        .ft-nl { margin-bottom: 80px; }
         .ft-nl-row {
           display: flex;
           align-items: center;
-          border-bottom: 1px solid rgba(255,255,255,0.08);
-          padding-bottom: 14px;
-          margin-bottom: 18px;
+          border-bottom: 1px solid rgba(255,255,255,0.09);
+          padding-bottom: 20px;
+          margin-bottom: 28px;
         }
         .ft-nl-input {
           flex: 1;
@@ -134,55 +133,55 @@ export default function Footer() {
           padding: 0;
           letter-spacing: 0.02em;
         }
-        .ft-nl-input::placeholder { color: #2a2a2a; }
+        .ft-nl-input::placeholder { color: #3a3a3a; }
         .ft-nl-btn {
           background: transparent;
           border: none;
-          color: #333;
+          color: #424242;
           font-size: 18px;
           cursor: pointer;
           padding: 0 0 0 12px;
           line-height: 1;
-          transition: color 0.25s;
+          transition: color 0.4s;
         }
-        .ft-nl-btn:hover { color: #fff; }
+        .ft-nl-btn:hover { color: #999; }
         .ft-nl-sub {
           font-size: 10px;
           font-weight: 300;
-          color: #282828;
+          color: #383838;
           margin: 0;
-          letter-spacing: 0.04em;
+          letter-spacing: 0.05em;
         }
 
         /* ── SOCIALS ── */
         .ft-socials {
           display: flex;
-          gap: 22px;
+          gap: 32px;
           align-items: center;
           margin-top: auto;
         }
         .ft-socials a {
-          color: #2e2e2e;
+          color: #3e3e3e;
           display: flex;
           align-items: center;
-          transition: color 0.25s;
+          transition: color 0.4s;
         }
-        .ft-socials a:hover { color: #888; }
+        .ft-socials a:hover { color: #666; }
 
         /* ── NAV ── */
         .ft-nav {
           flex: 1;
           display: flex;
-          padding-left: 80px;
-          gap: 64px;
+          padding-left: 100px;
+          gap: 88px;
         }
         .ft-nav-col { flex: 1; }
         .ft-col-head {
           font-size: 10px;
           font-weight: 400;
-          letter-spacing: 0.14em;
-          color: #2e2e2e;
-          margin: 0 0 32px;
+          letter-spacing: 0.2em;
+          color: #3e3e3e;
+          margin: 0 0 44px;
           text-transform: uppercase;
         }
         .ft-links {
@@ -191,14 +190,14 @@ export default function Footer() {
           margin: 0;
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 22px;
         }
         .ft-links li a {
           font-size: 12px;
           font-weight: 300;
-          color: #3a3a3a;
-          letter-spacing: 0.02em;
-          transition: color 0.25s;
+          color: #4e4e4e;
+          letter-spacing: 0.03em;
+          transition: color 0.4s;
         }
         .ft-links li a:hover { color: #aaa; }
 
@@ -207,21 +206,21 @@ export default function Footer() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 24px 80px;
+          padding: 28px 100px;
         }
         .ft-copy {
           font-size: 10px;
           font-weight: 300;
-          color: #222;
-          letter-spacing: 0.06em;
+          color: #323232;
+          letter-spacing: 0.08em;
         }
         .ft-locale {
           font-size: 10px;
           font-weight: 300;
-          color: #222;
-          letter-spacing: 0.1em;
+          color: #323232;
+          letter-spacing: 0.12em;
           cursor: pointer;
-          transition: color 0.25s;
+          transition: color 0.4s;
         }
         .ft-locale:hover { color: #666; }
 
@@ -235,17 +234,17 @@ export default function Footer() {
           .ft-left {
             flex: none;
             padding-right: 0;
-            border-right: none;
             border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding-bottom: 52px;
-            margin-bottom: 48px;
+            padding-bottom: 60px;
+            margin-bottom: 56px;
           }
           .ft-socials { margin-top: 40px; }
           .ft-nav {
             padding-left: 0;
             flex-direction: row;
             gap: 0;
-            justify-content: space-between;
+            justify-content: flex-start;
+            gap: 48px;
           }
           .ft-nav-col { flex: none; }
           .ft-col-head { margin-bottom: 24px; }

@@ -292,7 +292,7 @@ export default function Navbar() {
           align-items: stretch;
           justify-content: flex-start;
           height: 60px;
-          padding: 0 20px;
+          padding: 0 20px 0 28px;
           position: relative;
         }
 
@@ -347,6 +347,7 @@ export default function Navbar() {
         @media (min-width: 768px) {
           .acne-mobile-only { display: none !important; }
           .acne-desktop-only { display: flex !important; }
+          .acne-header-inner { padding-left: 48px; }
           .acne-logo {
             order: -1;
             margin-right: 24px;
