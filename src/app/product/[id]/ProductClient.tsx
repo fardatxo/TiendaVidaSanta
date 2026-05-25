@@ -1263,6 +1263,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .ss-accordion-body {
           display: grid;
           grid-template-rows: 0fr;
+          overflow: hidden;
           transition: grid-template-rows 0.28s ease;
         }
         .ss-accordion-body.open {
@@ -1270,7 +1271,6 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
         .ss-accordion-body-inner {
           min-height: 0;
-          overflow: hidden;
           padding-bottom: 16px;
         }
         .ss-accordion-text {
