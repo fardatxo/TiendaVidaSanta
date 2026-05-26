@@ -16,11 +16,12 @@ export default async function Home() {
         <div className="tn-mani-inner">
           <div className="tn-mani-rule" />
           <p className="tn-mani-body">
-            TONET exists outside of seasons.<br /><br />
-            Not built for this moment&mdash;<br />
-            built for the century that follows.<br /><br />
-            Garments for those who carry elegance<br />
-            not as aspiration, but as inheritance.
+            Not a brand.<br />
+            A house.<br /><br />
+            Not a collection.<br />
+            A lineage.<br /><br />
+            Built in silence,<br />
+            worn in permanence.
           </p>
           <div className="tn-mani-rule" />
           <p className="tn-mani-sig">TONET PARIS &mdash; EST. MMXXIV</p>
@@ -38,11 +39,24 @@ export default async function Home() {
         />
       </div>
 
+      {/* ── 3.5. THE DECLARATION ── */}
+      <section className="tn-decl">
+        <div className="tn-decl-inner">
+          <p className="tn-decl-over">House of Tonet</p>
+          <h2 className="tn-decl-headline">
+            A contemporary dynasty<br />
+            built between history<br />
+            and modernity.
+          </h2>
+          <p className="tn-decl-sub">Not shaped by seasons. Defined only by silence.</p>
+        </div>
+      </section>
+
       {/* ── 4. FEATURED GARMENTS ── */}
       <section className="tn-garments">
         <div className="tn-garm-header">
-          <p className="tn-garm-season">Spring &mdash; Summer 2026</p>
-          <h2 className="tn-garm-title">Selected Works</h2>
+          <p className="tn-garm-season">TONET &mdash; SS MMXXVI</p>
+          <h2 className="tn-garm-title">The Garments</h2>
         </div>
         <div className="tn-garm-grid">
           {featured.map((product) => (
@@ -68,12 +82,12 @@ export default async function Home() {
             </Link>
           ))}
         </div>
-        <Link href="/search" className="tn-garm-all">View All Garments</Link>
+        <Link href="/search" className="tn-garm-all">Enter the Collection</Link>
       </section>
 
       {/* ── 5. WORLD OF TONET ── */}
       <section className="tn-world">
-        <p className="tn-world-eyebrow">The World of Tonet</p>
+        <p className="tn-world-eyebrow">The World</p>
         <div className="tn-world-grid">
           <Link href="/about" className="tn-world-panel">
             <img src="/hero/ComfyUI-main_reference_00016_.png" alt="Archive" className="tn-world-img" loading="lazy" decoding="async" />
@@ -86,9 +100,9 @@ export default async function Home() {
             <span className="tn-world-label">Atelier</span>
           </Link>
           <Link href="/stores" className="tn-world-panel">
-            <img src="/hero/ComfyUI-main_reference_00023_.png" alt="Presence" className="tn-world-img" loading="lazy" decoding="async" />
+            <img src="/hero/ComfyUI-main_reference_00023_.png" alt="Residence" className="tn-world-img" loading="lazy" decoding="async" />
             <div className="tn-world-veil" />
-            <span className="tn-world-label">Presence</span>
+            <span className="tn-world-label">Residence</span>
           </Link>
         </div>
       </section>
@@ -99,18 +113,18 @@ export default async function Home() {
           <img src="/hero/ComfyUI-main_reference_00018_.png" alt="Spring Summer 2026" className="tn-season-img" loading="lazy" decoding="async" />
           <div className="tn-season-veil" />
           <div className="tn-season-meta">
-            <p className="tn-season-over">Spring &mdash; Summer</p>
-            <h3 className="tn-season-name">2026</h3>
-            <p className="tn-season-cta">View Collection</p>
+            <p className="tn-season-over">House of Tonet</p>
+            <h3 className="tn-season-name">SS MMXXVI</h3>
+            <p className="tn-season-cta">Enter</p>
           </div>
         </Link>
         <Link href="/collection/amazing-super-summer" className="tn-season-card">
           <img src="/hero/ComfyUI-main_reference_00032_.png" alt="Essentials" className="tn-season-img" loading="lazy" decoding="async" />
           <div className="tn-season-veil" />
           <div className="tn-season-meta">
-            <p className="tn-season-over">Curated Selection</p>
-            <h3 className="tn-season-name">Essentials</h3>
-            <p className="tn-season-cta">View Collection</p>
+            <p className="tn-season-over">The House</p>
+            <h3 className="tn-season-name">The Archive</h3>
+            <p className="tn-season-cta">Enter</p>
           </div>
         </Link>
       </section>
@@ -170,14 +184,56 @@ export default async function Home() {
           opacity: 0.82;
         }
 
+        /* ══ DECLARATION ══ */
+        .tn-decl {
+          background: #f0efe9;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 160px 48px;
+        }
+        .tn-decl-inner {
+          text-align: center;
+          max-width: 700px;
+          width: 100%;
+        }
+        .tn-decl-over {
+          font-family: var(--font-primary);
+          font-size: 10px;
+          font-weight: 300;
+          letter-spacing: 0.52em;
+          color: #bbb;
+          text-transform: uppercase;
+          margin: 0 0 60px;
+        }
+        .tn-decl-headline {
+          font-family: var(--font-primary);
+          font-size: clamp(22px, 3.2vw, 44px);
+          font-weight: 200;
+          letter-spacing: 0.13em;
+          color: #181818;
+          text-transform: uppercase;
+          line-height: 1.4;
+          margin: 0 0 56px;
+        }
+        .tn-decl-sub {
+          font-family: var(--font-primary);
+          font-size: 10px;
+          font-weight: 300;
+          letter-spacing: 0.38em;
+          color: #aaa;
+          text-transform: uppercase;
+          margin: 0;
+        }
+
         /* ══ FEATURED GARMENTS ══ */
         .tn-garments {
           background: #f5f4f0;
-          padding: 120px 80px 100px;
+          padding: 160px 80px 140px;
         }
         .tn-garm-header {
           text-align: center;
-          margin-bottom: 72px;
+          margin-bottom: 96px;
         }
         .tn-garm-season {
           font-family: var(--font-primary);
@@ -200,9 +256,9 @@ export default async function Home() {
         .tn-garm-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 3px;
+          gap: 24px;
           max-width: 1280px;
-          margin: 0 auto 72px;
+          margin: 0 auto 96px;
         }
         .tn-garm-card {
           display: block;
@@ -277,7 +333,7 @@ export default async function Home() {
         /* ══ WORLD OF TONET ══ */
         .tn-world {
           background: #0a0a0a;
-          padding-top: 100px;
+          padding-top: 120px;
         }
         .tn-world-eyebrow {
           font-family: var(--font-primary);
@@ -421,14 +477,17 @@ export default async function Home() {
 
         /* ══ RESPONSIVE ══ */
         @media (max-width: 1024px) {
-          .tn-garments { padding: 100px 40px 80px; }
+          .tn-garments { padding: 120px 40px 100px; }
+          .tn-decl { padding: 120px 40px; }
         }
         @media (max-width: 767px) {
           .tn-mani { padding: 100px 28px; }
           .tn-mani-body { font-size: 13px; line-height: 2.2; }
           .tn-cinematic { height: 55dvh; }
+          .tn-decl { padding: 100px 28px; }
+          .tn-decl-headline { font-size: clamp(20px, 7vw, 32px); }
           .tn-garments { padding: 80px 20px 60px; }
-          .tn-garm-grid { grid-template-columns: 1fr; gap: 2px; }
+          .tn-garm-grid { grid-template-columns: 1fr; gap: 16px; }
           .tn-garm-title { font-size: 22px; }
           .tn-world-grid { grid-template-columns: 1fr; }
           .tn-world-panel { aspect-ratio: 4 / 3; }

@@ -31,7 +31,7 @@ export default function HeroSection() {
           Status.
         </h1>
         <Link href="/collection/spring-summer-2026" className="tn-hero-cta">
-          Explore Collection
+          The Collection
         </Link>
       </div>
 
