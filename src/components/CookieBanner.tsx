@@ -7,6 +7,7 @@ const CONSENT_KEY = 'tonet_consent';
 
 export default function CookieBanner() {
   const [visible, setVisible] = useState(false);
+  const [dismissing, setDismissing] = useState(false);
 
   useEffect(() => {
     if (!localStorage.getItem(CONSENT_KEY)) {
@@ -17,13 +18,14 @@ export default function CookieBanner() {
 
   const respond = (value: 'accepted' | 'declined') => {
     localStorage.setItem(CONSENT_KEY, value);
-    setVisible(false);
+    setDismissing(true);
+    setTimeout(() => setVisible(false), 800);
   };
 
   if (!visible) return null;
 
   return (
-    <div className="ck-bar" role="dialog" aria-label="Cookie consent">
+    <div className={`ck-bar${dismissing ? ' ck-dismissing' : ''}`} role="dialog" aria-label="Cookie consent">
       <div className="ck-inner">
         <div className="ck-text">
           <p className="ck-over">Privacy &mdash; House of Tonet</p>
@@ -57,6 +59,13 @@ export default function CookieBanner() {
         @keyframes ck-rise {
           from { transform: translateY(100%); opacity: 0; }
           to   { transform: translateY(0);   opacity: 1; }
+        }
+        @keyframes ck-fall {
+          from { transform: translateY(0);   opacity: 1; }
+          to   { transform: translateY(100%); opacity: 0; }
+        }
+        .ck-bar.ck-dismissing {
+          animation: ck-fall 0.8s cubic-bezier(0.7, 0, 0.84, 0) forwards;
         }
         .ck-inner {
           display: flex;
