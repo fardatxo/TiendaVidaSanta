@@ -59,8 +59,8 @@ export default async function Home() {
           <h2 className="tn-garm-title">The Garments</h2>
         </div>
         <div className="tn-garm-grid">
-          {featured.map((product) => (
-            <Link key={product.handle} href={`/product/${product.handle}`} className="tn-garm-card">
+          {featured.map((product, i) => (
+            <Link key={product.handle} href={`/product/${product.handle}`} className={`tn-garm-card${i === 0 ? ' tn-garm-card--hero' : ''}`}>
               <div className="tn-garm-img-wrap">
                 {product.imageUrl && (
                   <img
@@ -85,6 +85,18 @@ export default async function Home() {
         <Link href="/search" className="tn-garm-all">Enter the Collection</Link>
       </section>
 
+      {/* ── 4.5. PULL QUOTE ── */}
+      <section className="tn-quote">
+        <div className="tn-quote-inner">
+          <blockquote className="tn-quote-text">
+            Worn by those<br />
+            who need<br />
+            no introduction.
+          </blockquote>
+          <p className="tn-quote-attr">House of Tonet &mdash; MMXXVI</p>
+        </div>
+      </section>
+
       {/* ── 5. WORLD OF TONET ── */}
       <section className="tn-world">
         <p className="tn-world-eyebrow">The World</p>
@@ -104,6 +116,24 @@ export default async function Home() {
             <div className="tn-world-veil" />
             <span className="tn-world-label">Residence</span>
           </Link>
+        </div>
+      </section>
+
+      {/* ── 5.5. CRAFT & MATERIALS ── */}
+      <section className="tn-craft">
+        <div className="tn-craft-img-col">
+          <img src="/hero/ComfyUI-main_reference_00017_.png" alt="The Craft" className="tn-craft-img" loading="lazy" decoding="async" />
+        </div>
+        <div className="tn-craft-text-col">
+          <p className="tn-craft-over">The Craft</p>
+          <h2 className="tn-craft-headline">Made with<br />intention.</h2>
+          <p className="tn-craft-body">
+            Every garment bearing the House mark is constructed
+            with deliberate restraint. No excess. No ornament
+            beyond what is necessary. Only the precision of form,
+            the weight of fabric, and the silence of craft.
+          </p>
+          <Link href="/about" className="tn-craft-cta">The House</Link>
         </div>
       </section>
 
@@ -255,22 +285,27 @@ export default async function Home() {
         }
         .tn-garm-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 24px;
+          grid-template-columns: 58% 42%;
+          grid-template-rows: 1fr 1fr;
+          gap: 4px;
           max-width: 1280px;
           margin: 0 auto 96px;
+          height: 85dvh;
         }
         .tn-garm-card {
-          display: block;
+          display: flex;
+          flex-direction: column;
           text-decoration: none;
           color: inherit;
           background: #ece9e3;
           overflow: hidden;
         }
         .tn-garm-card:hover { opacity: 1; }
+        .tn-garm-card--hero { grid-row: 1 / 3; }
         .tn-garm-img-wrap {
-          aspect-ratio: 3 / 4;
+          flex: 1;
           overflow: hidden;
+          min-height: 0;
         }
         .tn-garm-img {
           width: 100%;
@@ -286,6 +321,7 @@ export default async function Home() {
           justify-content: space-between;
           align-items: baseline;
           background: #ece9e3;
+          flex-shrink: 0;
         }
         .tn-garm-name {
           font-family: var(--font-primary);
@@ -327,6 +363,110 @@ export default async function Home() {
         .tn-garm-all:hover {
           color: #111;
           border-color: #888;
+          opacity: 1 !important;
+        }
+
+        /* ══ PULL QUOTE ══ */
+        .tn-quote {
+          background: #0d0d0d;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 160px 80px;
+          border-top: 1px solid rgba(255,255,255,0.04);
+          border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .tn-quote-inner { text-align: center; }
+        .tn-quote-text {
+          font-family: var(--font-primary);
+          font-size: clamp(40px, 7vw, 96px);
+          font-weight: 200;
+          letter-spacing: 0.1em;
+          color: rgba(255,255,255,0.82);
+          text-transform: uppercase;
+          line-height: 1.0;
+          margin: 0 0 64px;
+        }
+        .tn-quote-attr {
+          font-family: var(--font-primary);
+          font-size: 9px;
+          font-weight: 300;
+          letter-spacing: 0.48em;
+          color: rgba(255,255,255,0.18);
+          text-transform: uppercase;
+          margin: 0;
+        }
+
+        /* ══ CRAFT ══ */
+        .tn-craft {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          background: #0d0d0d;
+          min-height: 80dvh;
+          border-top: 1px solid rgba(255,255,255,0.04);
+        }
+        .tn-craft-img-col {
+          overflow: hidden;
+          position: relative;
+        }
+        .tn-craft-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          opacity: 0.7;
+        }
+        .tn-craft-text-col {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: 100px 80px;
+        }
+        .tn-craft-over {
+          font-family: var(--font-primary);
+          font-size: 10px;
+          font-weight: 300;
+          letter-spacing: 0.48em;
+          color: rgba(255,255,255,0.2);
+          text-transform: uppercase;
+          margin: 0 0 48px;
+        }
+        .tn-craft-headline {
+          font-family: var(--font-primary);
+          font-size: clamp(28px, 3.8vw, 52px);
+          font-weight: 200;
+          letter-spacing: 0.12em;
+          color: rgba(255,255,255,0.82);
+          text-transform: uppercase;
+          line-height: 1.1;
+          margin: 0 0 48px;
+        }
+        .tn-craft-body {
+          font-family: var(--font-primary);
+          font-size: 13px;
+          font-weight: 300;
+          line-height: 2.2;
+          color: rgba(255,255,255,0.38);
+          letter-spacing: 0.04em;
+          margin: 0 0 56px;
+          max-width: 400px;
+        }
+        .tn-craft-cta {
+          font-family: var(--font-primary);
+          font-size: 10px;
+          font-weight: 300;
+          letter-spacing: 0.4em;
+          color: rgba(255,255,255,0.38);
+          text-transform: uppercase;
+          text-decoration: none;
+          border-bottom: 1px solid rgba(255,255,255,0.14);
+          padding-bottom: 5px;
+          width: fit-content;
+          transition: color 0.5s, border-color 0.5s;
+        }
+        .tn-craft-cta:hover {
+          color: rgba(255,255,255,0.72);
+          border-color: rgba(255,255,255,0.32);
           opacity: 1 !important;
         }
 
@@ -479,6 +619,7 @@ export default async function Home() {
         @media (max-width: 1024px) {
           .tn-garments { padding: 120px 40px 100px; }
           .tn-decl { padding: 120px 40px; }
+          .tn-craft-text-col { padding: 80px 48px; }
         }
         @media (max-width: 767px) {
           .tn-mani { padding: 100px 28px; }
@@ -487,8 +628,19 @@ export default async function Home() {
           .tn-decl { padding: 100px 28px; }
           .tn-decl-headline { font-size: clamp(20px, 7vw, 32px); }
           .tn-garments { padding: 80px 20px 60px; }
-          .tn-garm-grid { grid-template-columns: 1fr; gap: 16px; }
+          .tn-garm-grid {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto;
+            height: auto;
+            gap: 2px;
+          }
+          .tn-garm-card--hero { grid-row: auto; }
+          .tn-garm-img-wrap { flex: none; aspect-ratio: 3 / 4; }
           .tn-garm-title { font-size: 22px; }
+          .tn-quote { padding: 100px 28px; }
+          .tn-craft { grid-template-columns: 1fr; }
+          .tn-craft-img-col { height: 55dvh; }
+          .tn-craft-text-col { padding: 60px 24px; }
           .tn-world-grid { grid-template-columns: 1fr; }
           .tn-world-panel { aspect-ratio: 4 / 3; }
           .tn-world-label { bottom: 28px; left: 24px; }

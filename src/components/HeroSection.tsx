@@ -24,7 +24,7 @@ export default function HeroSection() {
       <div className="tn-hero-vignette" />
 
       <div className={`tn-hero-content${visible ? ' tn-visible' : ''}`}>
-        <p className="tn-hero-eyebrow">TONET &mdash; PARIS</p>
+        <p className="tn-hero-eyebrow">SS &mdash; MMXXVI</p>
         <h1 className="tn-hero-headline">
           Silence.<br />
           Structure.<br />
@@ -68,10 +68,10 @@ export default function HeroSection() {
           inset: 0;
           display: flex;
           flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          padding-top: 60px;
+          align-items: flex-start;
+          justify-content: flex-end;
+          text-align: left;
+          padding: 0 80px 120px;
           opacity: 0;
           transform: translateY(18px);
           transition: opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1),
@@ -120,8 +120,7 @@ export default function HeroSection() {
         .tn-scroll-wire {
           position: absolute;
           bottom: 44px;
-          left: 50%;
-          transform: translateX(-50%);
+          right: 80px;
         }
         .tn-scroll-line {
           display: block;
@@ -143,12 +142,19 @@ export default function HeroSection() {
         }
         @media (max-width: 767px) {
           .tn-hero { height: calc(100dvh + 60px); }
+          .tn-hero-content {
+            align-items: center;
+            justify-content: flex-end;
+            text-align: center;
+            padding: 0 32px 100px;
+          }
           .tn-hero-headline {
             font-size: clamp(40px, 13vw, 72px);
             letter-spacing: 0.1em;
             margin-bottom: 56px;
           }
           .tn-hero-eyebrow { margin-bottom: 40px; }
+          .tn-scroll-wire { right: auto; left: 50%; transform: translateX(-50%); }
         }
       `}</style>
     </section>
