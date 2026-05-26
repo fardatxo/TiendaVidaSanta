@@ -13,6 +13,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import CartDrawer from "@/components/CartDrawer";
 import ShippingBanner from "@/components/ShippingBanner";
 import MenuDrawer from "@/components/MenuDrawer";
+import CookieBanner from "@/components/CookieBanner";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -47,6 +48,7 @@ export default function RootLayout({
                 <MenuDrawer />
                 <main>{children}</main>
                 <Footer />
+                <CookieBanner />
                 <Analytics />
               </WishlistProvider>
               </AuthProvider>
