@@ -547,6 +547,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           {/* Title */}
           <h1 className="ss-title">{product.title}</h1>
 
+          <p className="ss-editorial-subtext">Part of the House Selection.</p>
+
           {/* Price + variant name on second line */}
           <div className="ss-price-row">
             <span className="ss-price">{priceFormatted}</span>
@@ -604,12 +606,12 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
               disabled={adding || !selectedVariant.availableForSale}
             >
               {adding
-                ? t('common.adding')
+                ? 'Adding…'
                 : !selectedVariant.availableForSale
-                ? t('common.soldOut')
+                ? 'Unavailable'
                 : needsSizeSelection
-                ? (isGiftCard ? 'SELECT TYPE' : t('common.selectSize'))
-                : t('common.addToBag')}
+                ? (isGiftCard ? 'Select Amount' : 'Select Size')
+                : 'Add to Selection'}
             </button>
             <button
               className="ss-bookmark"
@@ -625,7 +627,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                   points="1.5,0 1.5,12 6,9.8181763 10.5,12 10.5,0"
                 />
               </svg>
-              <span className="ss-bookmark-label">{inWishlist ? 'SAVED' : 'ADD TO FAVORITES'}</span>
+              <span className="ss-bookmark-label">{inWishlist ? 'Archived' : 'Archive'}</span>
             </button>
           </div>
 
@@ -687,7 +689,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
             <div className="ss-accordion-item">
               <button className="ss-accordion-header" onClick={() => toggleAccordion('needtoknow')}>
-                <span>You Need to Know</span>
+                <span>The Essentials</span>
                 <span className={`ss-accordion-icon${expandedAccordion === 'needtoknow' ? ' open' : ''}`}><Plus size={12} strokeWidth={1.4} /></span>
               </button>
               <div className={`ss-accordion-body${expandedAccordion === 'needtoknow' ? ' open' : ''}`}>
@@ -729,7 +731,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         <div className="ss-size-drawer-header">
           <span className="ss-size-drawer-title">{product.title}</span>
           <div className="ss-size-header-right">
-            <span className="ss-size-guide">SIZE GUIDE</span>
+            <span className="ss-size-guide">Size Guide</span>
             <button className="ss-size-close" onClick={() => setSizeOpen(false)} aria-label="Close">
               <X size={16} strokeWidth={1.4} />
             </button>
@@ -751,8 +753,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                 </span>
                 {!available && (
                   <div className="ss-size-oos-wrap">
-                    <span className="ss-sold-out">SOLD OUT</span>
-                    <span className="ss-get-notified">GET NOTIFIED</span>
+                    <span className="ss-sold-out">Reserved</span>
+                    <span className="ss-get-notified">Request Availability</span>
                   </div>
                 )}
               </button>
@@ -765,16 +767,30 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             onClick={handleAddToBag}
             disabled={!selectedSize || adding || !isSizeAvailable(selectedSize)}
           >
-            {adding ? 'ADDING...' : 'ADD TO BAG'}
+            {adding ? 'Adding…' : 'Add to Selection'}
           </button>
         </div>
       </div>
 
 
-      {/* ── RECENTLY VIEWED ── */}
+      {/* ══ THE HOUSE ══ */}
+      <section className="ss-philosophy">
+        <div className="ss-philosophy-inner">
+          <span className="ss-philosophy-eyebrow">The House</span>
+          <p className="ss-philosophy-text">
+            TONET was not built for the moment. It was constructed for permanence — for those who understand that true elegance is never loud, and that refinement requires no explanation.
+          </p>
+          <p className="ss-philosophy-text">
+            Each garment belongs to a longer conversation between structure and silence, between the body and its architecture.
+          </p>
+          <span className="ss-philosophy-note">— House Notes, 2026</span>
+        </div>
+      </section>
+
+      {/* ══ RECENTLY VIEWED ══ */}
       {recentlyViewed.length > 0 && (
         <section className="rec-section">
-          <h2 className="rec-label">RECENTLY VIEWED</h2>
+          <h2 className="rec-label">Previously Considered</h2>
           <div className="rec-carousel-wrap">
             <div className="rec-carousel" ref={recentCallbackRef}>
               <div style={{flexShrink: 0, width: 16, minWidth: 16}} />
@@ -801,7 +817,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
       {/* ── YOU MAY ALSO LIKE – carousel ── */}
       {recommended.length > 0 && (
         <section className="rec-section">
-          <h2 className="rec-label">YOU MAY ALSO LIKE</h2>
+          <h2 className="rec-label">House Selection</h2>
           <div className="rec-carousel-wrap">
             <div
               className="rec-carousel"
@@ -829,15 +845,15 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         ══════════════════════════════════════ */
 
         html, body {
-          background: #ffffff !important;
+          background: #EEEDED !important;
         }
 
         .ss-pdp-layout {
           display: flex;
           flex-direction: column;
-          font-family: var(--font-serif);
+          font-family: var(--font-primary);
           color: #111;
-          background: #ffffff;
+          background: #EEEDED;
         }
         @media (min-width: 768px) {
           .ss-pdp-layout { background: unset; }
@@ -914,13 +930,24 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
 
         .ss-title {
-          font-size: 18px;
+          font-size: 13px;
           font-weight: 300;
-          line-height: 1.2;
-          margin: 0 0 8px 0;
-          letter-spacing: 0.06em;
+          line-height: 1.3;
+          margin: 0 0 6px 0;
+          letter-spacing: 0.28em;
           text-transform: uppercase;
           text-align: center;
+          font-family: var(--font-primary);
+        }
+        /* Editorial subtext */
+        .ss-editorial-subtext {
+          font-size: 8px;
+          font-weight: 300;
+          letter-spacing: 0.5em;
+          text-transform: uppercase;
+          color: rgba(0,0,0,0.28);
+          text-align: center;
+          margin: 0 0 24px 0;
           font-family: var(--font-primary);
         }
         .ss-price-row {
@@ -928,23 +955,23 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           align-items: baseline;
           justify-content: center;
           gap: 12px;
-          margin-bottom: 16px;
+          margin-bottom: 24px;
         }
         .ss-price {
-          font-size: 16px;
-          font-weight: 600;
+          font-size: 11px;
+          font-weight: 300;
           font-family: var(--font-primary);
-          color: #111;
+          color: rgba(0,0,0,0.48);
           white-space: nowrap;
-          letter-spacing: 0;
+          letter-spacing: 0.12em;
         }
         .ss-subtitle {
-          font-size: 12px;
-          font-weight: 400;
+          font-size: 10px;
+          font-weight: 300;
           font-family: var(--font-primary);
-          color: #555;
+          color: rgba(0,0,0,0.32);
           line-height: 1.5;
-          letter-spacing: 0;
+          letter-spacing: 0.04em;
         }
 
         /* Thumbnails */
@@ -1008,90 +1035,87 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
         /* Estimated delivery */
         .ss-delivery-estimate {
-          font-size: 12px;
+          font-size: 8px;
           font-family: var(--font-primary);
-          font-weight: 400;
-          color: #888;
-          margin: 20px 0 0;
-          letter-spacing: 0.08em;
+          font-weight: 300;
+          color: rgba(0,0,0,0.25);
+          margin: 28px 0 0;
+          letter-spacing: 0.32em;
           text-align: center;
           text-transform: uppercase;
         }
 
         /* Description plain */
         .ss-desc-plain {
-          font-size: 11px;
+          font-size: 10px;
           font-family: var(--font-primary);
           font-weight: 300;
-          color: #999;
-          line-height: 1.5;
-          margin: 16px 0 0;
+          color: rgba(0,0,0,0.32);
+          line-height: 1.8;
+          margin: 20px 0 0;
           letter-spacing: 0.05em;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
         }
 
         /* Action row */
         .ss-actions {
           display: flex;
-          gap: 0;
+          flex-direction: column;
+          gap: 10px;
           margin-bottom: 0;
-          height: 48px;
         }
         .ss-cta-btn {
-          flex: 1;
-          height: 48px;
-          background: #111;
-          color: #fff;
-          border: 1px solid #111;
+          width: 100%;
+          height: 52px;
+          background: rgba(0,0,0,0.85);
+          color: rgba(255,255,255,0.9);
+          border: none;
           border-radius: 0;
           font-family: var(--font-primary);
-          font-size: 12px;
-          font-weight: 500;
+          font-size: 9px;
+          font-weight: 300;
           text-transform: uppercase;
-          letter-spacing: 0.14em;
+          letter-spacing: 0.38em;
           cursor: pointer;
-          transition: background 0.15s;
+          transition: background 0.5s;
         }
-        .ss-cta-btn:hover:not(:disabled) { background: #333; }
-        .ss-cta-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .ss-cta-btn:hover:not(:disabled) { background: rgba(0,0,0,1); }
+        .ss-cta-btn:disabled { opacity: 0.35; cursor: not-allowed; }
         .ss-bookmark {
-          flex: 1;
-          height: 48px;
-          border: 1px solid #d0d0d0;
-          border-left: none;
-          background: #fff;
+          width: 100%;
+          height: 44px;
+          border: 1px solid rgba(0,0,0,0.12);
+          background: transparent;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 6px;
+          gap: 8px;
           cursor: pointer;
           border-radius: 0;
-          transition: background 0.15s;
+          transition: background 0.5s, color 0.5s;
           font-family: var(--font-primary);
-          font-size: 12px;
-          font-weight: 400;
+          font-size: 9px;
+          font-weight: 300;
           text-transform: uppercase;
-          letter-spacing: 0.08em;
-          color: #111;
+          letter-spacing: 0.32em;
+          color: rgba(0,0,0,0.38);
         }
-        .ss-bookmark:hover { background: #f5f5f5; }
+        .ss-bookmark:hover { background: rgba(0,0,0,0.03); color: rgba(0,0,0,0.65); }
         .ss-bookmark-label { white-space: nowrap; }
 
-        /* ── SIZE DRAWER ── */
+        /* ══ SIZE DRAWER ══ */
         .ss-size-drawer {
           position: fixed;
           top: 0; right: 0; bottom: 0;
           width: min(100vw, 400px);
-          background: #fff;
-          border-left: 1px solid #e0e0e0;
+          background: #0d0d0d;
+          border-left: 1px solid rgba(255,255,255,0.05);
           z-index: 1002;
           display: flex;
           flex-direction: column;
           transform: translateX(100%);
-          transition: transform 0.72s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: transform 0.95s cubic-bezier(0.16, 1, 0.3, 1);
           font-family: var(--font-primary);
+          color: rgba(255,255,255,0.82);
         }
         .ss-size-drawer.open { transform: translateX(0); }
 
@@ -1099,16 +1123,17 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 16px 20px;
-          border-bottom: 1px solid #e8e8e8;
+          padding: 24px 32px;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
           flex-shrink: 0;
           gap: 12px;
         }
         .ss-size-drawer-title {
-          font-size: 12px;
-          font-weight: 500;
-          letter-spacing: 0.08em;
+          font-size: 9px;
+          font-weight: 300;
+          letter-spacing: 0.38em;
           text-transform: uppercase;
+          color: rgba(255,255,255,0.48);
           flex: 1;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -1117,22 +1142,27 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .ss-size-header-right {
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 20px;
           flex-shrink: 0;
         }
         .ss-size-guide {
-          font-size: 10px;
-          letter-spacing: 0.08em;
+          font-size: 8px;
+          letter-spacing: 0.38em;
           text-transform: uppercase;
-          color: #888;
+          color: rgba(255,255,255,0.2);
           cursor: pointer;
+          transition: color 0.4s;
         }
+        .ss-size-guide:hover { color: rgba(255,255,255,0.55); }
         .ss-size-close {
           background: none; border: none;
-          cursor: pointer; color: #000;
+          cursor: pointer; color: rgba(255,255,255,0.28);
           display: flex; align-items: center; justify-content: center;
           width: 28px; height: 28px; padding: 4px;
+          transition: color 0.4s;
         }
+        .ss-size-close:hover { color: rgba(255,255,255,0.75); }
+        .ss-size-close svg { stroke: currentColor; }
 
         .ss-size-drawer-list {
           flex: 1;
@@ -1146,26 +1176,28 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 18px 20px;
+          padding: 18px 32px;
           border: none;
-          border-bottom: 1px solid #f0f0f0;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
           background: none;
           cursor: pointer;
           font-family: inherit;
           text-align: left;
+          transition: background 0.4s;
         }
+        .ss-size-row:not(.oos):hover { background: rgba(255,255,255,0.03); }
         .ss-size-row.oos { cursor: default; }
         .ss-size-row-name {
-          font-size: 12px;
-          font-weight: 400;
-          letter-spacing: 0.08em;
+          font-size: 10px;
+          font-weight: 300;
+          letter-spacing: 0.32em;
           text-transform: uppercase;
-          color: #111;
+          color: rgba(255,255,255,0.7);
           display: flex;
           align-items: center;
         }
-        .ss-size-row.oos .ss-size-row-name { color: #bbb; }
-        .ss-size-bullet { color: #111; }
+        .ss-size-row.oos .ss-size-row-name { color: rgba(255,255,255,0.18); }
+        .ss-size-bullet { color: rgba(255,255,255,0.7); }
         .ss-size-oos-wrap {
           display: flex;
           flex-direction: column;
@@ -1173,41 +1205,41 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           gap: 2px;
         }
         .ss-sold-out {
-          font-size: 10px;
-          letter-spacing: 0.08em;
+          font-size: 8px;
+          letter-spacing: 0.3em;
           text-transform: uppercase;
-          color: #bbb;
+          color: rgba(255,255,255,0.18);
         }
         .ss-get-notified {
-          font-size: 10px;
-          letter-spacing: 0.08em;
+          font-size: 8px;
+          letter-spacing: 0.3em;
           text-transform: uppercase;
-          color: #111;
+          color: rgba(255,255,255,0.35);
           text-decoration: underline;
         }
 
         .ss-size-drawer-footer {
           flex-shrink: 0;
-          padding: 16px 20px 20px;
-          border-top: 1px solid #e8e8e8;
+          padding: 20px 32px 28px;
+          border-top: 1px solid rgba(255,255,255,0.05);
         }
         .ss-size-add-btn {
           display: block;
           width: 100%;
-          background: #111;
-          color: #fff;
+          background: rgba(255,255,255,0.88);
+          color: #0d0d0d;
           border: none;
-          padding: 15px;
-          font-size: 12px;
+          padding: 17px;
+          font-size: 9px;
           font-family: var(--font-primary);
-          font-weight: 500;
+          font-weight: 300;
           text-transform: uppercase;
-          letter-spacing: 0.14em;
+          letter-spacing: 0.38em;
           cursor: pointer;
-          transition: background 0.15s;
+          transition: background 0.5s;
         }
         .ss-size-add-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-        .ss-size-add-btn:not(:disabled):hover { background: #333; }
+        .ss-size-add-btn:not(:disabled):hover { background: rgba(255,255,255,1); }
 
         /* Delivery line */
         .ss-delivery {
@@ -1226,56 +1258,58 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
         /* Accordion sections */
         .ss-accordions {
-          margin-top: 32px;
+          margin-top: 44px;
         }
         .ss-accordion-item {
-          border-bottom: 1px solid #e8e8e8;
+          border-bottom: 1px solid rgba(0,0,0,0.07);
         }
         .ss-accordion-header {
           width: 100%;
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 16px 0;
+          padding: 20px 0;
           background: none;
           border: none;
           font-family: var(--font-primary);
-          font-size: 12px;
-          font-weight: 500;
-          color: #111;
+          font-size: 9px;
+          font-weight: 300;
+          color: rgba(0,0,0,0.6);
           cursor: pointer;
           text-align: left;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.38em;
           text-transform: uppercase;
+          transition: color 0.4s;
         }
         .ss-accordion-header:focus { outline: none; }
-        .ss-accordion-header:hover { opacity: 0.7; }
+        .ss-accordion-header:hover { color: rgba(0,0,0,0.9); opacity: 1; }
         .ss-accordion-icon {
           font-size: 18px;
           font-weight: 300;
-          color: #111;
-          transition: transform 0.2s ease;
+          color: rgba(0,0,0,0.35);
+          transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
           line-height: 1;
         }
         .ss-accordion-icon.open { transform: rotate(45deg); }
         .ss-accordion-body {
           overflow: hidden;
           max-height: 0;
-          transition: max-height 0.32s ease;
+          transition: max-height 0.6s cubic-bezier(0.16,1,0.3,1);
         }
         .ss-accordion-body.open {
           max-height: 600px;
         }
         .ss-accordion-body-inner {
-          padding-bottom: 16px;
+          padding-bottom: 20px;
         }
         .ss-accordion-text {
-          font-size: 13px;
+          font-size: 11px;
           font-family: var(--font-primary);
           font-weight: 300;
-          line-height: 1.8;
-          color: #555;
+          line-height: 1.9;
+          color: rgba(0,0,0,0.42);
           margin: 0;
+          letter-spacing: 0.04em;
         }
 
         /* Inline size buttons inside accordion */
@@ -1421,19 +1455,19 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           letter-spacing: 0.14em;
         }
 
-        /* ── RECOMMENDED ── */
+        /* ══ RECOMMENDED ══ */
         .rec-section {
-          padding: 60px 0 80px;
+          padding: 80px 0 100px;
           font-family: var(--font-primary);
           overflow: hidden;
         }
         .rec-label {
-          font-size: 14px;
-          font-weight: 500;
+          font-size: 8px;
+          font-weight: 300;
           text-transform: uppercase;
-          letter-spacing: 0.1em;
-          color: #111;
-          margin: 0 0 28px;
+          letter-spacing: 0.5em;
+          color: rgba(0,0,0,0.32);
+          margin: 0 0 44px;
           padding-left: 0;
           text-align: center;
         }
@@ -1465,7 +1499,47 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           scroll-snap-align: start;
           padding-right: 1px;
         }
-        /* ── MOBILE IMAGE GRID ── */
+        /* ══ THE HOUSE PHILOSOPHY ══ */
+        .ss-philosophy {
+          padding: 100px 32px;
+          background: #0d0d0d;
+          text-align: center;
+        }
+        .ss-philosophy-inner {
+          max-width: 560px;
+          margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 28px;
+        }
+        .ss-philosophy-eyebrow {
+          font-size: 8px;
+          font-weight: 300;
+          letter-spacing: 0.5em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.2);
+          font-family: var(--font-primary);
+        }
+        .ss-philosophy-text {
+          font-size: 13px;
+          font-weight: 300;
+          line-height: 1.9;
+          letter-spacing: 0.03em;
+          color: rgba(255,255,255,0.48);
+          font-family: var(--font-primary);
+          margin: 0;
+        }
+        .ss-philosophy-note {
+          font-size: 8px;
+          font-weight: 300;
+          letter-spacing: 0.4em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.16);
+          font-family: var(--font-primary);
+        }
+
+        /* ══ MOBILE IMAGE GRID ══ */
         .ss-mobile-img-grid {
           display: none;
         }
@@ -1474,7 +1548,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 6px;
-            background: #fff;
+            background: #EEEDED;
             padding: 0 20px 120px 20px;
           }
           .ss-mobile-img-cell {
@@ -1491,15 +1565,15 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
 
         @media (max-width: 767px) {
-          html, body { background: #ffffff !important; }
+          html, body { background: #EEEDED !important; }
           .ss-gallery,
           .ss-gallery-item,
           .ss-info,
           .outfit-section,
-          .rec-section,
-          .ss-mobile-img-cell { background: #ffffff !important; }
-          .rec-section { padding: 40px 0 60px; }
-          .rec-label { font-size: 14px; }
+          .ss-mobile-img-cell { background: #EEEDED !important; }
+          .rec-section { background: #EEEDED !important; padding: 60px 0 80px; }
+          .ss-philosophy { padding: 80px 24px; }
+          .ss-philosophy-text { font-size: 12px; }
           .rec-carousel { padding-left: 0; }
           .rec-carousel-item {
             flex: 0 0 83.333vw;
