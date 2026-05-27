@@ -112,7 +112,7 @@ export default function Navbar() {
         <div className="acne-header-inner">
           {/* LEFT: Hamburger+Search (mobile) + Nav links (desktop) */}
           <div className="acne-nav-left">
-            <button className="acne-mob-icon acne-mobile-only" aria-label="Menu" onClick={openMenu}>
+            <button className="acne-mob-icon acne-mobile-only" aria-label="Menu" onClick={openMenuWithSearch}>
               <Menu size={18} strokeWidth={1} />
             </button>
             <nav className="acne-nav-links acne-desktop-only">
