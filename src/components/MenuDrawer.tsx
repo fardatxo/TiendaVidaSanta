@@ -168,6 +168,7 @@ export default function MenuDrawer() {
           </div>
 
           {/* Collections */}
+          <p className="md-nav-eyebrow">Navigate</p>
           <nav className="md-nav">
             {collections.map(c => (
               <button
@@ -205,12 +206,12 @@ export default function MenuDrawer() {
                   ref={searchInputRef}
                   type="text"
                   className="md-search-input"
-                  placeholder="Search, suits, coats, etc"
+                  placeholder="Search the Collection…"
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                 />
               </form>
-              <p className="md-search-popular-title">Trending searches</p>
+              <p className="md-search-popular-title">House Selection</p>
               <nav className="md-sub-nav">
                 {(trendingTitles.length > 0 ? trendingTitles : ['Hoodie', 'T-Shirt', 'Trousers']).map(term => (
                   <button key={term} className="md-sub-item md-search-tag" onClick={() => handleSearchTag(term)}>
@@ -245,43 +246,40 @@ export default function MenuDrawer() {
       </div>
 
       <style>{`
+        /* ══ BACKDROP ══ */
         .md-backdrop {
           position: fixed;
           inset: 0;
-          background: rgba(0,0,0,0.35);
+          background: rgba(0,0,0,0.6);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
           opacity: 0;
           pointer-events: none;
-          transition: opacity 0.3s ease;
+          transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1);
           z-index: 1000;
         }
-        .md-backdrop.open {
-          opacity: 1;
-          pointer-events: auto;
-        }
+        .md-backdrop.open { opacity: 1; pointer-events: auto; }
 
+        /* ══ DRAWER ══ */
         .md-drawer {
           position: fixed;
-          top: 0;
-          left: 0;
-          bottom: 0;
+          top: 0; left: 0; bottom: 0;
           display: flex;
           flex-direction: row;
           z-index: 1001;
           transform: translateX(-100%);
-          transition: transform 0.72s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .md-drawer.open {
-          transform: translateX(0);
-        }
+        .md-drawer.open { transform: translateX(0); }
 
-        /* ── Left column ── */
+        /* ══ LEFT COLUMN ══ */
         .md-col-left {
-          width: 300px;
-          background: #fff;
+          width: 320px;
+          background: #0c0c0c;
           display: flex;
           flex-direction: column;
           overflow-y: auto;
-          border-right: 1px solid #e5e5e5;
+          border-right: 1px solid rgba(255,255,255,0.04);
           scrollbar-width: none;
         }
         .md-col-left::-webkit-scrollbar { display: none; }
@@ -290,8 +288,7 @@ export default function MenuDrawer() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 20px 24px;
-          border-bottom: 1px solid #e5e5e5;
+          padding: 24px 40px;
         }
         .md-topbar-btn {
           display: flex;
@@ -300,84 +297,95 @@ export default function MenuDrawer() {
           background: none !important;
           border: none !important;
           cursor: pointer;
-          color: #111 !important;
+          color: rgba(255,255,255,0.35) !important;
           transform: none !important;
           border-radius: 0 !important;
-          padding: 4px !important;
+          padding: 6px !important;
+          transition: color 0.5s !important;
+        }
+        .md-topbar-btn:hover { color: rgba(255,255,255,0.75) !important; opacity: 1 !important; }
+        .md-topbar-btn svg { stroke: currentColor; }
+
+        /* Nav eyebrow */
+        .md-nav-eyebrow {
+          font-family: var(--font-primary);
+          font-size: 8px;
+          font-weight: 300;
+          letter-spacing: 0.5em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.13);
+          padding: 40px 40px 14px;
+          margin: 0;
         }
 
         .md-nav {
           display: flex;
           flex-direction: column;
-          padding: 16px 0;
+          padding: 0 0 48px;
           flex: 1;
         }
         .md-nav-item {
           display: block;
           width: 100%;
           text-align: left;
-          padding: 10px 28px;
+          padding: 11px 40px;
           font-family: var(--font-primary);
-          font-size: 17px;
-          font-weight: 500;
-          color: #111;
+          font-size: 10px;
+          font-weight: 300;
+          color: rgba(255,255,255,0.52);
           background: none !important;
           border: none !important;
           cursor: pointer;
           text-decoration: none;
           line-height: 1.5;
-          letter-spacing: 0 !important;
+          letter-spacing: 0.32em !important;
+          text-transform: uppercase;
           border-radius: 0 !important;
           transform: none !important;
-          transition: color 0.15s;
+          transition: color 0.5s;
         }
-        .md-nav-item:hover {
-          opacity: 1 !important;
-        }
-        .md-nav-active {
-          font-weight: 700;
-        }
-        .md-nav-item:not(.md-nav-active) {
-          color: #111;
-        }
-        /* When a sub-panel is open, dim non-active items */
-        .md-expanded .md-nav-item:not(.md-nav-active) {
-          color: #999;
-        }
+        .md-nav-item:hover { color: rgba(255,255,255,0.9) !important; opacity: 1 !important; }
+        .md-nav-active { color: rgba(255,255,255,0.88) !important; font-weight: 300; }
+        .md-nav-item:not(.md-nav-active) { color: rgba(255,255,255,0.52); }
+        .md-expanded .md-nav-item:not(.md-nav-active) { color: rgba(255,255,255,0.18); }
 
         .md-bottom-links {
           display: flex;
           flex-direction: column;
-          padding: 16px 0;
-          border-top: 1px solid #e5e5e5;
+          padding: 20px 0;
+          border-top: 1px solid rgba(255,255,255,0.04);
           margin-top: auto;
         }
         .md-bottom-link {
           display: block;
-          padding: 8px 28px;
+          padding: 6px 40px;
           font-family: var(--font-primary);
-          font-size: 16px;
-          font-weight: 400;
-          color: #111;
+          font-size: 9px;
+          font-weight: 300;
+          letter-spacing: 0.38em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.16);
           text-decoration: none;
+          transition: color 0.5s;
         }
-        .md-bottom-link:hover {
-          opacity: 0.7 !important;
-        }
+        .md-bottom-link:hover { color: rgba(255,255,255,0.5) !important; opacity: 1 !important; }
 
         .md-locale {
-          padding: 16px 28px 24px;
+          padding: 10px 40px 28px;
           font-family: var(--font-primary);
-          font-size: 14px;
-          color: #999;
+          font-size: 8px;
+          font-weight: 300;
+          letter-spacing: 0.4em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.08);
         }
 
-        /* ── Right column (tags) ── */
+        /* ══ RIGHT COLUMN ══ */
         .md-col-right {
           width: 0;
           overflow: hidden;
-          background: #fff;
-          transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          background: #0e0e0e;
+          transition: width 0.55s cubic-bezier(0.16, 1, 0.3, 1);
           display: flex;
           flex-direction: column;
           overflow-y: auto;
@@ -385,39 +393,40 @@ export default function MenuDrawer() {
         }
         .md-col-right::-webkit-scrollbar { display: none; }
         .md-col-right-open {
-          width: 280px;
-          border-right: 1px solid #e5e5e5;
+          width: 300px;
+          border-left: 1px solid rgba(255,255,255,0.04);
         }
 
-        /* Search form */
-        .md-search-form {
-          padding: 0 28px 16px;
-        }
+        /* ══ SEARCH ══ */
+        .md-search-form { padding: 52px 40px 20px; }
         .md-search-input {
           width: 100%;
-          padding: 12px 14px;
+          padding: 12px 0;
           font-family: var(--font-primary);
-          font-size: 15px;
-          color: #111;
-          border: 1px solid #ccc;
+          font-size: 12px;
+          font-weight: 300;
+          letter-spacing: 0.08em;
+          color: rgba(255,255,255,0.82);
+          background: transparent;
+          border: none;
+          border-bottom: 1px solid rgba(255,255,255,0.12);
           border-radius: 0;
           outline: none;
-          background: #fff;
+          transition: border-color 0.55s;
         }
-        .md-search-input:focus {
-          border-color: #111;
-        }
+        .md-search-input:focus { border-bottom-color: rgba(255,255,255,0.45); }
         .md-search-input::placeholder {
-          color: #999;
+          color: rgba(255,255,255,0.18);
+          letter-spacing: 0.15em;
         }
         .md-search-popular-title {
-          padding: 8px 28px;
+          padding: 32px 40px 14px;
           font-family: var(--font-primary);
-          font-size: 14px;
-          font-weight: 500;
-          color: #111;
-          text-decoration: underline;
-          text-underline-offset: 2px;
+          font-size: 8px;
+          font-weight: 300;
+          letter-spacing: 0.5em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.13);
           margin: 0;
         }
         .md-search-tag {
@@ -428,103 +437,98 @@ export default function MenuDrawer() {
           border: none !important;
           cursor: pointer;
           font-family: var(--font-primary);
-          font-size: 16px;
-          font-weight: 400;
-          color: #0066cc;
-          padding: 6px 28px;
+          font-size: 10px;
+          font-weight: 300;
+          letter-spacing: 0.28em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.42);
+          padding: 10px 40px;
           line-height: 1.5;
-          letter-spacing: 0 !important;
           border-radius: 0 !important;
           transform: none !important;
+          transition: color 0.5s;
         }
-        .md-search-tag:hover {
-          text-decoration: underline;
-          opacity: 1 !important;
-        }
+        .md-search-tag:hover { color: rgba(255,255,255,0.88) !important; opacity: 1 !important; }
 
+        /* ══ COLLECTION PANEL ══ */
         .md-sub-title {
           font-family: var(--font-primary);
-          font-size: 17px;
-          font-weight: 600;
-          color: #111;
-          padding: 24px 28px 16px;
+          font-size: 8px;
+          font-weight: 300;
+          letter-spacing: 0.5em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.16);
+          padding: 52px 40px 24px;
           margin: 0;
         }
-        .md-sub-nav {
-          display: flex;
-          flex-direction: column;
-        }
+        .md-sub-nav { display: flex; flex-direction: column; }
         .md-sub-item {
           display: block;
-          padding: 8px 28px;
+          padding: 10px 40px;
           font-family: var(--font-primary);
-          font-size: 16px;
-          font-weight: 400;
-          color: #111;
+          font-size: 10px;
+          font-weight: 300;
+          letter-spacing: 0.28em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.42);
           text-decoration: none;
           line-height: 1.5;
+          transition: color 0.5s;
         }
-        .md-sub-item:hover {
-          text-decoration: underline;
-          opacity: 1 !important;
-        }
+        .md-sub-item:hover { color: rgba(255,255,255,0.88) !important; opacity: 1 !important; }
 
-        /* Back button — only visible on mobile */
+        /* ══ BACK BUTTON ══ */
         .md-back-btn {
           display: none;
           align-items: center;
-          padding: 20px 28px 8px;
+          padding: 28px 40px 8px;
           background: none !important;
           border: none !important;
           cursor: pointer;
-          color: #111 !important;
+          color: rgba(255,255,255,0.22) !important;
           transform: none !important;
           border-radius: 0 !important;
+          transition: color 0.5s !important;
         }
+        .md-back-btn:hover { color: rgba(255,255,255,0.6) !important; opacity: 1 !important; }
+        .md-back-btn svg { stroke: currentColor; }
 
+        /* ══ MOBILE ══ */
         @media (max-width: 767px) {
-          .md-backdrop {
-            display: none;
-          }
-          .md-drawer {
-            width: 100vw;
-            overflow: hidden;
-          }
-
-          /* Left column — swipes out to the left */
+          .md-backdrop { display: none; }
+          .md-drawer { width: 100vw; overflow: hidden; }
           .md-col-left {
             width: 100vw;
             border-right: none;
             position: absolute;
             top: 0; left: 0; bottom: 0;
             transform: translateX(0);
-            transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
           }
-          .md-col-left-hidden-mobile {
-            transform: translateX(-100%);
-            pointer-events: none;
-          }
-
-          /* Right column — swipes in from the right */
+          .md-col-left-hidden-mobile { transform: translateX(-100%); pointer-events: none; }
           .md-col-right {
             width: 100vw;
             position: absolute;
             top: 0; left: 0; bottom: 0;
             transform: translateX(100%);
             overflow-y: auto;
-            border-right: none;
-            transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: none;
+            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
           }
-          .md-col-right-open {
-            transform: translateX(0);
-            pointer-events: auto;
-            border-right: none;
-          }
-
-          .md-back-btn {
-            display: flex;
-          }
+          .md-col-right-open { transform: translateX(0); pointer-events: auto; border-left: none; }
+          .md-back-btn { display: flex; }
+          .md-nav-eyebrow { padding: 32px 28px 12px; }
+          .md-nav-item { padding: 11px 28px; }
+          .md-topbar { padding: 24px 28px; }
+          .md-bottom-link { padding: 6px 28px; }
+          .md-locale { padding: 10px 28px 28px; }
+          .md-search-form { padding: 48px 28px 20px; }
+          .md-search-popular-title { padding: 28px 28px 14px; }
+          .md-search-tag { padding: 10px 28px; }
+          .md-sub-title { padding: 48px 28px 20px; }
+          .md-sub-item { padding: 10px 28px; }
+          .md-back-btn { padding: 28px 28px 8px; }
         }
       `}</style>
     </>
