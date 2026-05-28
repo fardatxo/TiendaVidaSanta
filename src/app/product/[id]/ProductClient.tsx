@@ -845,7 +845,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         ══════════════════════════════════════ */
 
         html, body {
-          background: #EEEDED !important;
+          background: #ffffff !important;
         }
 
         .ss-pdp-layout {
@@ -853,7 +853,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           flex-direction: column;
           font-family: var(--font-primary);
           color: #111;
-          background: #EEEDED;
+          background: #ffffff;
         }
         @media (min-width: 768px) {
           .ss-pdp-layout { background: unset; }
@@ -862,7 +862,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         /* ── GALLERY ── */
         .ss-gallery {
           position: relative;
-          background: #EEEDED;
+          background: #ffffff;
           overflow: hidden;
         }
         /* Mobile: show carousel, hide desktop stack */
@@ -884,7 +884,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           display: flex;
           align-items: center;
           justify-content: center;
-          background: #EEEDED;
+          background: #ffffff;
           overflow: hidden;
         }
         .ss-gallery-img {
@@ -926,7 +926,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         /* ── INFO PANEL ── */
         .ss-info {
           padding: 24px 20px 28px 20px;
-          background: #EEEDED;
+          background: #ffffff;
         }
 
         .ss-title {
@@ -998,7 +998,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           border-right: 1px solid rgba(0,0,0,0.06);
           border-radius: 0;
           cursor: pointer;
-          background: #EEEDED;
+          background: #ffffff;
           flex-shrink: 0;
           box-sizing: border-box;
           overflow: hidden;
@@ -1387,7 +1387,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           .ss-pdp-layout {
             flex-direction: row;
             min-height: 100vh;
-            background: #EEEDED;
+            background: #ffffff;
           }
 
           /* Desktop: hide mobile carousel, show stacked images */
@@ -1406,7 +1406,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           .ss-desktop-img-block {
             width: 100%;
             aspect-ratio: 3 / 4;
-            background: #EEEDED;
+            background: #ffffff;
             overflow: hidden;
             display: flex;
             align-items: center;
@@ -1432,7 +1432,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
-            background: #EEEDED;
+            background: #ffffff;
           }
           .ss-info::-webkit-scrollbar { display: none; }
 
@@ -1459,7 +1459,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
         /* ── CAROUSEL IMAGE BLOCKS ── */
         .rec-img-wrap {
-          background: #EEEDED;
+          background: #ffffff;
         }
 
         /* ── COMPLETE THE OUTFIT ── */
@@ -1565,13 +1565,13 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 6px;
-            background: #EEEDED;
+            background: #ffffff;
             padding: 0 20px 120px 20px;
           }
           .ss-mobile-img-cell {
             aspect-ratio: 3 / 4;
             overflow: hidden;
-            background: #EEEDED;
+            background: #ffffff;
           }
           .ss-mobile-img-cell img {
             width: 100%;
@@ -1582,13 +1582,13 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
 
         @media (max-width: 767px) {
-          html, body { background: #EEEDED !important; }
+          html, body { background: #ffffff !important; }
           .ss-gallery,
           .ss-gallery-item,
           .ss-info,
           .outfit-section,
-          .ss-mobile-img-cell { background: #EEEDED !important; }
-          .rec-section { background: #EEEDED !important; padding: 60px 0 80px; }
+          .ss-mobile-img-cell { background: #ffffff !important; }
+          .rec-section { background: #ffffff !important; padding: 60px 0 80px; }
           .ss-philosophy { padding: 80px 24px; }
           .ss-philosophy-text { font-size: 12px; }
           .rec-carousel { padding-left: 0; }
