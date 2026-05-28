@@ -81,6 +81,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   const [availPhone, setAvailPhone] = useState('');
   const [availSubmitted, setAvailSubmitted] = useState(false);
   const [availSubmitting, setAvailSubmitting] = useState(false);
+  const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const { t } = useTranslation();
   useLocale();
   const { toggle, has } = useWishlist();
@@ -261,6 +262,15 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
     el.addEventListener('wheel', handleWheel, { passive: false });
     return () => el.removeEventListener('wheel', handleWheel);
   }, []);
+
+  useEffect(() => {
+    if (availModal || sizeGuideOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [availModal, sizeGuideOpen]);
   const autoPlayRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isPausedRef = useRef(false);
 
@@ -769,7 +779,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         <div className="ss-size-drawer-header">
           <span className="ss-size-drawer-title">{product.title}</span>
           <div className="ss-size-header-right">
-            <span className="ss-size-guide">Size Guide</span>
+            <button className="ss-size-guide" onClick={() => setSizeGuideOpen(true)} aria-label="Size information">Sizing</button>
             <button className="ss-size-close" onClick={() => setSizeOpen(false)} aria-label="Close">
               <X size={16} strokeWidth={1.4} />
             </button>
@@ -783,7 +793,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
               <button
                 key={size}
                 className={`ss-size-row${isSelected ? ' selected' : ''}${!available ? ' oos' : ''}`}
-                onClick={() => handleSizeSelectInDrawer(size)}
+                onClick={() => { if (!available) { openAvailModal(size); } else { handleSizeSelectInDrawer(size); } }}
               >
                 <span className="ss-size-row-name">
                   {isSelected && <span className="ss-size-bullet">•&nbsp;</span>}
@@ -792,7 +802,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                 {!available && (
                   <div className="ss-size-oos-wrap">
                     <span className="ss-sold-out">Reserved</span>
-                    <button className="ss-get-notified" type="button" onClick={(e) => { e.stopPropagation(); openAvailModal(size); }}>Request Availability</button>
+                    <span className="ss-get-notified-hint">Request Availability</span>
                   </div>
                 )}
               </button>
@@ -963,6 +973,53 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                 </button>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ══ SIZE GUIDE MODAL ══ */}
+      {sizeGuideOpen && (
+        <div className="sg-overlay" onClick={() => setSizeGuideOpen(false)}>
+          <div className="sg-modal" onClick={e => e.stopPropagation()}>
+            {/* Header */}
+            <div className="sg-header">
+              <span className="sg-title">Size Information</span>
+              <button className="sg-close" onClick={() => setSizeGuideOpen(false)} aria-label="Close">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1">
+                  <line x1="1" y1="1" x2="13" y2="13" />
+                  <line x1="13" y1="1" x2="1" y2="13" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Subtext */}
+            <p className="sg-subtext">
+              Measurements are approximate.<br />
+              Designed for a relaxed silhouette.
+            </p>
+
+            {/* Size table */}
+            <div className="sg-table">
+              {([
+                { size: 'XS', chest: 54, length: 66 },
+                { size: 'S',  chest: 56, length: 68 },
+                { size: 'M',  chest: 58, length: 70 },
+                { size: 'L',  chest: 60, length: 72 },
+                { size: 'XL', chest: 62, length: 74 },
+              ] as const).map((row) => (
+                <div className="sg-table-row" key={row.size}>
+                  <span className="sg-size-label">{row.size}</span>
+                  <span className="sg-measurement">Chest&nbsp;&nbsp;{row.chest} cm</span>
+                  <span className="sg-measurement">Length&nbsp;&nbsp;{row.length} cm</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Fit notes */}
+            <div className="sg-fit-notes">
+              <p className="sg-fit-note">Model is 183 cm wearing size L.</p>
+              <p className="sg-fit-note">Fits oversized by design.</p>
+            </div>
           </div>
         </div>
       )}
@@ -1276,14 +1333,19 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           flex-shrink: 0;
         }
         .ss-size-guide {
-          font-size: 8px;
-          letter-spacing: 0.38em;
+          font-size: 7px;
+          letter-spacing: 0.42em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.2);
+          padding-right: 0.42em;
+          color: rgba(255,255,255,0.18);
+          background: none;
+          border: none;
           cursor: pointer;
+          font-family: var(--font-primary);
+          font-weight: 300;
           transition: color 0.4s;
         }
-        .ss-size-guide:hover { color: rgba(255,255,255,0.55); }
+        .ss-size-guide:hover { color: rgba(255,255,255,0.5); }
         .ss-size-close {
           background: none; border: none;
           cursor: pointer; color: rgba(255,255,255,0.28);
@@ -1306,56 +1368,67 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 18px 32px;
+          padding: 22px 32px;
           border: none;
-          border-bottom: 1px solid rgba(255,255,255,0.05);
+          border-bottom: 1px solid rgba(255,255,255,0.04);
+          border-left: 2px solid transparent;
           background: none;
           cursor: pointer;
           font-family: inherit;
           text-align: left;
-          transition: background 0.4s;
+          box-sizing: border-box;
+          transition: background 0.35s, border-left-color 0.35s, opacity 0.35s;
         }
-        .ss-size-row:not(.oos):hover { background: rgba(255,255,255,0.03); }
-        .ss-size-row.oos { cursor: default; }
+        .ss-size-row:not(.oos):not(.selected):hover {
+          background: rgba(255,255,255,0.025);
+        }
+        .ss-size-row.selected {
+          border-left-color: rgba(255,255,255,0.5);
+          background: rgba(255,255,255,0.03);
+        }
+        .ss-size-row.oos {
+          cursor: pointer;
+          opacity: 0.38;
+        }
+        .ss-size-row.oos:hover {
+          opacity: 0.62;
+          background: rgba(255,255,255,0.015);
+        }
         .ss-size-row-name {
           font-size: 10px;
           font-weight: 300;
           letter-spacing: 0.32em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.7);
+          color: rgba(255,255,255,0.72);
           display: flex;
           align-items: center;
         }
-        .ss-size-row.oos .ss-size-row-name { color: rgba(255,255,255,0.18); }
-        .ss-size-bullet { color: rgba(255,255,255,0.7); }
+        .ss-size-row.selected .ss-size-row-name { color: rgba(255,255,255,0.9); }
+        .ss-size-bullet { color: rgba(255,255,255,0.72); }
         .ss-size-oos-wrap {
           display: flex;
           flex-direction: column;
           align-items: flex-end;
-          gap: 2px;
+          gap: 4px;
         }
         .ss-sold-out {
-          font-size: 8px;
-          letter-spacing: 0.3em;
+          font-size: 7px;
+          letter-spacing: 0.35em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.18);
+          color: rgba(255,255,255,0.22);
+          padding-right: 0.35em;
         }
-        .ss-get-notified {
-          font-size: 8px;
+        .ss-get-notified-hint {
+          font-size: 7px;
           font-family: var(--font-primary);
           font-weight: 300;
-          letter-spacing: 0.3em;
+          letter-spacing: 0.32em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.35);
-          text-decoration: underline;
-          text-underline-offset: 3px;
-          background: none;
-          border: none;
-          padding: 0;
-          cursor: pointer;
-          transition: color 0.3s;
+          color: rgba(255,255,255,0.28);
+          padding-right: 0.32em;
+          transition: color 0.35s;
         }
-        .ss-get-notified:hover { color: rgba(255,255,255,0.65); }
+        .ss-size-row.oos:hover .ss-get-notified-hint { color: rgba(255,255,255,0.55); }
 
         .ss-size-drawer-footer {
           flex-shrink: 0;
@@ -1902,6 +1975,11 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .arm-success {
           text-align: center;
           padding: 24px 0 8px;
+          animation: arm-success-appear 0.32s cubic-bezier(0.22,1,0.36,1) forwards;
+        }
+        @keyframes arm-success-appear {
+          from { opacity: 0; transform: translateY(6px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
         .arm-success-title {
           display: block;
@@ -1909,20 +1987,142 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           font-size: 22px;
           font-weight: 300;
           letter-spacing: 0.04em;
-          color: rgba(255,255,255,0.7);
+          color: rgba(255,255,255,0.65);
           margin-bottom: 18px;
         }
         .arm-success-sub {
           font-family: var(--font-primary);
           font-size: 10px;
           font-weight: 300;
-          letter-spacing: 0.04em;
-          line-height: 1.8;
-          color: rgba(255,255,255,0.25);
+          letter-spacing: 0.06em;
+          line-height: 1.9;
+          color: rgba(255,255,255,0.22);
           margin: 0;
         }
         @media (max-width: 480px) {
           .arm-modal { padding: 32px 24px; border-radius: 10px; }
+        }
+
+        /* ══ SIZE GUIDE MODAL ══ */
+        .sg-overlay {
+          position: fixed;
+          inset: 0;
+          z-index: 5000;
+          background: rgba(0,0,0,0.72);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 24px;
+          animation: arm-fade-in 0.35s cubic-bezier(0.22,1,0.36,1) forwards;
+        }
+        .sg-modal {
+          background: #111;
+          border: 1px solid #222;
+          border-radius: 12px;
+          width: 100%;
+          max-width: 480px;
+          padding: 40px 36px;
+          box-sizing: border-box;
+          animation: arm-slide-in 0.38s cubic-bezier(0.22,1,0.36,1) forwards;
+        }
+        .sg-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 20px;
+        }
+        .sg-title {
+          font-family: var(--font-primary);
+          font-size: 9px;
+          font-weight: 300;
+          letter-spacing: 0.5em;
+          text-transform: uppercase;
+          padding-right: 0.5em;
+          color: rgba(255,255,255,0.55);
+        }
+        .sg-close {
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: rgba(255,255,255,0.28);
+          display: flex;
+          align-items: center;
+          padding: 6px;
+          transition: color 0.3s;
+        }
+        .sg-close:hover { color: rgba(255,255,255,0.7); }
+        .sg-subtext {
+          font-family: var(--font-primary);
+          font-size: 11px;
+          font-weight: 300;
+          line-height: 1.85;
+          letter-spacing: 0.02em;
+          color: rgba(255,255,255,0.26);
+          margin: 0 0 40px 0;
+        }
+        .sg-table {
+          display: flex;
+          flex-direction: column;
+        }
+        .sg-table-row {
+          display: grid;
+          grid-template-columns: 44px 1fr 1fr;
+          align-items: center;
+          padding: 18px 0;
+          border-bottom: 1px solid rgba(255,255,255,0.04);
+          gap: 12px;
+        }
+        .sg-table-row:first-child {
+          border-top: 1px solid rgba(255,255,255,0.04);
+        }
+        .sg-size-label {
+          font-family: var(--font-primary);
+          font-size: 9px;
+          font-weight: 300;
+          letter-spacing: 0.38em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.65);
+          padding-right: 0.38em;
+        }
+        .sg-measurement {
+          font-family: var(--font-primary);
+          font-size: 9px;
+          font-weight: 300;
+          letter-spacing: 0.1em;
+          color: rgba(255,255,255,0.28);
+        }
+        .sg-fit-notes {
+          margin-top: 32px;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+        .sg-fit-note {
+          font-family: var(--font-primary);
+          font-size: 9px;
+          font-weight: 300;
+          letter-spacing: 0.06em;
+          color: rgba(255,255,255,0.18);
+          margin: 0;
+          font-style: italic;
+        }
+        @media (max-width: 480px) {
+          .sg-overlay {
+            align-items: flex-end;
+            padding: 0;
+          }
+          .sg-modal {
+            border-radius: 16px 16px 0 0;
+            max-width: 100%;
+            padding: 32px 24px 48px;
+            animation: sg-slide-up 0.4s cubic-bezier(0.22,1,0.36,1) forwards;
+          }
+          @keyframes sg-slide-up {
+            from { opacity: 0.3; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+          }
         }
       `}</style>
     </>
