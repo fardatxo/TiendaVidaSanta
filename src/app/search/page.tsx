@@ -20,7 +20,11 @@ export default async function SearchPage({
     ? products.filter(p =>
         p.title.toLowerCase().includes(query) ||
         p.description.toLowerCase().includes(query) ||
-        p.tags.some(t => t.toLowerCase().includes(query))
+        p.tags.some(t => t.toLowerCase().includes(query)) ||
+        p.variants.some(v =>
+          v.title.toLowerCase().includes(query) ||
+          v.selectedOptions.some(o => o.value.toLowerCase().includes(query))
+        )
       )
     : [];
 
