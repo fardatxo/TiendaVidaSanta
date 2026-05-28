@@ -14,6 +14,7 @@ import CartDrawer from "@/components/CartDrawer";
 import ShippingBanner from "@/components/ShippingBanner";
 import MenuDrawer from "@/components/MenuDrawer";
 import CookieBanner from "@/components/CookieBanner";
+import TransitionProvider from "@/components/TransitionProvider";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -37,6 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={jost.variable} suppressHydrationWarning>
       <body suppressHydrationWarning>
+        <TransitionProvider>
         <LocaleProvider>
           <UIProvider>
             <CartProvider>
@@ -55,6 +57,7 @@ export default function RootLayout({
             </CartProvider>
           </UIProvider>
         </LocaleProvider>
+        </TransitionProvider>
       </body>
     </html>
   );
