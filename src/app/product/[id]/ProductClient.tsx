@@ -1837,12 +1837,12 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             rgba(7,7,7,0.99) 100%
           );
           border: 1px solid rgba(255,255,255,0.04);
-          border-radius: 0;
+          border-radius: 12px;
           width: 100%;
           max-width: 440px;
           padding: 40px 36px;
           box-sizing: border-box;
-          margin-top: 18vh;
+          margin-top: 24vh;
           box-shadow:
             0 0 0 1px rgba(255,255,255,0.02),
             0 40px 120px rgba(0,0,0,0.65);
@@ -2035,12 +2035,12 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             rgba(7,7,7,0.99) 100%
           );
           border: 1px solid rgba(255,255,255,0.04);
-          border-radius: 0;
+          border-radius: 12px;
           width: 100%;
           max-width: 440px;
           padding: 40px 36px;
           box-sizing: border-box;
-          margin-top: 18vh;
+          margin-top: 24vh;
           box-shadow:
             0 0 0 1px rgba(255,255,255,0.02),
             0 40px 120px rgba(0,0,0,0.65);
@@ -2075,11 +2075,11 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .sg-close:hover { opacity: 0.7; }
         .sg-subtext {
           font-family: var(--font-primary);
-          font-size: 10px;
+          font-size: 9px;
           font-weight: 300;
-          line-height: 1.7;
+          line-height: 1.75;
           letter-spacing: 0.01em;
-          color: rgba(255,255,255,0.24);
+          color: rgba(255,255,255,0.18);
           margin: 0 0 32px 0;
         }
         .sg-table {
@@ -2134,7 +2134,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             padding: 0;
           }
           .arm-modal, .sg-modal {
-            margin-top: 0;
+            margin-top: 0 !important;
             border-radius: 24px 24px 0 0;
             max-width: 100%;
             width: 100%;
