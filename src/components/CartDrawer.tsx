@@ -131,7 +131,7 @@ export default function CartDrawer() {
                 Continue to Checkout
               </button>
               <button className="cd-favorites-btn">
-                Archive
+                Save for Later
               </button>
             </div>
           </div>
