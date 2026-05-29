@@ -9,6 +9,7 @@ export interface WishlistItem {
   price: number;
   currencyCode: string;
   collectionTitle: string;
+  addedAt?: number;
 }
 
 interface WishlistContextValue {
@@ -19,7 +20,7 @@ interface WishlistContextValue {
   has: (handle: string) => boolean;
 }
 
-const STORAGE_KEY = 'wishlist';
+const STORAGE_KEY = 'tonet-archive';
 const WishlistContext = createContext<WishlistContextValue | null>(null);
 
 function readStorage(): WishlistItem[] {
@@ -53,7 +54,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   const add = useCallback((item: WishlistItem) => {
     setItems(prev => {
       if (prev.some(i => i.handle === item.handle)) return prev;
-      return [...prev, item];
+      return [...prev, { ...item, addedAt: Date.now() }];
     });
   }, []);
 
@@ -66,7 +67,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
       if (prev.some(i => i.handle === item.handle)) {
         return prev.filter(i => i.handle !== item.handle);
       }
-      return [...prev, item];
+      return [...prev, { ...item, addedAt: Date.now() }];
     });
   }, []);
 

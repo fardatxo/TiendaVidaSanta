@@ -1,210 +1,342 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useWishlist } from '@/context/WishlistContext';
-import { useLocale } from '@/context/LocaleContext';
-import { useTranslation } from '@/lib/i18n';
-import { useAuth } from '@/context/AuthContext';
+
+function archiveId(handle: string): string {
+  const n = handle.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  return `TNT-${String((n % 9000) + 1000).padStart(4, '0')}`;
+}
+
+function timeRemaining(addedAt: number | undefined): { text: string; expired: boolean } {
+  if (!addedAt) return { text: 'Active', expired: false };
+  const elapsed = Date.now() - addedAt;
+  const h48 = 48 * 3600 * 1000;
+  if (elapsed >= h48) return { text: 'Expired', expired: true };
+  const rem = h48 - elapsed;
+  const h = Math.floor(rem / 3600000);
+  const m = Math.floor((rem % 3600000) / 60000);
+  if (h > 0) return { text: `${h}h remaining`, expired: false };
+  return { text: `${m}m remaining`, expired: false };
+}
+
+function formatAdded(ts: number | undefined): string {
+  if (!ts) return '—';
+  return new Date(ts).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'long', year: 'numeric',
+  }).toUpperCase();
+}
 
 export default function WishlistClient() {
   const { items, remove } = useWishlist();
-  const { formatPrice } = useLocale();
-  const { t } = useTranslation();
-  const { user } = useAuth();
+  const [, setTick] = useState(0);
+
+  useEffect(() => {
+    const iv = setInterval(() => setTick(t => t + 1), 60000);
+    return () => clearInterval(iv);
+  }, []);
 
   return (
     <>
-      <div className="wl-wrap">
-        {/* Tabs */}
-        <nav className="wl-tabs">
-          <Link href="/account" className="wl-tab">{t('wishlist.account')}</Link>
-          <Link href="/account/orders" className="wl-tab">{t('wishlist.orders')}</Link>
-          <Link href="/account/information" className="wl-tab">{t('wishlist.myInfo')}</Link>
-          <Link href="/wishlist" className="wl-tab wl-tab--active">{t('wishlist.tabTitle')}</Link>
-        </nav>
+      <div className="pa-wrap">
 
-        <h1 className="wl-title">{t('wishlist.title')}</h1>
-        {!user && (
-          <p className="wl-subtitle"><Link href="/login" className="wl-signin">{t('wishlist.signIn')}</Link> {t('wishlist.subtitleRest')}</p>
-        )}
+        {/* ── Header */}
+        <div className="pa-header">
+          <span className="pa-supra">Tonet</span>
+          <h1 className="pa-title">Personal Archive</h1>
+          <p className="pa-desc">
+            A temporary collection of pieces retained for future consideration.
+            <br />
+            Items remain archived for 48 hours.
+          </p>
+        </div>
 
+        {/* ── Empty state */}
         {items.length === 0 ? (
-          <p className="wl-empty">{t('wishlist.empty')}</p>
+          <div className="pa-empty">
+            <span className="pa-empty-title">Your archive is empty.</span>
+            <p className="pa-empty-sub">
+              Browse the collection and add pieces to build your personal archive.
+            </p>
+            <Link href="/collections" className="pa-browse">Browse the Collection</Link>
+          </div>
         ) : (
-          <div className="wl-grid">
-            {items.map((item) => (
-              <div key={item.handle} className="wl-card">
-                <button
-                  className="wl-remove"
-                  onClick={() => remove(item.handle)}
-                  aria-label="Remove"
-                >
-                  X {t('wishlist.remove')}
-                </button>
+          <div className="pa-entries">
+            {items.map((item) => {
+              const id = archiveId(item.handle);
+              const { text: remaining, expired } = timeRemaining(item.addedAt);
+              return (
+                <div key={item.handle} className={`pa-entry${expired ? ' pa-entry--expired' : ''}`}>
 
-                <Link href={`/product/${item.handle}`} className="wl-card-link">
-                  <div className="wl-img-wrap">
-                    {item.imageUrl && (
-                      <img src={item.imageUrl} alt={item.title} className="wl-img" />
-                    )}
+                  {/* Image */}
+                  <Link href={`/product/${item.handle}`} className="pa-img-link">
+                    <div className="pa-img-wrap">
+                      {item.imageUrl && (
+                        <img src={item.imageUrl} alt={item.title} className="pa-img" />
+                      )}
+                    </div>
+                  </Link>
+
+                  {/* Catalogue data */}
+                  <div className="pa-data">
+                    <div className="pa-data-top">
+                      <span className="pa-id">{id}</span>
+                      {item.collectionTitle && (
+                        <span className="pa-collection">{item.collectionTitle.toUpperCase()}</span>
+                      )}
+                    </div>
+
+                    <Link href={`/product/${item.handle}`} className="pa-title-link">
+                      <h2 className="pa-piece-title">{item.title.toUpperCase()}</h2>
+                    </Link>
+
+                    <div className="pa-fields">
+                      <div className="pa-field">
+                        <span className="pa-field-label">Added</span>
+                        <span className="pa-field-value">{formatAdded(item.addedAt)}</span>
+                      </div>
+                      <div className="pa-field">
+                        <span className="pa-field-label">Duration</span>
+                        <span className={`pa-field-value${expired ? ' pa-field-expired' : ''}`}>
+                          {remaining}
+                        </span>
+                      </div>
+                      <div className="pa-field">
+                        <span className="pa-field-label">Status</span>
+                        <span className={`pa-status${expired ? ' pa-status--expired' : ''}`}>
+                          {expired ? 'Expired' : 'Available'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button className="pa-remove" onClick={() => remove(item.handle)}>
+                      Remove from Archive
+                    </button>
                   </div>
-                  <div className="wl-meta">
-                    <span className="wl-name">{item.title}</span>
-                    <span className="wl-price">{formatPrice(item.price, item.currencyCode)}</span>
-                    {item.collectionTitle && (
-                      <span className="wl-collection">{item.collectionTitle}</span>
-                    )}
-                  </div>
-                </Link>
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
 
       <style>{`
-        .wl-wrap {
-          max-width: 960px;
-          margin: 0 auto;
-          padding: 106px 24px 80px;
+        /* ═══════════════════════════════════════
+           TONET — PERSONAL ARCHIVE
+        ═══════════════════════════════════════ */
+        html, body { background: #0c0c0c !important; }
+
+        .pa-wrap {
+          min-height: 100vh;
+          background: #0c0c0c;
+          padding: 130px 48px 120px;
+          box-sizing: border-box;
           font-family: var(--font-primary);
-          font-size: 11px;
-          color: #111;
+          color: rgba(255,255,255,0.7);
         }
 
-        /* ── Tabs ── */
-        .wl-tabs {
-          display: flex;
-          gap: 24px;
-          border-bottom: none;
-          margin-bottom: 32px;
-          flex-wrap: wrap;
+        /* Header */
+        .pa-header {
+          max-width: 560px;
+          margin: 0 auto 88px;
+          text-align: center;
+          padding-bottom: 64px;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .wl-tab {
-          font-size: 11px;
-          font-weight: 400;
-          text-decoration: none;
-          color: #111;
-          letter-spacing: 0.03em;
-          padding-bottom: 4px;
-          border-bottom: 1px solid transparent;
-        }
-        .wl-tab:hover {
-          border-bottom-color: #111;
-        }
-        .wl-tab--active {
-          text-decoration: underline;
-          text-underline-offset: 3px;
-        }
-
-        /* ── Header ── */
-        .wl-title {
-          font-size: 11px;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.12em;
-          margin: 0 0 12px;
-        }
-        .wl-subtitle {
-          font-size: 11px;
-          font-weight: 400;
-          color: #111;
-          margin: 0 0 32px;
-        }
-        .wl-signin {
-          color: #111;
-          text-decoration: underline;
-          text-underline-offset: 2px;
-          text-transform: uppercase;
-          font-weight: 700;
-        }
-        .wl-empty {
-          font-size: 12px;
-          color: #999;
-          margin-top: 32px;
-        }
-
-        /* ── Grid ── */
-        .wl-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 0;
-        }
-
-        /* ── Card ── */
-        .wl-card {
-          position: relative;
-          border: 1px solid transparent;
-        }
-        .wl-remove {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          z-index: 2;
-          background: none;
-          border: none;
-          cursor: pointer;
-          font-family: inherit;
-          font-size: 10px;
-          font-weight: 500;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          color: #111;
-          padding: 4px 0;
-          opacity: 0;
-          transition: opacity 0.15s;
-        }
-        .wl-card:hover .wl-remove {
-          opacity: 1;
-        }
-        .wl-card-link {
+        .pa-supra {
           display: block;
-          text-decoration: none;
-          color: inherit;
+          font-size: 8px;
+          font-weight: 300;
+          letter-spacing: 0.55em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.18);
+          margin-bottom: 28px;
+          padding-right: 0.55em;
         }
-        .wl-img-wrap {
-          width: 100%;
+        .pa-title {
+          font-family: var(--font-brand);
+          font-size: clamp(26px, 4vw, 42px);
+          font-weight: 300;
+          letter-spacing: 0.18em;
+          color: rgba(255,255,255,0.7);
+          margin: 0 0 28px;
+          padding-right: 0.18em;
+        }
+        .pa-desc {
+          font-size: 10px;
+          font-weight: 300;
+          line-height: 2.1;
+          letter-spacing: 0.04em;
+          color: rgba(255,255,255,0.2);
+          margin: 0;
+        }
+
+        /* Empty */
+        .pa-empty {
+          max-width: 440px;
+          margin: 80px auto;
+          text-align: center;
+        }
+        .pa-empty-title {
+          display: block;
+          font-size: 12px;
+          font-weight: 300;
+          letter-spacing: 0.08em;
+          color: rgba(255,255,255,0.35);
+          margin-bottom: 16px;
+        }
+        .pa-empty-sub {
+          font-size: 10px;
+          font-weight: 300;
+          line-height: 2;
+          color: rgba(255,255,255,0.16);
+          margin: 0 0 44px;
+        }
+        .pa-browse {
+          display: inline-block;
+          font-size: 8px;
+          font-weight: 300;
+          letter-spacing: 0.44em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.28);
+          text-decoration: none;
+          border-bottom: 1px solid rgba(255,255,255,0.12);
+          padding-bottom: 6px;
+          transition: color 0.35s, border-color 0.35s;
+        }
+        .pa-browse:hover { color: rgba(255,255,255,0.55); border-bottom-color: rgba(255,255,255,0.3); }
+
+        /* Entries */
+        .pa-entries {
+          max-width: 860px;
+          margin: 0 auto;
+        }
+        .pa-entry {
+          display: grid;
+          grid-template-columns: 108px 1fr;
+          gap: 44px;
+          padding: 44px 0;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+          transition: opacity 0.4s;
+        }
+        .pa-entry:first-child { border-top: 1px solid rgba(255,255,255,0.05); }
+        .pa-entry--expired { opacity: 0.38; }
+
+        /* Image */
+        .pa-img-link { display: block; text-decoration: none; }
+        .pa-img-wrap {
+          width: 108px;
           aspect-ratio: 3 / 4;
-          background: #f5f5f5;
+          background: rgba(255,255,255,0.025);
           overflow: hidden;
         }
-        .wl-img {
+        .pa-img {
           width: 100%;
           height: 100%;
           object-fit: contain;
           display: block;
+          filter: grayscale(0.1);
+          transition: filter 0.4s;
         }
-        .wl-meta {
-          padding: 10px 10px 14px;
+        .pa-img-wrap:hover .pa-img { filter: grayscale(0); }
+
+        /* Data column */
+        .pa-data {
           display: flex;
           flex-direction: column;
-          gap: 2px;
+          justify-content: space-between;
+          gap: 22px;
+          padding: 2px 0;
         }
-        .wl-name {
-          font-size: 11px;
-          font-weight: 500;
+        .pa-data-top { display: flex; flex-direction: column; gap: 5px; }
+        .pa-id {
+          font-size: 8px;
+          font-weight: 300;
+          letter-spacing: 0.48em;
           text-transform: uppercase;
-          letter-spacing: 0.03em;
-          line-height: 1.3;
-          color: #111;
+          color: rgba(255,255,255,0.18);
+          padding-right: 0.48em;
         }
-        .wl-price {
-          font-size: 11px;
-          font-weight: 400;
-          color: #111;
-        }
-        .wl-collection {
-          font-size: 10px;
-          font-weight: 400;
-          letter-spacing: 0.03em;
-          color: #999;
+        .pa-collection {
+          font-size: 7px;
+          font-weight: 300;
+          letter-spacing: 0.38em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.12);
         }
 
+        .pa-title-link { text-decoration: none; }
+        .pa-piece-title {
+          font-size: 11px;
+          font-weight: 300;
+          letter-spacing: 0.2em;
+          color: rgba(255,255,255,0.68);
+          margin: 0;
+          line-height: 1.6;
+          transition: color 0.3s;
+        }
+        .pa-title-link:hover .pa-piece-title { color: rgba(255,255,255,0.92); }
+
+        /* Fields */
+        .pa-fields {
+          display: flex;
+          gap: 44px;
+          flex-wrap: wrap;
+        }
+        .pa-field { display: flex; flex-direction: column; gap: 6px; }
+        .pa-field-label {
+          font-size: 7px;
+          font-weight: 300;
+          letter-spacing: 0.42em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.15);
+          padding-right: 0.42em;
+        }
+        .pa-field-value {
+          font-size: 9px;
+          font-weight: 300;
+          letter-spacing: 0.06em;
+          color: rgba(255,255,255,0.4);
+        }
+        .pa-field-expired { color: rgba(255,255,255,0.18) !important; }
+
+        .pa-status {
+          font-size: 8px;
+          font-weight: 300;
+          letter-spacing: 0.35em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.35);
+          padding-right: 0.35em;
+        }
+        .pa-status--expired { color: rgba(255,255,255,0.16); }
+
+        /* Remove */
+        .pa-remove {
+          background: none;
+          border: none;
+          padding: 0;
+          cursor: pointer;
+          font-family: var(--font-primary);
+          font-size: 7px;
+          font-weight: 300;
+          letter-spacing: 0.38em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.12);
+          text-decoration: underline;
+          text-underline-offset: 3px;
+          align-self: flex-start;
+          transition: color 0.3s;
+        }
+        .pa-remove:hover { color: rgba(255,255,255,0.35); }
+
         @media (max-width: 767px) {
-          .wl-wrap { padding: 86px 16px 100px; }
-          .wl-tabs { gap: 16px; margin-bottom: 24px; }
-          .wl-grid { grid-template-columns: repeat(2, 1fr); }
-          .wl-remove { opacity: 1; }
+          .pa-wrap { padding: 100px 24px 80px; }
+          .pa-header { margin-bottom: 60px; padding-bottom: 48px; }
+          .pa-entry { grid-template-columns: 84px 1fr; gap: 22px; padding: 32px 0; }
+          .pa-img-wrap { width: 84px; }
+          .pa-fields { gap: 24px; }
+          .pa-piece-title { font-size: 10px; letter-spacing: 0.14em; }
         }
       `}</style>
     </>

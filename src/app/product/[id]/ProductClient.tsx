@@ -81,6 +81,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   const [availPhone, setAvailPhone] = useState('');
   const [availSubmitted, setAvailSubmitted] = useState(false);
   const [availSubmitting, setAvailSubmitting] = useState(false);
+  const [archiveToast, setArchiveToast] = useState(false);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const { t } = useTranslation();
   useLocale();
@@ -662,22 +663,27 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                 : 'Add to Selection'}
             </button>
             <button
-              className="ss-bookmark"
-              aria-label="Add to wishlist"
-              onClick={() => toggle(wishlistItem)}
+              className={`ss-archive-btn${inWishlist ? ' ss-archive-btn--in' : ''}`}
+              onClick={() => {
+                toggle(wishlistItem);
+                if (!inWishlist) {
+                  setArchiveToast(true);
+                  setTimeout(() => setArchiveToast(false), 3200);
+                } else {
+                  setArchiveToast(false);
+                }
+              }}
             >
-              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                <polygon
-                  fill={inWishlist ? 'currentColor' : 'none'}
-                  stroke="currentColor"
-                  strokeWidth="0.8"
-                  strokeLinejoin="round"
-                  points="1.5,0 1.5,12 6,9.8181763 10.5,12 10.5,0"
-                />
-              </svg>
-              <span className="ss-bookmark-label">{inWishlist ? 'Archived' : 'Archive'}</span>
+              {inWishlist ? 'Archived' : 'Add to Archive'}
             </button>
           </div>
+
+          {archiveToast && (
+            <div className="ss-archive-toast">
+              <span className="ss-archive-toast-main">Added to your Archive.</span>
+              <span className="ss-archive-toast-sub">Available in your personal archive for 48 hours.</span>
+            </div>
+          )}
 
           {/* Description — uppercase below actions */}
           {product.description && (
@@ -1266,28 +1272,51 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
         .ss-cta-btn:hover:not(:disabled) { background: rgba(0,0,0,0.96); }
         .ss-cta-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        .ss-bookmark {
+        .ss-archive-btn {
           width: 100%;
           height: 42px;
-          border: 1px solid rgba(0,0,0,0.1);
           background: transparent;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
+          border: none;
           cursor: pointer;
           border-radius: 0;
-          transition: background 0.7s, color 0.7s, border-color 0.7s;
           font-family: var(--font-primary);
           font-size: 8px;
           font-weight: 300;
           text-transform: uppercase;
           letter-spacing: 0.38em;
           padding-right: 0.38em;
-          color: rgba(0,0,0,0.35);
+          color: rgba(0,0,0,0.28);
+          text-decoration: underline;
+          text-underline-offset: 3px;
+          transition: color 0.5s;
         }
-        .ss-bookmark:hover { background: rgba(0,0,0,0.03); color: rgba(0,0,0,0.6); border-color: rgba(0,0,0,0.2); }
-        .ss-bookmark-label { white-space: nowrap; }
+        .ss-archive-btn:hover { color: rgba(0,0,0,0.6); }
+        .ss-archive-btn--in { color: rgba(0,0,0,0.5); }
+        .ss-archive-toast {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+          padding: 12px 0 0;
+          animation: ss-toast-in 0.4s cubic-bezier(0.16,1,0.3,1) forwards;
+        }
+        @keyframes ss-toast-in {
+          from { opacity: 0; transform: translateY(5px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .ss-archive-toast-main {
+          font-family: var(--font-primary);
+          font-size: 9px;
+          font-weight: 300;
+          letter-spacing: 0.12em;
+          color: rgba(0,0,0,0.5);
+        }
+        .ss-archive-toast-sub {
+          font-family: var(--font-primary);
+          font-size: 8px;
+          font-weight: 300;
+          letter-spacing: 0.04em;
+          color: rgba(0,0,0,0.22);
+        }
 
         /* ══ SIZE DRAWER ══ */
         .ss-size-drawer {
@@ -1837,12 +1866,12 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             rgba(7,7,7,0.99) 100%
           );
           border: 1px solid rgba(255,255,255,0.04);
-          border-radius: 12px;
+          border-radius: 0;
           width: 100%;
           max-width: 440px;
           padding: 40px 36px;
           box-sizing: border-box;
-          margin-top: 24vh;
+          margin-top: 18vh;
           box-shadow:
             0 0 0 1px rgba(255,255,255,0.02),
             0 40px 120px rgba(0,0,0,0.65);
@@ -2035,12 +2064,12 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             rgba(7,7,7,0.99) 100%
           );
           border: 1px solid rgba(255,255,255,0.04);
-          border-radius: 12px;
+          border-radius: 0;
           width: 100%;
           max-width: 440px;
           padding: 40px 36px;
           box-sizing: border-box;
-          margin-top: 24vh;
+          margin-top: 18vh;
           box-shadow:
             0 0 0 1px rgba(255,255,255,0.02),
             0 40px 120px rgba(0,0,0,0.65);
@@ -2075,11 +2104,11 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .sg-close:hover { opacity: 0.7; }
         .sg-subtext {
           font-family: var(--font-primary);
-          font-size: 9px;
+          font-size: 10px;
           font-weight: 300;
-          line-height: 1.75;
+          line-height: 1.7;
           letter-spacing: 0.01em;
-          color: rgba(255,255,255,0.18);
+          color: rgba(255,255,255,0.24);
           margin: 0 0 32px 0;
         }
         .sg-table {
@@ -2134,7 +2163,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             padding: 0;
           }
           .arm-modal, .sg-modal {
-            margin-top: 0 !important;
+            margin-top: 0;
             border-radius: 24px 24px 0 0;
             max-width: 100%;
             width: 100%;

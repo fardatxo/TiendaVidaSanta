@@ -10,7 +10,7 @@ function resolveLabel(href: string): string {
   if (path.startsWith('/product/'))   return 'The Garment';
   if (path.startsWith('/collection/')) return 'The Collection';
   if (path.startsWith('/search'))     return 'The Archive';
-  if (path.startsWith('/wishlist'))   return 'The Selection';
+  if (path.startsWith('/wishlist'))   return 'The Archive';
   if (path.startsWith('/account'))    return 'The Account';
   if (path.startsWith('/contact'))    return 'The House';
   if (path.startsWith('/login'))      return 'Tonet';
