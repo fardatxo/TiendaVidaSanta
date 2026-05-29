@@ -500,6 +500,18 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
     if (!availEmail || availSizes.length === 0) return;
     setAvailSubmitting(true);
     try {
+      const stored = JSON.parse(localStorage.getItem('tonet-avail-requests') ?? '[]');
+      stored.push({
+        id: `${product.handle}-${Date.now()}`,
+        product: product.handle,
+        title: product.title,
+        imageUrl: product.imageUrl,
+        sizes: availSizes,
+        email: availEmail,
+        submittedAt: Date.now(),
+      });
+      localStorage.setItem('tonet-avail-requests', JSON.stringify(stored));
+
       await fetch('/api/availability-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

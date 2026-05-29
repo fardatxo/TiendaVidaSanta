@@ -181,6 +181,14 @@ export default function MenuDrawer() {
             ))}
           </nav>
 
+          {/* Archive section */}
+          <p className="md-nav-eyebrow md-archive-eyebrow">Archive</p>
+          <div className="md-archive-links">
+            <Link href="/archive" className="md-archive-link" onClick={closeMenu}>Personal Archive</Link>
+            <Link href="/archive?tab=acquisitions" className="md-archive-link" onClick={closeMenu}>Past Acquisitions</Link>
+            <Link href="/archive?tab=requests" className="md-archive-link" onClick={closeMenu}>Availability Requests</Link>
+          </div>
+
           {/* Bottom links */}
           <div className="md-bottom-links">
             <Link href="/stores" className="md-bottom-link" onClick={closeMenu}>Stores</Link>
@@ -348,6 +356,26 @@ export default function MenuDrawer() {
         .md-nav-active { color: rgba(255,255,255,0.88) !important; font-weight: 300; }
         .md-nav-item:not(.md-nav-active) { color: rgba(255,255,255,0.52); }
         .md-expanded .md-nav-item:not(.md-nav-active) { color: rgba(255,255,255,0.18); }
+
+        .md-archive-eyebrow { padding-top: 16px !important; }
+        .md-archive-links {
+          display: flex;
+          flex-direction: column;
+          padding: 0 0 24px;
+        }
+        .md-archive-link {
+          display: block;
+          padding: 9px 40px;
+          font-family: var(--font-primary);
+          font-size: 9px;
+          font-weight: 300;
+          letter-spacing: 0.32em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.32);
+          text-decoration: none;
+          transition: color 0.5s;
+        }
+        .md-archive-link:hover { color: rgba(255,255,255,0.7) !important; }
 
         .md-bottom-links {
           display: flex;
@@ -529,6 +557,7 @@ export default function MenuDrawer() {
           .md-sub-title { padding: 48px 28px 20px; }
           .md-sub-item { padding: 10px 28px; }
           .md-back-btn { padding: 28px 28px 8px; }
+          .md-archive-link { padding: 9px 28px; }
         }
       `}</style>
     </>
