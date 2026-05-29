@@ -46,23 +46,24 @@ export default function InformationClient() {
     <>
       <div className="info-wrap">
         <nav className="info-tabs">
-          <Link href="/account" className="info-tab">{t('account.overview')}</Link>
-          <Link href="/account/orders" className="info-tab">{t('wishlist.orders')}</Link>
-          <Link href="/account/information" className="info-tab info-tab--active">{t('wishlist.myInfo')}</Link>
-          <Link href="/wishlist" className="info-tab">{t('wishlist.tabTitle')}</Link>
+          <Link href="/account" className="info-tab">The Residence</Link>
+          <Link href="/account/orders" className="info-tab">Acquisitions</Link>
+          <Link href="/account/information" className="info-tab info-tab--active">House Record</Link>
+          <Link href="/archive" className="info-tab">Archive</Link>
         </nav>
 
-        <h1 className="info-title">{t('account.myInfoTitle')}</h1>
+        <h1 className="info-title">House Record</h1>
+        <p className="info-desc">Institutional information and contact details maintained within the House.</p>
 
         <form className="info-form" onSubmit={handleSave}>
-          <label className="info-label">{t('auth.firstName')}</label>
+          <label className="info-label">First Name</label>
           <input
             className="info-input"
             value={firstName}
             onChange={(e) => { setFirstName(e.target.value); setEditing(true); }}
           />
 
-          <label className="info-label">{t('auth.lastName')}</label>
+          <label className="info-label">Last Name</label>
           <input
             className="info-input"
             value={lastName}
@@ -72,7 +73,7 @@ export default function InformationClient() {
           <label className="info-label">Email</label>
           <input className="info-input info-input--disabled" value={user.email} disabled />
 
-          <label className="info-label">{t('welcome.phone')}</label>
+          <label className="info-label">Phone</label>
           <input
             className="info-input"
             value={phone}
@@ -86,116 +87,156 @@ export default function InformationClient() {
               checked={newsletter}
               onChange={(e) => { setNewsletter(e.target.checked); setEditing(true); }}
             />
-            <span>{t('welcome.newsletter')}</span>
+            <span>Receive dispatches and collection notices from the House.</span>
           </label>
 
-          {saved && <p className="info-saved">{t('account.saved')}</p>}
+          {saved && <p className="info-saved">Record updated successfully.</p>}
 
           <button type="submit" className="info-btn" disabled={!editing}>
-            {t('account.saveChanges')}
+            Update Record
           </button>
         </form>
       </div>
 
       <style>{`
+        html, body { background: #0c0c0c !important; }
+
         .info-wrap {
-          max-width: 480px;
+          max-width: 960px;
           margin: 0 auto;
-          padding: 24px 24px 80px;
+          padding: 120px 24px 80px;
           font-family: var(--font-primary);
-          color: #111;
+          color: rgba(255,255,255,0.85);
         }
+
         .info-tabs {
           display: flex;
-          gap: 24px;
-          margin-bottom: 32px;
+          gap: 32px;
+          margin-bottom: 60px;
           flex-wrap: wrap;
+          border-bottom: 1px solid rgba(255,255,255,0.06);
+          padding-bottom: 1px;
         }
         .info-tab {
-          font-size: 11px;
-          font-weight: 400;
+          font-size: 8px;
+          font-weight: 300;
           text-decoration: none;
-          color: #111;
-          letter-spacing: 0.03em;
-          padding-bottom: 4px;
-          border-bottom: 1px solid transparent;
-        }
-        .info-tab:hover { border-bottom-color: #111; }
-        .info-tab--active {
-          text-decoration: underline;
-          text-underline-offset: 3px;
-        }
-        .info-title {
-          font-size: 11px;
-          font-weight: 600;
+          color: rgba(255,255,255,0.3);
+          letter-spacing: 0.4em;
           text-transform: uppercase;
-          letter-spacing: 0.12em;
-          margin: 0 0 24px;
+          padding-bottom: 12px;
+          border-bottom: 1px solid transparent;
+          margin-bottom: -1px;
+          transition: color 0.4s, border-color 0.4s;
         }
+        .info-tab:hover { color: rgba(255,255,255,0.6); }
+        .info-tab--active {
+          color: rgba(255,255,255,0.8);
+          border-bottom-color: rgba(255,255,255,0.4);
+        }
+
+        .info-title {
+          font-family: var(--font-brand);
+          font-size: clamp(24px, 4vw, 36px);
+          font-weight: 300;
+          margin: 0 0 16px;
+          letter-spacing: 0.15em;
+          color: rgba(255,255,255,0.7);
+        }
+        .info-desc {
+          font-size: 11px;
+          font-weight: 300;
+          letter-spacing: 0.08em;
+          color: rgba(255,255,255,0.35);
+          margin: 0 0 48px;
+        }
+
         .info-form {
           display: flex;
           flex-direction: column;
+          max-width: 420px;
         }
         .info-label {
-          font-size: 10px;
-          font-weight: 500;
+          font-size: 8px;
+          font-weight: 300;
           text-transform: uppercase;
-          letter-spacing: 0.08em;
-          color: #888;
-          margin-bottom: 6px;
+          letter-spacing: 0.25em;
+          color: rgba(255,255,255,0.4);
+          margin-bottom: 8px;
         }
         .info-input {
-          background: #f7f7f7;
+          background: transparent;
           border: none;
-          padding: 14px 12px;
-          font-size: 12px;
-          font-family: Arial, sans-serif;
-          color: #111;
+          border-bottom: 1px solid rgba(255,255,255,0.1);
+          padding: 12px 0;
+          font-size: 11px;
+          font-family: var(--font-primary);
+          font-weight: 300;
+          color: rgba(255,255,255,0.8);
+          margin-bottom: 32px;
           outline: none;
-          margin-bottom: 20px;
+          letter-spacing: 0.05em;
+          border-radius: 0;
+          transition: border-color 0.4s;
         }
+        .info-input:focus { border-bottom-color: rgba(255,255,255,0.4); }
         .info-input--disabled {
-          color: #999;
-          cursor: not-allowed;
+          color: rgba(255,255,255,0.2);
+          border-bottom-color: rgba(255,255,255,0.05);
         }
+
         .info-checkbox {
           display: flex;
           align-items: flex-start;
-          gap: 10px;
-          font-size: 12px;
-          color: #333;
-          margin-bottom: 24px;
+          gap: 12px;
+          margin: 16px 0 32px;
           cursor: pointer;
         }
-        .info-checkbox input[type="checkbox"] {
-          margin-top: 2px;
-          width: 16px;
-          height: 16px;
-          accent-color: #000;
+        .info-checkbox input {
+          margin-top: 3px;
+          accent-color: #ffffff;
         }
-        .info-saved {
-          color: #2d6e2d;
-          font-size: 11px;
-          margin: 0 0 12px;
+        .info-checkbox span {
+          font-size: 10px;
+          font-weight: 300;
+          letter-spacing: 0.06em;
+          color: rgba(255,255,255,0.4);
+          line-height: 1.6;
         }
+
         .info-btn {
-          background: #000;
-          color: #fff;
-          border: 1px solid #000;
-          padding: 16px;
-          font-size: 11px;
-          font-family: Arial, sans-serif;
+          background: transparent;
+          border: 1px solid rgba(255,255,255,0.15);
+          padding: 14px;
+          font-size: 9px;
+          font-family: var(--font-primary);
+          font-weight: 300;
           text-transform: uppercase;
-          letter-spacing: 0.5px;
+          letter-spacing: 0.3em;
+          color: rgba(255,255,255,0.6);
           cursor: pointer;
-          font-weight: 500;
-          transition: background 0.2s, color 0.2s;
+          transition: border-color 0.4s, color 0.4s;
+          margin-top: 12px;
         }
-        .info-btn:hover { background: #ffffff; color: #000; }
-        .info-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .info-btn:hover:not(:disabled) {
+          border-color: rgba(255,255,255,0.4);
+          color: rgba(255,255,255,0.9);
+        }
+        .info-btn:disabled {
+          opacity: 0.3;
+          cursor: not-allowed;
+        }
+
+        .info-saved {
+          font-size: 10px;
+          font-weight: 300;
+          color: rgba(255,255,255,0.5);
+          margin-bottom: 16px;
+        }
 
         @media (max-width: 767px) {
-          .info-wrap { padding: 16px 16px 100px; }
+          .info-wrap { padding: 100px 16px 80px; }
+          .info-tabs { gap: 20px; margin-bottom: 40px; }
         }
       `}</style>
     </>
