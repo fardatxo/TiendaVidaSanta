@@ -117,7 +117,7 @@ export default function Navbar() {
             </button>
             <nav className="acne-nav-links acne-desktop-only">
               <Link href="/collections" onClick={closeMenu}>The Collection</Link>
-              <Link href="/about" onClick={closeMenu}>The House Journal</Link>
+              <Link href="/about" onClick={closeMenu}>The House</Link>
             </nav>
           </div>
 
