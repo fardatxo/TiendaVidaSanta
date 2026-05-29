@@ -36,7 +36,7 @@ function lineToItem(line: CartLine): CartItem {
 
 export default function CartDrawer() {
   const { isCartOpen, closeCart } = useUI();
-  const { cart, updateQty, removeFromCart, clearCart } = useCart();
+  const { cart, updateQty, removeFromCart } = useCart();
   const { formatPrice } = useLocale();
 
   const items: CartItem[] = cart.lines.map(lineToItem);
@@ -130,8 +130,8 @@ export default function CartDrawer() {
               >
                 Continue to Checkout
               </button>
-              <button className="cd-favorites-btn" onClick={clearCart}>
-                Delete All
+              <button className="cd-favorites-btn">
+                Archive
               </button>
             </div>
           </div>

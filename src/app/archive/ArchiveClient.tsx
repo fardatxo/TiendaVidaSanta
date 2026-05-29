@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useWishlist } from '@/context/WishlistContext';
 import { useAuth } from '@/context/AuthContext';
 
-type Tab = 'personal' | 'acquisitions' | 'requests';
+type Tab = 'personal' | 'acquisitions' | 'requests' | 'registry';
 
 interface AvailRequest {
   id: string;
@@ -76,6 +76,7 @@ export default function ArchiveClient() {
     { key: 'personal', label: 'Personal Archive' },
     { key: 'acquisitions', label: 'Past Acquisitions' },
     { key: 'requests', label: 'Availability Requests' },
+    { key: 'registry', label: 'Collection Registry' },
   ];
 
   return (
@@ -84,8 +85,10 @@ export default function ArchiveClient() {
 
         {/* Header */}
         <div className="ar-header">
-          <span className="ar-supra">Tonet</span>
-          <h1 className="ar-title">Archive</h1>
+          <h1 className="ar-title">ARCHIVE ROOM</h1>
+          <p className="ar-hero-desc">
+            A private space for collecting, revisiting and tracking selected TONET pieces.
+          </p>
         </div>
 
         {/* Tab navigation */}
@@ -107,17 +110,18 @@ export default function ArchiveClient() {
           {/* ── Personal Archive ── */}
           {activeTab === 'personal' && (
             <>
+              <h2 className="ar-section-title">PERSONAL ARCHIVE</h2>
               <p className="ar-section-desc">
                 A temporary collection of pieces retained for future consideration.
-                Items remain archived for 48 hours.
               </p>
               {items.length === 0 ? (
                 <div className="ar-empty">
-                  <span className="ar-empty-title">Your archive is empty.</span>
+                  <h3 className="ar-empty-title">PERSONAL ARCHIVE</h3>
                   <p className="ar-empty-sub">
-                    Browse the collection and add pieces to build your personal archive.
+                    No pieces currently archived.<br/>
+                    Selected pieces will appear here for future consideration.
                   </p>
-                  <Link href="/collections" className="ar-cta-link">Browse the Collection</Link>
+                  <Link href="/collections" className="ar-cta-link">Explore Collections →</Link>
                 </div>
               ) : (
                 <div className="ar-entries">
@@ -176,6 +180,7 @@ export default function ArchiveClient() {
           {/* ── Past Acquisitions ── */}
           {activeTab === 'acquisitions' && (
             <div className="ar-acquisitions">
+              <h2 className="ar-section-title">PAST ACQUISITIONS</h2>
               <p className="ar-section-desc">
                 A permanent record of pieces that have entered your collection.
               </p>
@@ -206,6 +211,7 @@ export default function ArchiveClient() {
           {/* ── Availability Requests ── */}
           {activeTab === 'requests' && (
             <>
+              <h2 className="ar-section-title">AVAILABILITY REQUESTS</h2>
               <p className="ar-section-desc">
                 Size availability requests submitted on pieces from the collection.
                 You will be contacted at your registered email if availability changes.
@@ -258,6 +264,28 @@ export default function ArchiveClient() {
             </>
           )}
 
+          {/* ── Collection Registry ── */}
+          {activeTab === 'registry' && (
+            <div className="ar-registry">
+              <h2 className="ar-section-title">COLLECTION REGISTRY</h2>
+              <p className="ar-section-desc">
+                An editorial overview of current and past collections, seasonal notes and release chronology.
+              </p>
+              <div className="ar-registry-body">
+                <div className="ar-reg-item">
+                  <h3 className="ar-reg-title">PERMANENCE</h3>
+                  <p className="ar-reg-desc">The core collection. Pieces designed to transcend seasonality.</p>
+                  <Link href="/collection/permanence" className="ar-cta-link">Explore Collection</Link>
+                </div>
+                <div className="ar-reg-item">
+                  <h3 className="ar-reg-title">SS26 — VOL I</h3>
+                  <p className="ar-reg-desc">Initial ready-to-wear explorations in restrained tones.</p>
+                  <Link href="/collection/ss26" className="ar-cta-link">View Notes</Link>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
 
@@ -277,24 +305,24 @@ export default function ArchiveClient() {
           max-width: 860px;
           margin: 0 auto 56px;
         }
-        .ar-supra {
-          display: block;
-          font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.55em;
-          text-transform: uppercase;
-          color: rgba(255,255,255,0.14);
-          margin-bottom: 20px;
-          padding-right: 0.55em;
-        }
         .ar-title {
           font-family: var(--font-brand);
           font-size: clamp(28px, 4.5vw, 48px);
           font-weight: 300;
           letter-spacing: 0.2em;
           color: rgba(255,255,255,0.65);
-          margin: 0;
+          margin: 0 0 24px;
           padding-right: 0.2em;
+        }
+        .ar-hero-desc {
+          font-family: var(--font-primary);
+          font-size: 11px;
+          font-weight: 300;
+          line-height: 2.1;
+          letter-spacing: 0.08em;
+          color: rgba(255,255,255,0.35);
+          margin: 0;
+          max-width: 480px;
         }
 
         /* ── Tabs */
@@ -333,7 +361,18 @@ export default function ArchiveClient() {
         }
 
         /* ── Content */
-        .ar-content { max-width: 860px; margin: 0 auto; }
+        .ar-content { max-width: 860px; margin: 0 auto; min-height: 400px; }
+
+        .ar-section-title {
+          font-family: var(--font-primary);
+          font-size: 8px;
+          font-weight: 300;
+          letter-spacing: 0.55em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.45);
+          margin: 0 0 16px;
+          padding-right: 0.55em;
+        }
 
         .ar-section-desc {
           font-size: 10px;
@@ -498,6 +537,40 @@ export default function ArchiveClient() {
           letter-spacing: 0.04em;
           line-height: 1.8;
           margin: 0;
+          max-width: 420px;
+        }
+
+        /* Registry */
+        .ar-registry { padding: 0; }
+        .ar-registry-body {
+          display: flex;
+          flex-direction: column;
+          gap: 60px;
+          padding-top: 20px;
+          border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .ar-reg-item {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
+        }
+        .ar-reg-title {
+          font-family: var(--font-primary);
+          font-size: 10px;
+          font-weight: 300;
+          letter-spacing: 0.38em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.65);
+          margin: 0;
+        }
+        .ar-reg-desc {
+          font-size: 11px;
+          font-weight: 300;
+          color: rgba(255,255,255,0.28);
+          letter-spacing: 0.04em;
+          line-height: 1.8;
+          margin: 0 0 12px;
           max-width: 420px;
         }
 

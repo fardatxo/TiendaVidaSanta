@@ -187,6 +187,7 @@ export default function MenuDrawer() {
             <Link href="/archive" className="md-archive-link" onClick={closeMenu}>Personal Archive</Link>
             <Link href="/archive?tab=acquisitions" className="md-archive-link" onClick={closeMenu}>Past Acquisitions</Link>
             <Link href="/archive?tab=requests" className="md-archive-link" onClick={closeMenu}>Availability Requests</Link>
+            <Link href="/archive?tab=registry" className="md-archive-link" onClick={closeMenu}>Collection Registry</Link>
           </div>
 
           {/* Bottom links */}
