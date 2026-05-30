@@ -8,11 +8,11 @@ import {
   useCallback,
   type ReactNode,
 } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
 import { useRouter, usePathname } from 'next/navigation';
 import type { User } from '@/lib/auth';
 import * as authService from '@/lib/auth';
-import { auth } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
+import { doc, setDoc } from 'firebase/firestore';
 import { supabase } from '@/lib/supabase';
 
 // ── Context shape ──────────────────────────────────────────────────
@@ -48,41 +48,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [pendingRedirect, setPendingRedirect] = useState<string | null>(null);
   const router = useRouter();
 
-  // Listen to both Firebase and Supabase auth state
+  // Listen to Supabase auth state and unified Firestore profiles
   useEffect(() => {
     let active = true;
 
     const checkLoggedOut = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!auth.currentUser && !session && active) {
+      if (!session && active) {
         setUser(null);
       }
     };
 
-    // 1. Firebase Auth listener
-    const unsubscribeFirebase = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (!active) return;
-      if (firebaseUser) {
-        try {
-          const profile = await authService.getUserById(firebaseUser.uid);
-          if (profile && active) {
-            setUser(profile);
-          }
-        } catch (error) {
-          console.error('[AuthContext] failed to fetch Firebase user profile:', error);
-        }
-      } else {
-        await checkLoggedOut();
-      }
-      setIsLoading(false);
-    });
-
-    // 2. Supabase Auth listener
+    // Listen only to Supabase Auth state
     const { data: { subscription: unsubscribeSupabase } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!active) return;
       if (session?.user) {
         try {
-          const profile = await authService.getUserById(session.user.id);
+          let profile = await authService.getUserById(session.user.id);
+
+          if (!profile && active) {
+            // Google OAuth or Email signup fallback creation
+            const parts = (session.user.user_metadata?.full_name || '').split(' ');
+            const mockUser: User = {
+              id: session.user.id,
+              email: session.user.email ?? '',
+              firstName: session.user.user_metadata?.given_name || parts[0] || '',
+              lastName: session.user.user_metadata?.family_name || parts.slice(1).join(' ') || '',
+              newsletter: false,
+              onboardingComplete: false,
+              provider: session.user.app_metadata?.provider === 'google' ? 'google' : 'email',
+              createdAt: new Date().toISOString(),
+            };
+            await setDoc(doc(db, 'users', session.user.id), mockUser);
+            profile = mockUser;
+          }
+
           if (profile && active) {
             setUser(profile);
           }
@@ -97,7 +97,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => {
       active = false;
-      unsubscribeFirebase();
       unsubscribeSupabase.unsubscribe();
     };
   }, []);

@@ -3,15 +3,10 @@
  */
 
 import {
-  signInWithPopup,
-  GoogleAuthProvider,
-  signOut,
-} from 'firebase/auth';
-import {
   doc, getDoc, setDoc, updateDoc,
   collection, query, where, getDocs, limit,
 } from 'firebase/firestore';
-import { auth, db } from './firebase';
+import { db } from './firebase';
 import { supabase } from './supabase';
 
 // ── Types ──────────────────────────────────────────────────────────
@@ -127,39 +122,21 @@ export async function login(email: string, password: string): Promise<AuthResult
   }
 }
 
-const googleProvider = new GoogleAuthProvider();
-
 export async function loginWithGoogle(): Promise<AuthResult> {
   try {
-    const cred = await signInWithPopup(auth, googleProvider);
-    const existing = await getUserById(cred.user.uid);
-
-    if (existing) {
-      return { success: true, user: existing };
-    }
-
-    const parts = (cred.user.displayName ?? '').split(' ');
-    const user: User = {
-      id: cred.user.uid,
-      email: cred.user.email!,
-      firstName: parts[0] ?? '',
-      lastName: parts.slice(1).join(' ') ?? '',
-      newsletter: false,
-      onboardingComplete: false,
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      createdAt: new Date().toISOString(),
-    };
+      options: {
+        redirectTo: `${window.location.origin}/login`,
+      }
+    });
 
-    await setDoc(doc(db, 'users', cred.user.uid), user);
-    return { success: true, user, isNew: true };
-  } catch (err: any) {
-    console.error('[loginWithGoogle] error:', err.code, err.message);
-    if (
-      err.code === 'auth/popup-closed-by-user' ||
-      err.code === 'auth/cancelled-popup-request'
-    ) {
-      return { success: false, error: 'Sign-in cancelled.' };
+    if (error) {
+      return { success: false, error: error.message };
     }
+
+    return { success: true };
+  } catch (err: any) {
     return { success: false, error: err.message ?? 'Google sign-in failed.' };
   }
 }
@@ -167,12 +144,8 @@ export async function loginWithGoogle(): Promise<AuthResult> {
 export async function updateProfile(
   updates: Partial<Omit<User, 'id' | 'email' | 'provider' | 'createdAt'>>,
 ): Promise<User | null> {
-  let uid = auth.currentUser?.uid;
-
-  if (!uid) {
-    const { data: { session } } = await supabase.auth.getSession();
-    uid = session?.user?.id;
-  }
+  const { data: { session } } = await supabase.auth.getSession();
+  const uid = session?.user?.id;
 
   if (!uid) return null;
 
@@ -182,7 +155,6 @@ export async function updateProfile(
 }
 
 export async function logout(): Promise<void> {
-  await signOut(auth);
   await supabase.auth.signOut();
 }
 
