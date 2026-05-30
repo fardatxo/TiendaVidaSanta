@@ -628,49 +628,52 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           {/* Price + variant name on second line */}
           <div className="ss-price-row">
             <span className="ss-price">{priceFormatted}</span>
-            {(selectedColor || descriptionFirstLine) && (
-              <span className="ss-subtitle" style={{display:'inline-flex', alignItems:'center', gap: 6}}>
-                {selectedColor && (
-                  <span style={{
-                    display: 'inline-block',
-                    width: 11,
-                    height: 11,
-                    borderRadius: 2,
-                    background: colorNameToCSS(selectedColor),
-                    border: '1px solid rgba(0,0,0,0.15)',
-                    flexShrink: 0,
-                  }} />
-                )}
-                {selectedColor || descriptionFirstLine}
+            {selectedColor ? (
+              <span className="tonet-meta-shade">
+                <span className="tonet-meta-shade-label">SHADE /</span> {selectedColor.toUpperCase()}
               </span>
-            )}
+            ) : descriptionFirstLine ? (
+              <span className="ss-subtitle">{descriptionFirstLine}</span>
+            ) : null}
           </div>
 
-          {/* Variant / image thumbnails — only when >1 color variant */}
+          {/* TONET GARMENT SHADE SELECTOR */}
           {colorOptions.length > 1 && (
-            <div className="ss-thumbs-wrap">
-              {colorOptions.length > 4 && (
-                <button className="ss-thumbs-arrow ss-thumbs-arrow-left" onClick={() => scrollThumbs(-1)} aria-label="Previous">
-                  <ChevronLeft size={14} strokeWidth={1.4} color="#111" />
-                </button>
-              )}
-              <div className="ss-thumbs" ref={thumbsRef}>
-                {colorOptions.map((co) => (
-                  <button
-                    key={co.value}
-                    className={`ss-thumb ${selectedColor === co.value ? 'active' : ''}`}
-                    onClick={() => handleColorChange(co.value)}
-                    title={co.value}
-                  >
-                    <img src={co.imageUrl} alt={co.value} />
-                  </button>
-                ))}
+            <div className="tonet-shade-container">
+              <div className="tonet-shade-metadata">
+                <span className="tonet-shade-label">GARMENT SHADE</span>
+                <span className="tonet-shade-value">
+                  {selectedColor ? selectedColor.toUpperCase() : '—'}
+                  <span className="tonet-shade-status"> — SELECTED</span>
+                </span>
               </div>
-              {colorOptions.length > 4 && (
-                <button className="ss-thumbs-arrow ss-thumbs-arrow-right" onClick={() => scrollThumbs(1)} aria-label="Next">
-                  <ChevronRight size={14} strokeWidth={1.4} color="#111" />
-                </button>
-              )}
+              <div className="tonet-shades-list">
+                {colorOptions.map((co) => {
+                  const isActive = selectedColor === co.value;
+                  const swatchColor = colorNameToCSS(co.value);
+                  return (
+                    <button
+                      key={co.value}
+                      className={`tonet-shade-option ${isActive ? 'active' : ''}`}
+                      onClick={() => handleColorChange(co.value)}
+                    >
+                      <div className="tonet-shade-visual-wrapper">
+                        {/* Material/Color swatch: clean sharp square */}
+                        <span 
+                          className="tonet-shade-swatch" 
+                          style={{ backgroundColor: swatchColor }} 
+                        />
+                        {co.imageUrl && (
+                          <div className="tonet-archive-plate">
+                            <img src={co.imageUrl} alt={co.value} />
+                          </div>
+                        )}
+                      </div>
+                      <span className="tonet-shade-name-label">{co.value}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
 
@@ -1705,64 +1708,136 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           letter-spacing: 0.04em;
         }
 
-        /* Thumbnails */
-        .ss-thumbs-wrap {
-          position: relative;
-          margin-bottom: 24px;
+        /* TONET SHADE SELECTOR & METADATA */
+        .tonet-meta-shade {
+          font-family: var(--font-primary);
+          font-size: 9px;
+          font-weight: 300;
+          letter-spacing: 0.15em;
+          color: rgba(255, 255, 255, 0.85);
+          text-transform: uppercase;
         }
-        .ss-thumbs {
+        .tonet-meta-shade-label {
+          color: rgba(255, 255, 255, 0.35);
+          letter-spacing: 0.25em;
+          margin-right: 4px;
+        }
+
+        .tonet-shade-container {
+          margin-bottom: 32px;
+          border-top: 1px solid rgba(255, 255, 255, 0.05);
+          padding-top: 20px;
+        }
+        .tonet-shade-metadata {
           display: flex;
-          gap: 0;
-          overflow-x: auto;
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-          border: 1px solid rgba(0,0,0,0.08);
-          width: fit-content;
-          max-width: 100%;
+          justify-content: space-between;
+          align-items: baseline;
+          margin-bottom: 14px;
         }
-        .ss-thumbs::-webkit-scrollbar { display: none; }
-        .ss-thumb {
-          width: 56px;
-          height: 72px;
-          padding: 0;
+        .tonet-shade-label {
+          font-family: var(--font-primary);
+          font-size: 8px;
+          font-weight: 300;
+          letter-spacing: 0.35em;
+          color: rgba(255, 255, 255, 0.35);
+          text-transform: uppercase;
+        }
+        .tonet-shade-value {
+          font-family: var(--font-primary);
+          font-size: 8.5px;
+          font-weight: 300;
+          letter-spacing: 0.2em;
+          color: rgba(255, 255, 255, 0.85);
+          text-transform: uppercase;
+        }
+        .tonet-shade-status {
+          color: rgba(255, 255, 255, 0.3);
+          font-size: 7.5px;
+          letter-spacing: 0.1em;
+        }
+        .tonet-shades-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 24px;
+        }
+        .tonet-shade-option {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          background: none;
           border: none;
-          border-right: 1px solid rgba(0,0,0,0.06);
-          border-radius: 0;
+          padding: 6px 0;
           cursor: pointer;
-          background: #ffffff;
-          flex-shrink: 0;
-          box-sizing: border-box;
-          overflow: hidden;
           transition: opacity 0.4s;
+          opacity: 0.55;
+          outline: none;
         }
-        .ss-thumb:last-child { border-right: none; }
-        .ss-thumb.active { box-shadow: inset 0 0 0 1.5px rgba(0,0,0,0.7); }
-        .ss-thumb:hover:not(.active) { opacity: 0.6; }
-        .ss-thumb img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-          display: block;
+        .tonet-shade-option:hover {
+          opacity: 0.85;
         }
-        .ss-thumbs-arrow {
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 28px;
-          height: 28px;
-          background: #fff;
-          border: 1px solid #ddd;
-          border-radius: 50%;
+        .tonet-shade-option.active {
+          opacity: 1;
+        }
+        .tonet-shade-visual-wrapper {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          position: relative;
+        }
+        .tonet-shade-swatch {
+          width: 8px;
+          height: 8px;
+          display: inline-block;
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          box-sizing: border-box;
+          flex-shrink: 0;
+        }
+        .tonet-archive-plate {
+          width: 20px;
+          height: 26px;
+          overflow: hidden;
+          background: #121212;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          transition: border-color 0.4s;
           display: flex;
           align-items: center;
           justify-content: center;
-          cursor: pointer;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-          z-index: 2;
         }
-        .ss-thumbs-arrow-left { left: -14px; }
-        .ss-thumbs-arrow-right { right: -14px; }
-        .ss-thumbs-arrow:hover { background: rgba(0,0,0,0.04); }
+        .tonet-archive-plate img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          opacity: 0.75;
+          filter: grayscale(30%);
+        }
+        .tonet-shade-option.active .tonet-archive-plate {
+          border-color: rgba(255, 255, 255, 0.35);
+        }
+        .tonet-shade-name-label {
+          font-family: var(--font-primary);
+          font-size: 8.5px;
+          font-weight: 300;
+          letter-spacing: 0.15em;
+          color: rgba(255, 255, 255, 0.7);
+          text-transform: uppercase;
+          position: relative;
+          padding-bottom: 2px;
+        }
+        .tonet-shade-name-label::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 1px;
+          background-color: rgba(255, 255, 255, 0.45);
+          transform: scaleX(0);
+          transform-origin: left;
+          transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .tonet-shade-option.active .tonet-shade-name-label::after {
+          transform: scaleX(1);
+        }
 
         /* Estimated delivery */
         .ss-delivery-estimate {

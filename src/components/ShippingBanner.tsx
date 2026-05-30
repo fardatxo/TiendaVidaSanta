@@ -76,7 +76,7 @@ export default function ShippingBanner() {
       fontWeight: 300,
       letterSpacing: "0.45em",
       color: "rgba(255, 255, 255, 0.45)",
-      textTransform: "lowercase",
+      textTransform: "uppercase",
       fontFamily: "var(--font-primary), sans-serif",
       borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
       paddingLeft: "0.45em",
