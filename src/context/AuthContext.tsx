@@ -11,8 +11,6 @@ import {
 import { useRouter, usePathname } from 'next/navigation';
 import type { User } from '@/lib/auth';
 import * as authService from '@/lib/auth';
-import { db } from '@/lib/firebase';
-import { doc, setDoc } from 'firebase/firestore';
 import { supabase } from '@/lib/supabase';
 
 // ── Context shape ──────────────────────────────────────────────────
@@ -79,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               provider: session.user.app_metadata?.provider === 'google' ? 'google' : 'email',
               createdAt: new Date().toISOString(),
             };
-            await setDoc(doc(db, 'users', session.user.id), mockUser);
+            await supabase.from('profiles').upsert(mockUser);
             profile = mockUser;
           }
 

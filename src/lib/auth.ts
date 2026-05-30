@@ -1,12 +1,7 @@
 /**
- * Auth service — Supabase Auth (Email) + Firebase Auth (Google) + Firestore (Profiles)
+ * Auth service — 100% Supabase Auth & Database (Profiles)
  */
 
-import {
-  doc, getDoc, setDoc, updateDoc,
-  collection, query, where, getDocs, limit,
-} from 'firebase/firestore';
-import { db } from './firebase';
 import { supabase } from './supabase';
 
 // ── Types ──────────────────────────────────────────────────────────
@@ -35,8 +30,14 @@ export interface AuthResult {
 // ── Helpers ────────────────────────────────────────────────────────
 
 export async function getUserById(uid: string): Promise<User | null> {
-  const snap = await getDoc(doc(db, 'users', uid));
-  return snap.exists() ? (snap.data() as User) : null;
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', uid)
+    .single();
+
+  if (error || !data) return null;
+  return data as User;
 }
 
 // ── Public API ─────────────────────────────────────────────────────
@@ -75,7 +76,14 @@ export async function register(
       createdAt: new Date().toISOString(),
     };
 
-    await setDoc(doc(db, 'users', data.user.id), user);
+    const { error: dbError } = await supabase
+      .from('profiles')
+      .upsert(user);
+
+    if (dbError) {
+      return { success: false, error: dbError.message };
+    }
+
     return { success: true, user, isNew: true };
   } catch (err: any) {
     return { success: false, error: err.message ?? 'Registration failed.' };
@@ -102,7 +110,7 @@ export async function login(email: string, password: string): Promise<AuthResult
 
     const user = await getUserById(data.user.id);
     if (!user) {
-      // Create user record in Firestore if it doesn't exist (failsafe)
+      // Create user record in Supabase Profiles if it doesn't exist (failsafe)
       const mockUser: User = {
         id: data.user.id,
         email: data.user.email ?? email.toLowerCase().trim(),
@@ -113,7 +121,7 @@ export async function login(email: string, password: string): Promise<AuthResult
         provider: 'email',
         createdAt: new Date().toISOString(),
       };
-      await setDoc(doc(db, 'users', data.user.id), mockUser);
+      await supabase.from('profiles').upsert(mockUser);
       return { success: true, user: mockUser };
     }
     return { success: true, user };
@@ -149,8 +157,16 @@ export async function updateProfile(
 
   if (!uid) return null;
 
-  const ref = doc(db, 'users', uid);
-  await updateDoc(ref, updates as Record<string, unknown>);
+  const { error } = await supabase
+    .from('profiles')
+    .update(updates)
+    .eq('id', uid);
+
+  if (error) {
+    console.error('[updateProfile] error:', error.message);
+    return null;
+  }
+
   return getUserById(uid);
 }
 
@@ -160,13 +176,13 @@ export async function logout(): Promise<void> {
 
 export async function emailExists(email: string): Promise<boolean> {
   try {
-    const q = query(
-      collection(db, 'users'),
-      where('email', '==', email.toLowerCase().trim()),
-      limit(1),
-    );
-    const snap = await getDocs(q);
-    return !snap.empty;
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('email', email.toLowerCase().trim())
+      .limit(1);
+
+    return !error && data && data.length > 0;
   } catch {
     return false;
   }
