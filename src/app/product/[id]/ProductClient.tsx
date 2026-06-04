@@ -1779,21 +1779,6 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
         .product-info-column {
           padding: 24px 20px 28px 20px;
-          max-height: 80vh;
-          overflow-y: auto;
-          -webkit-overflow-scrolling: touch;
-          scrollbar-width: thin;
-          scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
-        }
-        .product-info-column::-webkit-scrollbar {
-          width: 4px;
-        }
-        .product-info-column::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .product-info-column::-webkit-scrollbar-thumb {
-          background: rgba(0, 0, 0, 0.15);
-          border-radius: 4px;
         }
 
         .ss-title {
@@ -2009,18 +1994,10 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             max-height: calc(100vh - 60px);
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+            scrollbar-width: none;
           }
           .product-info-column::-webkit-scrollbar {
-            width: 4px;
-          }
-          .product-info-column::-webkit-scrollbar-track {
-            background: transparent;
-          }
-          .product-info-column::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.15);
-            border-radius: 4px;
+            display: none;
           }
 
           .ss-mobile-sticky { display: none; }
