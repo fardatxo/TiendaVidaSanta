@@ -25,10 +25,9 @@ export default function HeroSection() {
 
       <div className={`tn-hero-content${visible ? ' tn-visible' : ''}`}>
         <p className="tn-hero-eyebrow">SS &mdash; MMXXVI</p>
-        <h1 className="tn-hero-headline">
-          Silence.<br />
-          Structure.<br />
-          Status.
+        <h1 className="tn-hero-headline homepage-hero">
+          Not a brand.<br />
+          A house.
         </h1>
         <Link href="/collection/i9nm9inm" className="tn-hero-cta">
           The Collection

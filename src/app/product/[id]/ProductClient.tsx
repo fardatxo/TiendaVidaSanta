@@ -669,11 +669,11 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
   return (
     <>
-      <div className="ss-pdp-layout">
+      <div className="ss-pdp-layout product-page">
         {/* ── GALLERY ── */}
-        <div className="ss-gallery">
+        <div className="ss-gallery product-hero">
           {/* Mobile: horizontal carousel */}
-          <div className="ss-mobile-gallery">
+          <div className="ss-mobile-gallery mobile-hero">
             <div
               className="ss-carousel"
               ref={carouselRef}
@@ -726,7 +726,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         </div>
 
         {/* ── INFO PANEL ── */}
-        <div className="ss-info" ref={infoRef}>
+        <div className="ss-info mobile-product-info" ref={infoRef}>
           <div className="product-info-column">
             {/* Title */}
             <h1 className="ss-title">{product.title}</h1>
@@ -775,7 +775,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
           {/* Select Size Grid */}
           {hasSizes && (
-            <div className="ss-sizes-select-area">
+            <div className="ss-sizes-select-area mobile-inline-sizes">
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                 <span className="ss-shade-label">SELECT SIZE</span>
                 <button
@@ -843,7 +843,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           </div>
 
           {/* Accordion sections */}
-          <div className="ss-accordions">
+          <div className="ss-accordions mobile-accordions">
             {/* Description */}
             {product.description && (
               <div className="ss-accordion-item">

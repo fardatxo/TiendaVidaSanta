@@ -39,6 +39,33 @@ export default async function Home() {
         />
       </div>
 
+      {/* ── 3.5. HORIZONTAL EDITORIAL GALLERY ── */}
+      <section className="homepage-gallery">
+        <div className="hg-scroll">
+          <div className="hg-item">
+            <img src="/hero/ComfyUI-main_reference_00016_.png" alt="" className="hg-img" loading="lazy" decoding="async" />
+          </div>
+          <div className="hg-item">
+            <img src="/hero/ComfyUI-main_reference_00017_.png" alt="" className="hg-img" loading="lazy" decoding="async" />
+          </div>
+          <div className="hg-item">
+            <img src="/hero/ComfyUI-main_reference_00018_.png" alt="" className="hg-img" loading="lazy" decoding="async" />
+          </div>
+          <div className="hg-item">
+            <img src="/hero/ComfyUI-main_reference_00021_.png" alt="" className="hg-img" loading="lazy" decoding="async" />
+          </div>
+          <div className="hg-item">
+            <img src="/hero/ComfyUI-main_reference_00023_.png" alt="" className="hg-img" loading="lazy" decoding="async" />
+          </div>
+          <div className="hg-item">
+            <img src="/hero/ComfyUI-main_reference_00028_.png" alt="" className="hg-img" loading="lazy" decoding="async" />
+          </div>
+          <div className="hg-item">
+            <img src="/hero/ComfyUI-main_reference_00032_.png" alt="" className="hg-img" loading="lazy" decoding="async" />
+          </div>
+        </div>
+      </section>
+
       {/* ── 3.5. THE DECLARATION ── */}
       <section className="tn-decl">
         <div className="tn-decl-inner">
@@ -53,28 +80,28 @@ export default async function Home() {
       </section>
 
       {/* ── 4. FEATURED GARMENTS ── */}
-      <section className="tn-garments">
+      <section className="tn-garments homepage-product-grid">
         <div className="tn-garm-header">
           <p className="tn-garm-season">TONET &mdash; SS MMXXVI</p>
-          <h2 className="tn-garm-title">The Garments</h2>
+          <h2 className="tn-garm-title">The Collection</h2>
         </div>
-        <div className="tn-garm-grid">
-          {featured.map((product, i) => (
-            <Link key={product.handle} href={`/product/${product.handle}`} className={`tn-garm-card${i === 0 ? ' tn-garm-card--hero' : ''}`}>
-              <div className="tn-garm-img-wrap">
+        <div className="tn-garm-grid pg-grid">
+          {featured.map((product) => (
+            <Link key={product.handle} href={`/product/${product.handle}`} className="tn-garm-card pg-card">
+              <div className="tn-garm-img-wrap pg-img-wrap">
                 {product.imageUrl && (
                   <img
                     src={product.imageUrl}
                     alt={product.title}
-                    className="tn-garm-img"
+                    className="tn-garm-img pg-img"
                     loading="lazy"
                     decoding="async"
                   />
                 )}
               </div>
-              <div className="tn-garm-info">
-                <span className="tn-garm-name">{product.title}</span>
-                <span className="tn-garm-price">
+              <div className="tn-garm-info pg-info">
+                <span className="tn-garm-name pg-name">{product.title}</span>
+                <span className="tn-garm-price pg-price">
                   {product.currencyCode === 'USD' ? '$' : '€'}
                   {Number(product.price).toFixed(2)}
                 </span>
@@ -82,7 +109,7 @@ export default async function Home() {
             </Link>
           ))}
         </div>
-        <Link href="/search" className="tn-garm-all">Enter the Collection</Link>
+        <Link href="/search" className="tn-garm-all pg-all">Enter the Collection</Link>
       </section>
 
       {/* ── 4.5. PULL QUOTE ── */}
@@ -615,6 +642,107 @@ export default async function Home() {
           border-color: rgba(255,255,255,0.38);
         }
 
+        /* ══ HOMEPAGE GALLERY ══ */
+        .homepage-gallery {
+          width: 100%;
+          background: #f5f4f0;
+          padding: 40px 0;
+          overflow: hidden;
+        }
+        .hg-scroll {
+          display: flex;
+          gap: 4px;
+          overflow-x: auto;
+          scroll-snap-type: x mandatory;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+          padding: 0 80px;
+        }
+        .hg-scroll::-webkit-scrollbar { display: none; }
+        .hg-item {
+          flex: 0 0 auto;
+          width: 320px;
+          height: 420px;
+          scroll-snap-align: start;
+          overflow: hidden;
+          background: #ece9e3;
+        }
+        .hg-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          opacity: 0.82;
+          transition: opacity 0.8s ease, transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .hg-item:hover .hg-img {
+          opacity: 1;
+          transform: scale(1.03);
+        }
+
+        /* ══ HOMEPAGE PRODUCT GRID ══ */
+        .homepage-product-grid .pg-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 4px;
+          max-width: 1280px;
+          margin: 0 auto 96px;
+        }
+        .homepage-product-grid .pg-card {
+          display: flex;
+          flex-direction: column;
+          text-decoration: none;
+          color: inherit;
+          background: #ece9e3;
+          overflow: hidden;
+          transition: opacity 0.6s ease;
+        }
+        .homepage-product-grid .pg-card:hover {
+          opacity: 0.78;
+        }
+        .homepage-product-grid .pg-img-wrap {
+          aspect-ratio: 3 / 4;
+          overflow: hidden;
+        }
+        .homepage-product-grid .pg-img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          display: block;
+          transition: opacity 0.6s ease;
+        }
+        .homepage-product-grid .pg-card:hover .pg-img {
+          opacity: 0.88;
+        }
+        .homepage-product-grid .pg-info {
+          padding: 18px 22px 20px;
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          background: #ece9e3;
+        }
+        .homepage-product-grid .pg-name {
+          font-family: var(--font-primary);
+          font-size: 10px;
+          font-weight: 300;
+          letter-spacing: 0.14em;
+          color: #444;
+          text-transform: uppercase;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          flex: 1;
+          margin-right: 16px;
+        }
+        .homepage-product-grid .pg-price {
+          font-family: var(--font-primary);
+          font-size: 12px;
+          font-weight: 400;
+          color: #111;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+
         /* ══ RESPONSIVE ══ */
         @media (max-width: 1024px) {
           .tn-garments { padding: 120px 40px 100px; }
@@ -647,6 +775,12 @@ export default async function Home() {
           .tn-season { grid-template-columns: 1fr; }
           .tn-season-card { height: 80dvh; }
           .tn-season-meta { bottom: 48px; }
+          .hg-scroll { padding: 0 20px; }
+          .hg-item { width: 260px; height: 340px; }
+          .homepage-product-grid .pg-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2px;
+          }
         }
       `}</style>
     </>
