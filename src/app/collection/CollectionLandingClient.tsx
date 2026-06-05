@@ -90,17 +90,16 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
       <section className="tc-hero">
         <img
           src="/hero/ComfyUI-main_reference_00028_.png"
-          alt="The Collection Campaign"
+          alt=""
           className="tc-hero-img"
           draggable={false}
         />
         <div className="tc-hero-overlay" />
         <div className="tc-hero-content">
-          <p className="tc-hero-eyebrow">HOUSE OF TONET</p>
           <h1 className="tc-hero-headline">THE COLLECTION</h1>
-          <p className="tc-hero-sub">A selection preserved within the House.</p>
+          <p className="tc-hero-sub">Preserved within the House.</p>
           <button className="tc-hero-cta" onClick={scrollToAll}>
-            Enter the Collection
+            Enter
           </button>
         </div>
       </section>
@@ -130,7 +129,6 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
           <div className="tc-gender-veil" />
         </div>
         <div className="tc-gender-content">
-          <p className="tc-gender-over">LINEAGE</p>
           <h2 className="tc-gender-title">FOR HIM</h2>
           <button className="tc-gender-cta" onClick={() => filterAndScroll('him')}>
             View Selection &rarr;
@@ -151,7 +149,6 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
           <div className="tc-gender-veil" />
         </div>
         <div className="tc-gender-content">
-          <p className="tc-gender-over">LINEAGE</p>
           <h2 className="tc-gender-title">FOR HER</h2>
           <button className="tc-gender-cta" onClick={() => filterAndScroll('her')}>
             View Selection &rarr;
@@ -162,9 +159,7 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
       {/* ── SECTION 5: THE FOUNDATIONS ── */}
       <section className="tc-foundations">
         <div className="tc-foundations-header">
-          <p className="tc-sec-eyebrow">ESSENTIALS</p>
           <h2 className="tc-sec-title">THE FOUNDATIONS</h2>
-          <p className="tc-sec-sub">Core archival black garments composed for permanent rotation.</p>
         </div>
 
         <div className="tc-foundations-grid">
@@ -174,7 +169,7 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
                 {product.imageUrl && (
                   <img
                     src={product.imageUrl}
-                    alt={product.title}
+                    alt=""
                     className="tc-f-img"
                     loading="lazy"
                     decoding="async"
@@ -193,59 +188,45 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
         </div>
       </section>
 
-      {/* ── SECTION 6: THE COLOUR STUDIES ── */}
-      <section className="tc-colour">
-        <div className="tc-colour-header">
-          <p className="tc-sec-eyebrow">CHROMATIC STUDY</p>
-          <h2 className="tc-sec-title">THE COLOUR STUDIES</h2>
-          <p className="tc-sec-sub">An exploration of organic pigments, dense tones and raw shade density.</p>
+      {/* ── SECTION 6: TONET AT NIGHT ── */}
+      <section className="tc-night">
+        <img
+          src="/hero/ComfyUI-main_reference_00016_.png"
+          alt=""
+          className="tc-night-img"
+          loading="lazy"
+          decoding="async"
+        />
+        <div className="tc-night-overlay" />
+        <div className="tc-night-content">
+          <h2 className="tc-night-title">TONET AT NIGHT</h2>
+        </div>
+      </section>
+
+      {/* ── SECTION 7: THE ARCHIVE (Moodboard) ── */}
+      <section className="tc-archive-mood">
+        <div className="tc-archive-mood-header">
+          <h2 className="tc-sec-title">THE ARCHIVE</h2>
+          <p className="tc-sec-sub">Preserved within the House.</p>
         </div>
 
-        <div className="tc-moodboard">
-          <div className="tc-mood-item tc-mood-large">
-            <div className="tc-mood-color" style={{ background: '#090909' }} />
-            <div className="tc-mood-desc">
-              <p className="tc-mood-tag">STUDY 01</p>
-              <h3 className="tc-mood-title">COAL BLACK</h3>
-              <p className="tc-mood-detail">Absolute density. Absorbing light to emphasize structural lines and architecture.</p>
-            </div>
+        <div className="tc-archive-mood-grid">
+          <div className="tc-am-item">
+            <img src="/hero/ComfyUI-main_reference_00018_.png" alt="Archival Detail" loading="lazy" decoding="async" />
           </div>
-          
-          <div className="tc-mood-item tc-mood-mid">
-            <div className="tc-mood-color" style={{ background: '#eae9e4' }} />
-            <div className="tc-mood-desc">
-              <p className="tc-mood-tag">STUDY 02</p>
-              <h3 className="tc-mood-title">ALABASTER</h3>
-              <p className="tc-mood-detail">Restrained highlight. A quiet contrast reflecting subtle architectural depth.</p>
-            </div>
+          <div className="tc-am-item tc-am-item-offset">
+            <img src="/hero/ComfyUI-main_reference_00023_.png" alt="Archival Studio" loading="lazy" decoding="async" />
           </div>
-
-          <div className="tc-mood-item">
-            <div className="tc-mood-color" style={{ background: '#736357' }} />
-            <div className="tc-mood-desc">
-              <p className="tc-mood-tag">STUDY 03</p>
-              <h3 className="tc-mood-title">RAW CLAY</h3>
-              <p className="tc-mood-detail">Textural earth. Composed from raw, unrefined organic earth pigments.</p>
-            </div>
-          </div>
-
-          <div className="tc-mood-item">
-            <div className="tc-mood-color" style={{ background: '#424242' }} />
-            <div className="tc-mood-desc">
-              <p className="tc-mood-tag">STUDY 04</p>
-              <h3 className="tc-mood-title">SHADOW GRAY</h3>
-              <p className="tc-mood-detail">Refracted shadow. A transitional tone designed to layer within the collection.</p>
-            </div>
+          <div className="tc-am-item">
+            <img src="/hero/ComfyUI-main_reference_00032_.png" alt="Archival Texture" loading="lazy" decoding="async" />
           </div>
         </div>
       </section>
 
-      {/* ── SECTION 7: ALL GARMENTS ── */}
+      {/* ── SECTION 8: ALL GARMENTS ── */}
       <section className="tc-all-garments" ref={allGarmentsRef}>
         <div className="tc-all-header">
-          <p className="tc-sec-eyebrow">ARCHIVE</p>
           <h2 className="tc-sec-title">ALL GARMENTS</h2>
-          <p className="tc-sec-sub">The complete lineage preserved inside the House of Tonet.</p>
         </div>
 
         {/* Filters & Sorting */}
@@ -614,73 +595,87 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
           letter-spacing: 0.04em;
         }
 
-        /* ── SECTION 6: THE COLOUR STUDIES ── */
-        .tc-colour {
-          background: #0d0d0d;
-          padding: 160px 80px;
-          border-bottom: 1px solid rgba(255,255,255,0.04);
-        }
-        .tc-colour-header {
-          text-align: center;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          margin-bottom: 100px;
-        }
-        .tc-moodboard {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 20px;
-          max-width: 1400px;
-          margin: 0 auto;
-        }
-        .tc-mood-item {
-          display: flex;
-          flex-direction: column;
-          background: #090909;
-          overflow: hidden;
-        }
-        .tc-mood-large {
-          grid-column: span 2;
-        }
-        .tc-mood-color {
-          height: 380px;
+        /* ── SECTION 6: TONET AT NIGHT ── */
+        .tc-night {
+          position: relative;
           width: 100%;
-          opacity: 0.85;
-          transition: opacity 0.6s ease;
+          height: 85vh;
+          overflow: hidden;
+          background: #000;
         }
-        .tc-mood-item:hover .tc-mood-color {
-          opacity: 1;
+        .tc-night-img {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          opacity: 0.45;
         }
-        .tc-mood-desc {
-          padding: 28px 24px;
+        .tc-night-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%, rgba(0,0,0,0.8) 100%);
+        }
+        .tc-night-content {
+          position: absolute;
+          inset: 0;
           display: flex;
-          flex-direction: column;
-          gap: 12px;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          z-index: 2;
         }
-        .tc-mood-tag {
+        .tc-night-title {
           font-family: var(--font-primary);
-          font-size: 9px;
-          font-weight: 300;
-          letter-spacing: 0.4em;
-          color: rgba(255,255,255,0.3);
-        }
-        .tc-mood-title {
-          font-family: var(--font-primary);
-          font-size: 12px;
-          font-weight: 400;
-          letter-spacing: 0.18em;
+          font-size: clamp(32px, 5.5vw, 72px);
+          font-weight: 200;
+          letter-spacing: 0.25em;
           color: #fff;
           text-transform: uppercase;
           margin: 0;
         }
-        .tc-mood-detail {
-          font-family: var(--font-primary);
-          font-size: 12px;
-          font-weight: 300;
-          line-height: 1.8;
-          color: rgba(255,255,255,0.35);
-          margin: 0;
+
+        /* ── SECTION 7: THE ARCHIVE (Moodboard) ── */
+        .tc-archive-mood {
+          background: #0d0d0d;
+          padding: 220px 80px;
+          border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .tc-archive-mood-header {
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-bottom: 120px;
+        }
+        .tc-archive-mood-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 40px;
+          max-width: 1400px;
+          margin: 0 auto;
+          align-items: start;
+        }
+        .tc-am-item {
+          overflow: hidden;
+          background: #090909;
+        }
+        .tc-am-item img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          aspect-ratio: 3 / 4;
+          display: block;
+          opacity: 0.65;
+          transition: transform 1.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+        }
+        .tc-am-item:hover img {
+          transform: scale(1.03);
+          opacity: 0.85;
+        }
+        .tc-am-item-offset {
+          transform: translateY(60px);
         }
 
         /* ── SECTION 7: ALL GARMENTS ── */
@@ -834,16 +829,16 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
         @media (max-width: 1200px) {
           .tc-foundations { padding: 120px 40px; }
           .tc-foundations-grid { gap: 20px; }
-          .tc-colour { padding: 120px 40px; }
-          .tc-moodboard { gap: 12px; }
+          .tc-archive-mood { padding: 160px 40px; }
+          .tc-archive-mood-grid { gap: 20px; }
           .tc-all-garments { padding: 120px 40px; }
           .tc-grid { grid-template-columns: repeat(3, 1fr); }
         }
 
         @media (max-width: 1024px) {
           .tc-foundations-grid { grid-template-columns: repeat(2, 1fr); }
-          .tc-moodboard { grid-template-columns: repeat(2, 1fr); }
-          .tc-mood-large { grid-column: auto; }
+          .tc-archive-mood-grid { grid-template-columns: repeat(2, 1fr); }
+          .tc-am-item-offset { transform: none; }
         }
 
         @media (max-width: 767px) {
@@ -873,11 +868,9 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
           .tc-foundations { padding: 80px 24px; }
           .tc-foundations-header { margin-bottom: 60px; }
           .tc-foundations-grid { grid-template-columns: 1fr; gap: 40px; }
-          .tc-colour { padding: 80px 24px; }
-          .tc-colour-header { margin-bottom: 60px; }
-          .tc-moodboard { grid-template-columns: 1fr; gap: 24px; }
-          .tc-mood-color { height: 280px; }
-          .tc-mood-desc { padding: 20px 0 0 0; }
+          .tc-archive-mood { padding: 80px 24px; }
+          .tc-archive-mood-header { margin-bottom: 60px; }
+          .tc-archive-mood-grid { grid-template-columns: 1fr; gap: 24px; }
           .tc-all-garments { padding: 80px 24px; }
           .tc-all-header { margin-bottom: 50px; }
           .tc-controls {
