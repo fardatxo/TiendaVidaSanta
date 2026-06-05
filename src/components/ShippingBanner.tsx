@@ -82,7 +82,7 @@ export default function ShippingBanner() {
       paddingLeft: "0.45em",
       boxSizing: "border-box",
     }}>
-      Complimentary shipping to {country}
+      Complimentary shipping to your country
     </div>
   );
 }

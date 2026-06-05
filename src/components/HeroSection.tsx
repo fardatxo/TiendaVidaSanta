@@ -70,7 +70,7 @@ export default function HeroSection() {
             </span>
           ))}
         </h1>
-        <Link href="/collection" className="tn-hero-cta">
+        <Link href="/collection/i9nm9inm" className="tn-hero-cta">
           Enter the House
         </Link>
       </div>
