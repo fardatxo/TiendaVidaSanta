@@ -1,68 +1,36 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import type { RecommendedProduct } from '@/lib/shopify';
-import { useLocale } from '@/context/LocaleContext';
 
 interface Props {
   product: RecommendedProduct;
 }
 
+const getArchiveRef = (handle: string) => {
+  const hash = handle.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  const num = String((hash % 9000) + 1000).padStart(4, '0');
+  return `ARC-26-${num}`;
+};
+
 export default function RecommendedCard({ product }: Props) {
-  const { formatPrice } = useLocale();
-  const [hoveredSibling, setHoveredSibling] = useState<{ handle: string; imageUrl: string } | null>(null);
-  const [showSwatches, setShowSwatches] = useState(false);
-
-  const displayImage = hoveredSibling?.imageUrl ?? product.imageUrl;
   const displayHref = `/product/${product.handle}`;
-
-  // Total colour count = self + siblings
-  const colourCount = product.siblings.length + 1;
+  const secondImage = product.siblings.length > 0 ? product.siblings[0].imageUrl : null;
 
   return (
-    <div
-      className="rec-card-wrap"
-      onMouseEnter={() => setShowSwatches(true)}
-      onMouseLeave={() => { setShowSwatches(false); setHoveredSibling(null); }}
-    >
+    <div className="rec-card-wrap">
       <Link href={displayHref} className="rec-card">
         <div className="rec-img-wrap">
-          {displayImage && (
-            <img src={displayImage} alt={product.title} className="rec-img" />
+          {product.imageUrl && (
+            <img src={product.imageUrl} alt={product.title} className="rec-img rec-img-primary" />
           )}
-          {/* Collection sibling swatches — shown on hover, bottom-left */}
-          {showSwatches && product.siblings.length > 0 && (
-            <div className="rec-swatches">
-              {/* Current product swatch */}
-              <div
-                className={`rec-swatch${!hoveredSibling ? ' active' : ''}`}
-                onMouseEnter={(e) => { e.preventDefault(); setHoveredSibling(null); }}
-              >
-                <img src={product.imageUrl} alt={product.title} className="rec-swatch-img" />
-              </div>
-              {/* Sibling swatches */}
-              {product.siblings.slice(0, 3).map((s) => (
-                <div
-                  key={s.handle}
-                  className={`rec-swatch${hoveredSibling?.handle === s.handle ? ' active' : ''}`}
-                  onMouseEnter={(e) => { e.preventDefault(); setHoveredSibling(s); }}
-                >
-                  <img src={s.imageUrl} alt={s.handle} className="rec-swatch-img" />
-                </div>
-              ))}
-              {product.siblings.length > 3 && (
-                <span className="rec-swatch-more">+</span>
-              )}
-            </div>
+          {secondImage && (
+            <img src={secondImage} alt={product.title} className="rec-img rec-img-secondary" />
           )}
         </div>
         <div className="rec-meta">
-          <span className="rec-title">{product.title.charAt(0).toUpperCase() + product.title.slice(1).toLowerCase()}</span>
-          <span className="rec-price">{formatPrice(product.price, product.currencyCode)}</span>
-          {colourCount > 1 && (
-            <span className="rec-collection">{colourCount} Colours</span>
-          )}
+          <span className="rec-title">{product.title}</span>
+          <span className="rec-archive-ref">{getArchiveRef(product.handle)}</span>
         </div>
       </Link>
 
@@ -75,16 +43,12 @@ export default function RecommendedCard({ product }: Props) {
           text-decoration: none;
           color: inherit;
           cursor: pointer;
-          opacity: 1 !important;
-        }
-        .rec-card:hover {
-          opacity: 1 !important;
         }
         .rec-img-wrap {
           position: relative;
           width: 100%;
           aspect-ratio: 3 / 4;
-          background: #EEEDED;
+          background: #f7f7f7;
           overflow: hidden;
         }
         .rec-img {
@@ -92,75 +56,46 @@ export default function RecommendedCard({ product }: Props) {
           height: 100%;
           object-fit: contain;
           display: block;
-          transition: opacity 0.15s ease;
+          transition: opacity 0.5s ease-in-out;
         }
-
-        /* ── Swatches ── */
-        .rec-swatches {
+        .rec-img-secondary {
           position: absolute;
-          bottom: 10px;
-          left: 10px;
-          display: flex;
-          gap: 6px;
-          align-items: center;
-          z-index: 2;
+          inset: 0;
+          opacity: 0;
         }
-        .rec-swatch {
-          width: 32px;
-          height: 32px;
-          border: 1px solid #d0d0d0;
-          background: #fff;
-          cursor: pointer;
-          overflow: hidden;
-          transition: border-color 0.12s;
+        .rec-card:hover .rec-img-primary {
+          opacity: ${secondImage ? 0 : 1};
         }
-        .rec-swatch:hover,
-        .rec-swatch.active {
-          border-color: #111;
+        .rec-card:hover .rec-img-secondary {
+          opacity: 1;
         }
-        .rec-swatch-img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-          display: block;
-        }
-        .rec-swatch-more {
-          font-size: 13px;
-          font-weight: 500;
-          color: #666;
-          padding-left: 2px;
-        }
-
-        /* ── Meta ── */
         .rec-meta {
-          padding-top: 10px;
-          padding-right: 12px;
-          padding-bottom: 16px;
-          padding-left: 18px;
+          padding-top: 18px;
+          padding-bottom: 24px;
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 6px;
           align-items: center;
           text-align: center;
         }
         .rec-title {
-          font-size: 13px;
-          font-weight: 500;
-          text-transform: none;
-          letter-spacing: 0.03em;
-          line-height: 1.3;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 9.5px;
+          font-weight: 300;
+          text-transform: uppercase;
+          letter-spacing: 0.14em;
+          line-height: 1.5;
           color: #111;
+          max-width: 280px;
+          margin: 0 auto;
         }
-        .rec-price {
-          font-size: 13px;
-          font-weight: 400;
-          color: #111;
-        }
-        .rec-collection {
-          font-size: 11px;
-          font-weight: 400;
-          letter-spacing: 0.03em;
-          color: #999;
+        .rec-archive-ref {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 8px;
+          font-weight: 300;
+          letter-spacing: 0.1em;
+          color: #888;
+          text-transform: uppercase;
         }
       `}</style>
     </div>

@@ -986,7 +986,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
       {/* ── YOU MAY ALSO LIKE – carousel ── */}
       {recommended.length > 0 && (
         <section className="rec-section">
-          <h2 className="rec-label">House Selection</h2>
+          <h2 className="rec-label">WITHIN THE HOUSE</h2>
           <div className="rec-carousel-wrap">
             <div
               className="rec-carousel"
@@ -2056,15 +2056,16 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .rec-carousel {
           display: flex;
           flex-direction: row;
-          gap: 0;
+          gap: 48px;
           overflow-x: auto;
           scroll-snap-type: x mandatory;
           -webkit-overflow-scrolling: touch;
           cursor: grab;
           user-select: none;
-          padding-left: 0;
-          padding-bottom: 4px;
-          scroll-padding-left: 16px;
+          padding-left: 40px;
+          padding-right: 40px;
+          padding-bottom: 24px;
+          scroll-padding-left: 40px;
           will-change: transform;
         }
         .rec-carousel:active { cursor: grabbing; }
@@ -2073,10 +2074,9 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .rec-carousel::-webkit-scrollbar { display: none; }
         .rec-carousel { scrollbar-width: none; }
         .rec-carousel-item {
-          flex: 0 0 calc(25% - 18px);
-          min-width: calc(25% - 18px);
+          flex: 0 0 calc(33.333% - 32px);
+          min-width: calc(33.333% - 32px);
           scroll-snap-align: start;
-          padding-right: 1px;
         }
         /* ══ THE HOUSE PHILOSOPHY ══ */
         .ss-philosophy {
@@ -2128,10 +2128,15 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           .rec-section { background: #ffffff !important; padding: 60px 0 80px; }
           .ss-philosophy { padding: 80px 24px; }
           .ss-philosophy-text { font-size: 12px; }
-          .rec-carousel { padding-left: 0; }
+          .rec-carousel {
+            gap: 24px !important;
+            padding-left: 24px !important;
+            padding-right: 24px !important;
+            scroll-padding-left: 24px !important;
+          }
           .rec-carousel-item {
-            flex: 0 0 83.333vw;
-            min-width: 83.333vw;
+            flex: 0 0 75vw !important;
+            min-width: 75vw !important;
           }
         }
         /* ══ AVAILABILITY REQUEST MODAL ══ */

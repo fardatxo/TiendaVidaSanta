@@ -45,7 +45,7 @@ const YmalCarousel = memo(function YmalCarousel({ recommended }: { recommended: 
 
   return (
     <section className="ymal-section">
-      <h2 className="ymal-title">YOU MAY ALSO LIKE</h2>
+      <h2 className="ymal-title">WITHIN THE HOUSE</h2>
       <div className="ymal-carousel-wrap">
         <div
           className="ymal-carousel"
