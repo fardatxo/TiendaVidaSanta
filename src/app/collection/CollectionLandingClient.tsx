@@ -603,14 +603,14 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
           font-size: 10px;
           font-weight: 300;
           letter-spacing: 0.14em;
-          color: rgba(255,255,255,0.5);
+          color: rgba(255,255,255,0.5) !important;
           text-transform: uppercase;
         }
         .tc-f-price {
           font-family: var(--font-primary);
           font-size: 11px;
           font-weight: 400;
-          color: rgba(255,255,255,0.75);
+          color: rgba(255,255,255,0.75) !important;
           letter-spacing: 0.04em;
         }
 
@@ -803,7 +803,7 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
           font-size: 10px;
           font-weight: 300;
           letter-spacing: 0.14em;
-          color: rgba(255,255,255,0.55);
+          color: rgba(255,255,255,0.55) !important;
           text-transform: uppercase;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -815,7 +815,7 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
           font-family: var(--font-primary);
           font-size: 11px;
           font-weight: 400;
-          color: rgba(255,255,255,0.75);
+          color: rgba(255,255,255,0.75) !important;
           letter-spacing: 0.04em;
         }
         .tc-empty {
@@ -900,6 +900,19 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
           }
           .tc-card-info {
             padding: 16px 0;
+          }
+          .tc-card-meta {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 4px;
+          }
+          .tc-card-name {
+            white-space: normal !important;
+            margin-right: 0 !important;
+            line-height: 1.4;
+          }
+          .tc-card-price {
+            margin-top: 2px;
           }
         }
       `}</style>
