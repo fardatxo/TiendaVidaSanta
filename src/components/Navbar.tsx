@@ -16,7 +16,7 @@ export default function Navbar() {
 
   const isHome = pathname === "/";
   const isProduct = pathname.startsWith("/product/");
-  const isCollection = pathname.startsWith("/collection/");
+  const isCollection = pathname.startsWith("/collection");
   const hasSubnav = isProduct || isCollection;
 
   const [collections, setCollections] = useState<{handle: string; title: string}[]>([]);

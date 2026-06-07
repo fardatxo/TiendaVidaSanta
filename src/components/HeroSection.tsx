@@ -93,7 +93,6 @@ export default function HeroSection() {
           width: 100%;
           height: calc(100dvh + 60px);
           overflow: hidden;
-          margin-top: -60px;
           background: #0d0d0d;
         }
         .tn-hero-slide {
