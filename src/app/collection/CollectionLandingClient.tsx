@@ -8,34 +8,52 @@ interface CollectionLandingClientProps {
   products: Product[];
 }
 
-function extractUniqueOptions(product: Product, optionName: string) {
-  const vals = new Set<string>();
-  product.variants.forEach(v => {
-    v.selectedOptions.forEach(o => {
-      if (o.name.toLowerCase().includes(optionName.toLowerCase())) {
-        vals.add(o.value);
-      }
-    });
-  });
-  return Array.from(vals);
-}
+const getArchiveRef = (handle: string) => {
+  const hash = handle.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  const num = String((hash % 9000) + 1000).padStart(4, '0');
+  return `ARC-26-${num}`;
+};
 
-function colorToCss(color: string): string {
-  const map: Record<string, string> = {
-    black: '#0a0a0a', white: '#f5f5f5', grey: '#666', gray: '#666',
-    navy: '#1a1a2e', beige: '#d4c4a8', cream: '#f0efe9',
-    brown: '#5c4033', camel: '#c19a6b', olive: '#556b2f',
-  };
-  const lc = color.toLowerCase().trim();
-  return map[lc] || lc;
-}
+const getCollectionInfo = (product: Product) => {
+  const matchText = (product.title + ' ' + product.description).toLowerCase();
+  if (matchText.includes('grey') || matchText.includes('gray') || matchText.includes('light') || matchText.includes('shadow')) {
+    return 'HOUSE_02 — LIGHT & FORM';
+  } else if (product.tags.some(t => /essential|core|foundation/i.test(t)) || matchText.includes('black')) {
+    return 'HOUSE_01 — PERMANENCE';
+  } else {
+    return 'HOUSE_03 — ORGANIC CHROMATIC';
+  }
+};
+
+const getGarmentType = (product: Product): 'tops' | 'bottoms' | 'outerwear' => {
+  const title = product.title.toLowerCase();
+  const tags = product.tags.map(t => t.toLowerCase());
+
+  const isOuterwear = tags.includes('outerwear') || tags.includes('jacket') || tags.includes('coat') || title.includes('jacket') || title.includes('coat') || title.includes('bomber') || title.includes('trench') || title.includes('hoodie');
+  const isBottoms = tags.includes('pants') || tags.includes('shorts') || tags.includes('bottoms') || tags.includes('trousers') || title.includes('shorts') || title.includes('pants') || title.includes('trousers') || title.includes('jogger');
+
+  if (isOuterwear) return 'outerwear';
+  if (isBottoms) return 'bottoms';
+  return 'tops';
+};
+
+const philosophicalQuotes = [
+  "We are not interested in trends. Only permanence.",
+  "Repetition is the ultimate form of restraint.",
+  "A garment is not a transaction. It is an artifact of the House.",
+  "Restraint is not the absence of design. It is the absolute presence of intention.",
+  "Garments are not products. They are pieces of a cumulative archive."
+];
 
 export default function CollectionLandingClient({ products }: CollectionLandingClientProps) {
-  const [activeFilter, setActiveTab] = useState<'all' | 'him' | 'her' | 'foundations' | 'archives'>('all');
-  const [sortKey, setSortKey] = useState<'default' | 'price-asc' | 'price-desc'>('default');
+  // Advanced Archive Indexing State
+  const [filterGarmentType, setFilterGarmentType] = useState<'all' | 'tops' | 'bottoms' | 'outerwear'>('all');
+  const [filterCollection, setFilterCollection] = useState<'all' | 'HOUSE_01' | 'HOUSE_02' | 'HOUSE_03'>('all');
+  const [filterState, setFilterState] = useState<'all' | 'active' | 'archived'>('all');
 
-  const allGarmentsRef = useRef<HTMLDivElement>(null);
+  const registryStartRef = useRef<HTMLDivElement>(null);
 
+  // Cinematic Intersection Observer
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -45,347 +63,251 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
           }
         });
       },
-      { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
+      { threshold: 0.15, rootMargin: '0px 0px -100px 0px' }
     );
 
-    const elements = document.querySelectorAll('.tc-fade-in');
+    const elements = document.querySelectorAll('.archive-reveal');
     elements.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
-  }, []);
+  }, [filterGarmentType, filterCollection, filterState]);
 
-  // SECTION 3 & 4 CTA actions: scroll to all garments and apply gender filter
-  const filterAndScroll = (filter: 'him' | 'her') => {
-    setActiveTab(filter);
-    if (allGarmentsRef.current) {
-      allGarmentsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const scrollToRegistry = () => {
+    if (registryStartRef.current) {
+      registryStartRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
-  const scrollToAll = () => {
-    if (allGarmentsRef.current) {
-      allGarmentsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+  // Determine availability of a product
+  const isAvailable = (product: Product) => {
+    return product.variants.some(v => v.availableForSale);
   };
 
-  // Section 5 Foundations filter: get products with 'black', 'essential', 'foundation' or dark tags
-  const foundations = useMemo(() => {
-    let list = products.filter(p => {
-      const matchText = (p.title + ' ' + p.description).toLowerCase();
-      const hasBlack = matchText.includes('black') || matchText.includes('negro') || matchText.includes('charcoal');
-      const hasCore = p.tags.some(t => /essential|core|foundation|básico/i.test(t));
-      return hasBlack || hasCore;
-    });
-    if (list.length === 0) {
-      list = [...products];
-    }
-    return list.slice(0, 4);
+  // Live museum metadata statistics calculation
+  const stats = useMemo(() => {
+    const total = products.length;
+    const collections = 3;
+    const archived = products.filter(p => !isAvailable(p)).length;
+    const active = total - archived;
+
+    return { total, collections, archived, active };
   }, [products]);
 
-  // Section 7 filtered list of products
+  // Archive filtered grid
   const filteredProducts = useMemo(() => {
-    let filtered = [...products];
+    return products.filter(product => {
+      // 1. Garment Type filter
+      if (filterGarmentType !== 'all') {
+        if (getGarmentType(product) !== filterGarmentType) return false;
+      }
 
-    // Apply main editorial filters
-    if (activeFilter === 'him') {
-      filtered = products.filter(p => p.tags.some(t => /men|him|male|hombre/i.test(t)));
-    } else if (activeFilter === 'her') {
-      filtered = products.filter(p => p.tags.some(t => /women|her|female|mujer/i.test(t)));
-    } else if (activeFilter === 'foundations') {
-      filtered = products.filter(p => {
-        const matchText = (p.title + ' ' + p.description).toLowerCase();
-        return matchText.includes('black') || p.tags.some(t => /essential|core|foundation/i.test(t));
-      });
-    } else if (activeFilter === 'archives') {
-      filtered = products.filter(p => p.tags.some(t => /archive|archival|old/i.test(t)) || p.title.toLowerCase().includes('archive'));
-    }
+      // 2. Collection filter
+      if (filterCollection !== 'all') {
+        const col = getCollectionInfo(product);
+        if (!col.includes(filterCollection)) return false;
+      }
 
-    // Fallback to all products if no products matched the filter (since tags might not be created in Shopify yet)
-    let result = filtered.length > 0 ? filtered : [...products];
+      // 3. House State filter
+      if (filterState !== 'all') {
+        const available = isAvailable(product);
+        if (filterState === 'active' && !available) return false;
+        if (filterState === 'archived' && available) return false;
+      }
 
-    // Apply sorting
-    if (sortKey === 'price-asc') {
-      result.sort((a, b) => a.price - b.price);
-    } else if (sortKey === 'price-desc') {
-      result.sort((a, b) => b.price - a.price);
-    }
-
-    return result;
-  }, [products, activeFilter, sortKey]);
+      return true;
+    });
+  }, [products, filterGarmentType, filterCollection, filterState]);
 
   return (
-    <div className="tc">
+    <div className="tonet-archive">
       
-      {/* ── SECTION 1: FULL VIEWPORT HERO ── */}
-      <section className="tc-hero">
+      {/* ── HERO SECTION (Cinematic Viewport) ── */}
+      <section className="tonet-archive-hero">
+        <div className="tonet-archive-hero__bg-overlay" />
         <img
           src="/hero/ComfyUI-main_reference_00028_.png"
-          alt="The Collection Campaign"
-          className="tc-hero-img tc-fade-in"
+          alt="TONET Archival Imagery"
+          className="tonet-archive-hero__image"
           draggable={false}
         />
-        <div className="tc-hero-overlay" />
-        <div className="tc-hero-content">
-          <p className="tc-hero-eyebrow">HOUSE OF TONET</p>
-          <h1 className="tc-hero-headline">THE COLLECTION</h1>
-          <p className="tc-hero-sub">A selection preserved within the House.</p>
-          <button className="tc-hero-cta" onClick={scrollToAll}>
-            Enter the Collection
-          </button>
-        </div>
-      </section>
-
-      {/* ── SECTION 2: EDITORIAL STATEMENT ── */}
-      <section className="tc-statement">
-        <div className="tc-statement-inner">
-          <p className="tc-statement-line">
-            TONET garments are not designed for seasons alone.
+        <div className="tonet-archive-hero__content">
+          <p className="tonet-archive-hero__eyebrow">HOUSE OF TONET</p>
+          <h1 className="tonet-archive-hero__title">THE COLLECTION</h1>
+          <p className="tonet-archive-hero__description">
+            A registry of garments produced and preserved by the House, exploring permanence, repetition and architectural form.
           </p>
-          <p className="tc-statement-line tc-statement-gold">
-            They are designed to remain.
-          </p>
-        </div>
-      </section>
-
-      {/* ── SECTION 3: FOR HIM ── */}
-      <section className="tc-gender tc-gender-him">
-        <div className="tc-gender-img-wrap">
-          <img
-            src="/hero/ComfyUI-main_reference_00021_.png"
-            alt="Tonet For Him"
-            className="tc-gender-img tc-fade-in"
-            loading="lazy"
-            decoding="async"
-          />
-          <div className="tc-gender-veil" />
-        </div>
-        <div className="tc-gender-content">
-          <p className="tc-gender-over">LINEAGE</p>
-          <h2 className="tc-gender-title">FOR HIM</h2>
-          <button className="tc-gender-cta" onClick={() => filterAndScroll('him')}>
-            View Selection &rarr;
+          <button className="tonet-archive-hero__cta" onClick={scrollToRegistry}>
+            ENTER REGISTRY
           </button>
         </div>
       </section>
 
-      {/* ── SECTION 4: FOR HER ── */}
-      <section className="tc-gender tc-gender-her">
-        <div className="tc-gender-img-wrap">
-          <img
-            src="/hero/ComfyUI-main_reference_00017_.png"
-            alt="Tonet For Her"
-            className="tc-gender-img tc-fade-in"
-            loading="lazy"
-            decoding="async"
-          />
-          <div className="tc-gender-veil" />
-        </div>
-        <div className="tc-gender-content">
-          <p className="tc-gender-over">LINEAGE</p>
-          <h2 className="tc-gender-title">FOR HER</h2>
-          <button className="tc-gender-cta" onClick={() => filterAndScroll('her')}>
-            View Selection &rarr;
-          </button>
-        </div>
-      </section>
-
-      {/* ── SECTION 5: THE FOUNDATIONS ── */}
-      <section className="tc-foundations">
-        <div className="tc-foundations-header">
-          <p className="tc-sec-eyebrow">ESSENTIALS</p>
-          <h2 className="tc-sec-title">THE FOUNDATIONS</h2>
-          <p className="tc-sec-sub">Core archival black garments composed for permanent rotation.</p>
-        </div>
-
-        <div className="tc-foundations-grid">
-          {foundations.map(product => {
-            const colors = extractUniqueOptions(product, 'color');
-            const sizes = extractUniqueOptions(product, 'size');
-            return (
-              <Link key={product.handle} href={`/product/${product.handle}`} className="tc-f-card">
-                <div className="tc-f-img-wrap">
-                  {product.imageUrl && (
-                    <img
-                      src={product.imageUrl}
-                      alt={product.title}
-                      className="tc-f-img tc-fade-in"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  )}
-                </div>
-                <div className="tc-f-info">
-                  <span className="tc-f-name">{product.title}</span>
-                  <span className="tc-f-price">
-                    {product.currencyCode === 'USD' ? '$' : '€'}
-                    {Number(product.price).toFixed(0)}
-                  </span>
-                  {colors.length > 0 && (
-                    <div className="tc-f-swatches">
-                      {colors.slice(0, 4).map((c, i) => (
-                        <span
-                          key={i}
-                          className="tc-f-swatch"
-                          style={{ background: colorToCss(c) }}
-                          title={c}
-                        />
-                      ))}
-                    </div>
-                  )}
-                  {sizes.length > 0 && (
-                    <div className="tc-f-sizes">
-                      {sizes.slice(0, 5).map((s, i) => (
-                        <span key={i} className="tc-f-size">{s}</span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ── SECTION 6: THE COLOUR STUDIES ── */}
-      <section className="tc-colour">
-        <div className="tc-colour-header">
-          <p className="tc-sec-eyebrow">CHROMATIC STUDY</p>
-          <h2 className="tc-sec-title">THE COLOUR STUDIES</h2>
-          <p className="tc-sec-sub">An exploration of organic pigments, dense tones and raw shade density.</p>
-        </div>
-
-        <div className="tc-moodboard">
-          <div className="tc-mood-item tc-mood-large">
-            <div className="tc-mood-color tc-fade-in" style={{ background: '#090909' }} />
-            <div className="tc-mood-desc">
-              <p className="tc-mood-tag">STUDY 01</p>
-              <h3 className="tc-mood-title">COAL BLACK</h3>
-              <p className="tc-mood-detail">Absolute density. Absorbing light to emphasize structural lines and architecture.</p>
-            </div>
+      {/* ── STATS SECTION (Museum Metadata) ── */}
+      <section className="tonet-archive-stats">
+        <div className="tonet-archive-stats__container">
+          <div className="tonet-archive-stats__item">
+            <span className="tonet-archive-stats__label">PIECES</span>
+            <span className="tonet-archive-stats__value">{stats.total}</span>
           </div>
+          <div className="tonet-archive-stats__item">
+            <span className="tonet-archive-stats__label">COLLECTIONS</span>
+            <span className="tonet-archive-stats__value">{stats.collections}</span>
+          </div>
+          <div className="tonet-archive-stats__item">
+            <span className="tonet-archive-stats__label">ACTIVE</span>
+            <span className="tonet-archive-stats__value">{stats.active}</span>
+          </div>
+          <div className="tonet-archive-stats__item">
+            <span className="tonet-archive-stats__label">ARCHIVED</span>
+            <span className="tonet-archive-stats__value">{stats.archived}</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FILTER INDEX (Almost Invisible Archive Indexing) ── */}
+      <section className="tonet-archive-controls" ref={registryStartRef}>
+        <div className="tonet-archive-controls__container">
           
-          <div className="tc-mood-item tc-mood-mid">
-            <div className="tc-mood-color tc-fade-in" style={{ background: '#eae9e4' }} />
-            <div className="tc-mood-desc">
-              <p className="tc-mood-tag">STUDY 02</p>
-              <h3 className="tc-mood-title">ALABASTER</h3>
-              <p className="tc-mood-detail">Restrained highlight. A quiet contrast reflecting subtle architectural depth.</p>
+          <div className="tonet-archive-filter">
+            <span className="tonet-archive-filter__label">GARMENT TYPE</span>
+            <div className="tonet-archive-filter__options">
+              {(['all', 'tops', 'bottoms', 'outerwear'] as const).map(t => (
+                <button
+                  key={t}
+                  className={`tonet-archive-filter__btn ${filterGarmentType === t ? 'active' : ''}`}
+                  onClick={() => setFilterGarmentType(t)}
+                >
+                  {t.toUpperCase()}
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="tc-mood-item">
-            <div className="tc-mood-color tc-fade-in" style={{ background: '#736357' }} />
-            <div className="tc-mood-desc">
-              <p className="tc-mood-tag">STUDY 03</p>
-              <h3 className="tc-mood-title">RAW CLAY</h3>
-              <p className="tc-mood-detail">Textural earth. Composed from raw, unrefined organic earth pigments.</p>
+          <div className="tonet-archive-filter">
+            <span className="tonet-archive-filter__label">COLLECTION</span>
+            <div className="tonet-archive-filter__options">
+              {(['all', 'HOUSE_01', 'HOUSE_02', 'HOUSE_03'] as const).map(c => (
+                <button
+                  key={c}
+                  className={`tonet-archive-filter__btn ${filterCollection === c ? 'active' : ''}`}
+                  onClick={() => setFilterCollection(c)}
+                >
+                  {c.replace('_', ' ').toUpperCase()}
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="tc-mood-item">
-            <div className="tc-mood-color tc-fade-in" style={{ background: '#424242' }} />
-            <div className="tc-mood-desc">
-              <p className="tc-mood-tag">STUDY 04</p>
-              <h3 className="tc-mood-title">SHADOW GRAY</h3>
-              <p className="tc-mood-detail">Refracted shadow. A transitional tone designed to layer within the collection.</p>
+          <div className="tonet-archive-filter">
+            <span className="tonet-archive-filter__label">HOUSE STATE</span>
+            <div className="tonet-archive-filter__options">
+              {(['all', 'active', 'archived'] as const).map(s => (
+                <button
+                  key={s}
+                  className={`tonet-archive-filter__btn ${filterState === s ? 'active' : ''}`}
+                  onClick={() => setFilterState(s)}
+                >
+                  {s === 'all' ? 'ALL ARCHIVE' : s.toUpperCase()}
+                </button>
+              ))}
             </div>
           </div>
+
         </div>
       </section>
 
-      {/* ── SECTION 7: ALL GARMENTS ── */}
-      <section className="tc-all-garments" ref={allGarmentsRef}>
-        <div className="tc-all-header">
-          <p className="tc-sec-eyebrow">ARCHIVE</p>
-          <h2 className="tc-sec-title">ALL GARMENTS</h2>
-          <p className="tc-sec-sub">The complete lineage preserved inside the House of Tonet.</p>
-        </div>
-
-        {/* Filters & Sorting */}
-        <div className="tc-controls">
-          <div className="tc-filters">
-            {(['all', 'him', 'her', 'foundations', 'archives'] as const).map(f => (
-              <button
-                key={f}
-                className={`tc-filter-btn${activeFilter === f ? ' active' : ''}`}
-                onClick={() => setActiveTab(f)}
-              >
-                {f === 'all' && 'All Selection'}
-                {f === 'him' && 'For Him'}
-                {f === 'her' && 'For Her'}
-                {f === 'foundations' && 'Foundations'}
-                {f === 'archives' && 'The Archive'}
-              </button>
-            ))}
-          </div>
-
-          <div className="tc-sorting">
-            <select
-              value={sortKey}
-              onChange={e => setSortKey(e.target.value as any)}
-              className="tc-sort-select"
-              aria-label="Sort Collection"
-            >
-              <option value="default">Default Study</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Product Grid */}
-        <div className="tc-grid">
+      {/* ── MAIN PRODUCT GRID (2-Column Architectural Layout) ── */}
+      <section className="tonet-archive-grid-section">
+        <div className="tonet-archive-grid">
           {filteredProducts.length > 0 ? (
-            filteredProducts.map(product => {
-              const colors = extractUniqueOptions(product, 'color');
-              const sizes = extractUniqueOptions(product, 'size');
+            filteredProducts.map((product, index) => {
+              const archiveRef = getArchiveRef(product.handle);
+              const collectionInfo = getCollectionInfo(product);
+              const available = isAvailable(product);
+              const secondImage = product.images.length > 1 ? product.images[1] : null;
+
+              // Insert an editorial quote block periodically
+              const shouldShowQuote = index > 0 && index % 6 === 0;
+              const quoteIndex = Math.floor(index / 6) % philosophicalQuotes.length;
+              const quoteText = philosophicalQuotes[quoteIndex];
+
               return (
-                <Link key={product.handle} href={`/product/${product.handle}`} className="tc-card">
-                  <div className="tc-card-img-wrap">
-                    {product.imageUrl && (
+                <div key={product.handle} className="tonet-archive-grid__wrapper">
+                  
+                  {shouldShowQuote && (
+                    <div className="tonet-archive-quote archive-reveal">
+                      <p className="tonet-archive-quote__text">"{quoteText}"</p>
+                      <span className="tonet-archive-quote__sub">TONET RESEARCH ARCHIVE</span>
+                    </div>
+                  )}
+
+                  <Link href={`/product/${product.handle}`} className="tonet-archive-card archive-reveal">
+                    {/* Architectural Image Wrapper with museum stone background */}
+                    <div className="tonet-archive-card__image-wrap">
                       <img
                         src={product.imageUrl}
                         alt={product.title}
-                        className="tc-card-img tc-fade-in"
+                        className="tonet-archive-card__image tonet-archive-card__image--primary"
                         loading="lazy"
-                        decoding="async"
                       />
-                    )}
-                  </div>
-                  <div className="tc-card-info">
-                    <div className="tc-card-meta">
-                      <span className="tc-card-name">{product.title}</span>
-                      <span className="tc-card-price">
-                        {product.currencyCode === 'USD' ? '$' : '€'}
-                        {Number(product.price).toFixed(0)}
-                      </span>
+                      {secondImage && (
+                        <img
+                          src={secondImage}
+                          alt={product.title}
+                          className="tonet-archive-card__image tonet-archive-card__image--secondary"
+                          loading="lazy"
+                        />
+                      )}
+                      
+                      {/* Technical Hover Panel (Museum Report) */}
+                      <div className="tonet-archive-hover-panel">
+                        <div className="tonet-archive-hover-panel__rows">
+                          <div className="tonet-archive-hover-panel__row">
+                            <span className="lbl">REGISTRY STATUS</span>
+                            <span className="val">{available ? 'ACTIVE ARCHIVE' : 'ARCHIVED'}</span>
+                          </div>
+                          <div className="tonet-archive-hover-panel__row">
+                            <span className="lbl">AVAILABILITY</span>
+                            <span className="val">{available ? 'AVAILABLE' : 'TEMPORARILY RECALLED'}</span>
+                          </div>
+                          <div className="tonet-archive-hover-panel__row">
+                            <span className="lbl">ARCHIVE REF.</span>
+                            <span className="val">{archiveRef}</span>
+                          </div>
+                          <div className="tonet-archive-hover-panel__row">
+                            <span className="lbl">FABRIC DETAILS</span>
+                            <span className="val">DOCUMENTED SPECIFICATION</span>
+                          </div>
+                        </div>
+                        <div className="tonet-archive-hover-panel__actions">
+                          <span className="action-btn">VIEW RECORD</span>
+                          <span className="action-sep">—</span>
+                          <span className="action-btn">PRESERVE STATE</span>
+                        </div>
+                      </div>
                     </div>
-                    {colors.length > 0 && (
-                      <div className="tc-swatches">
-                        {colors.slice(0, 4).map((c, i) => (
-                          <span
-                            key={i}
-                            className="tc-swatch"
-                            style={{ background: colorToCss(c) }}
-                            title={c}
-                          />
-                        ))}
+
+                    {/* Museum-like metadata block */}
+                    <div className="tonet-archive-card__metadata">
+                      <span className="tonet-archive-card__collection">{collectionInfo}</span>
+                      <h2 className="tonet-archive-card__title">{product.title}</h2>
+                      <div className="tonet-archive-card__bottom-row">
+                        <span className="tonet-archive-card__ref">Archive Ref. {archiveRef}</span>
+                        {!available && (
+                          <span className="tonet-archive-card__status tonet-archive-card__status--archived">
+                            PERMANENTLY ARCHIVED
+                          </span>
+                        )}
                       </div>
-                    )}
-                    {sizes.length > 0 && (
-                      <div className="tc-sizes">
-                        {sizes.slice(0, 5).map((s, i) => (
-                          <span key={i} className="tc-size">{s}</span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </Link>
+                    </div>
+                  </Link>
+
+                </div>
               );
             })
           ) : (
-            <div className="tc-empty">
-              <p>No garments found matching the selected criteria.</p>
+            <div className="tonet-archive-empty">
+              <p>NO GARMENTS REGISTERED UNDER THE SELECTED CRITERIA.</p>
             </div>
           )}
         </div>
@@ -393,732 +315,444 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
 
       {/* ── STYLE ── */}
       <style>{`
-        .tc {
-          background: #0d0d0d;
+        .tonet-archive {
+          background: #060606;
           color: #ffffff;
           overflow: hidden;
+          min-height: 100vh;
+          padding-bottom: 200px;
+          font-family: var(--font-primary), sans-serif;
         }
 
-        /* ── GLOBAL FADE IN SCROLL EFFECT ── */
-        .tc-fade-in {
+        /* Cinematic Intersection Observer Reveals */
+        .archive-reveal {
           opacity: 0;
-          transform: translateY(20px);
-          transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1), transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+          transform: translateY(30px);
+          transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
           will-change: opacity, transform;
         }
-        .tc-hero-img.tc-fade-in.visible {
-          opacity: 0.55;
-          transform: translateY(0);
-        }
-        .tc-gender-img.tc-fade-in.visible {
-          opacity: 0.5;
-          transform: translateY(0);
-        }
-        .tc-f-img.tc-fade-in.visible {
-          opacity: 0.75;
-          transform: translateY(0);
-        }
-        .tc-card-img.tc-fade-in.visible {
-          opacity: 0.75;
-          transform: translateY(0);
-        }
-        .tc-mood-color.tc-fade-in.visible {
-          opacity: 0.85;
+        .archive-reveal.visible {
+          opacity: 1;
           transform: translateY(0);
         }
 
-        /* ── SECTION 1: HERO ── */
-        .tc-hero {
+        /* ── HERO SECTION ── */
+        .tonet-archive-hero {
           position: relative;
           width: 100%;
-          height: calc(100dvh + 60px);
-          margin-top: -60px;
+          height: 100vh;
           display: flex;
           align-items: center;
           justify-content: center;
           background: #000;
         }
-        .tc-hero-img {
+        .tonet-archive-hero__bg-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(6,6,6,0.95) 100%);
+          z-index: 1;
+        }
+        .tonet-archive-hero__image {
           position: absolute;
           inset: 0;
           width: 100%;
           height: 100%;
           object-fit: cover;
-          display: block;
-          opacity: 0.55;
+          opacity: 0.38;
+          filter: grayscale(1);
         }
-        .tc-hero-overlay {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.65) 100%);
-        }
-        .tc-hero-content {
+        .tonet-archive-hero__content {
           position: relative;
           z-index: 2;
           text-align: center;
-          max-width: 650px;
+          max-width: 540px;
           padding: 0 24px;
         }
-        .tc-hero-eyebrow {
-          font-family: var(--font-primary);
-          font-size: 10px;
+        .tonet-archive-hero__eyebrow {
+          font-size: 9px;
           font-weight: 300;
-          letter-spacing: 0.5em;
+          letter-spacing: 0.52em;
+          color: rgba(255,255,255,0.3);
+          margin-bottom: 24px;
+        }
+        .tonet-archive-hero__title {
+          font-size: clamp(38px, 6vw, 72px);
+          font-weight: 200;
+          letter-spacing: 0.28em;
+          line-height: 1.15;
+          margin-bottom: 32px;
+          color: #fff;
+        }
+        .tonet-archive-hero__description {
+          font-size: 11.5px;
+          font-weight: 300;
+          line-height: 2.1;
+          letter-spacing: 0.1em;
+          color: rgba(255,255,255,0.42);
+          margin-bottom: 56px;
+        }
+        .tonet-archive-hero__cta {
+          font-size: 9px;
+          font-weight: 300;
+          letter-spacing: 0.42em;
           color: rgba(255,255,255,0.4);
-          margin: 0 0 24px;
-        }
-        .tc-hero-headline {
-          font-family: var(--font-primary);
-          font-size: clamp(40px, 8vw, 96px);
-          font-weight: 200;
-          letter-spacing: 0.25em;
-          line-height: 1.1;
-          color: #fff;
-          margin: 0 0 28px;
-        }
-        .tc-hero-sub {
-          font-family: var(--font-primary);
-          font-size: 12px;
-          font-weight: 300;
-          letter-spacing: 0.22em;
-          color: rgba(255,255,255,0.5);
-          text-transform: uppercase;
-          margin: 0 0 60px;
-        }
-        .tc-hero-cta {
-          font-family: var(--font-primary);
-          font-size: 10px;
-          font-weight: 300;
-          letter-spacing: 0.45em;
-          color: rgba(255,255,255,0.45);
           background: transparent;
           border: none;
           border-bottom: 1px solid rgba(255,255,255,0.15);
-          padding: 0 0 8px;
+          padding-bottom: 8px;
           cursor: pointer;
-          text-transform: uppercase;
-          transition: color 0.5s ease, border-color 0.5s ease;
+          transition: color 0.4s, border-color 0.4s;
         }
-        .tc-hero-cta:hover {
-          color: rgba(255,255,255,0.9);
-          border-color: rgba(255,255,255,0.45);
-        }
-
-        /* ── SECTION 2: EDITORIAL STATEMENT ── */
-        .tc-statement {
-          padding: 200px 24px;
-          background: #0d0d0d;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          border-bottom: 1px solid rgba(255,255,255,0.04);
-        }
-        .tc-statement-inner {
-          max-width: 600px;
-        }
-        .tc-statement-line {
-          font-family: var(--font-primary);
-          font-size: clamp(16px, 2.5vw, 24px);
-          font-weight: 300;
-          letter-spacing: 0.12em;
-          color: rgba(255,255,255,0.45);
-          line-height: 1.8;
-          margin: 0;
-        }
-        .tc-statement-gold {
-          color: #ffffff;
-          margin-top: 14px;
-          font-weight: 200;
-          letter-spacing: 0.18em;
-        }
-
-        /* ── SECTIONS 3 & 4: FOR HIM / FOR HER ── */
-        .tc-gender {
-          position: relative;
-          width: 100%;
-          height: 95vh;
-          overflow: hidden;
-          background: #0a0a0a;
-          display: flex;
-          align-items: center;
-          justify-content: flex-start;
-          padding: 0 10%;
-        }
-        .tc-gender-img-wrap {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-        }
-        .tc-gender-img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
-          opacity: 0;
-          transition: transform 1.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .tc-gender:hover .tc-gender-img.visible {
-          transform: scale(1.02);
-          opacity: 0.65;
-        }
-        .tc-gender-veil {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 100%);
-        }
-        .tc-gender-her .tc-gender-veil {
-          background: linear-gradient(to left, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 100%);
-        }
-        .tc-gender-her {
-          justify-content: flex-end;
-          text-align: right;
-        }
-        .tc-gender-content {
-          position: relative;
-          z-index: 2;
-          max-width: 480px;
-        }
-        .tc-gender-over {
-          font-family: var(--font-primary);
-          font-size: 10px;
-          font-weight: 300;
-          letter-spacing: 0.5em;
-          color: rgba(255,255,255,0.25);
-          margin: 0 0 16px;
-        }
-        .tc-gender-title {
-          font-family: var(--font-primary);
-          font-size: clamp(32px, 5vw, 64px);
-          font-weight: 200;
-          letter-spacing: 0.18em;
-          color: #fff;
-          margin: 0 0 32px;
-        }
-        .tc-gender-cta {
-          font-family: var(--font-primary);
-          font-size: 10px;
-          font-weight: 300;
-          letter-spacing: 0.35em;
-          color: rgba(255,255,255,0.45);
-          background: transparent;
-          border: none;
-          border-bottom: 1px solid rgba(255,255,255,0.15);
-          padding: 0 0 6px;
-          cursor: pointer;
-          text-transform: uppercase;
-          transition: color 0.4s ease-in-out, border-color 0.4s ease-in-out;
-        }
-        .tc-gender-cta:hover {
+        .tonet-archive-hero__cta:hover {
           color: #fff;
           border-color: rgba(255,255,255,0.6);
         }
 
-        /* Shared section styling (5 & 6) */
-        .tc-sec-eyebrow {
-          font-family: var(--font-primary);
-          font-size: 10px;
-          font-weight: 300;
-          letter-spacing: 0.52em;
-          color: rgba(255,255,255,0.25);
-          text-transform: uppercase;
-          margin: 0 0 24px;
+        /* ── STATS SECTION (Museum Metadata) ── */
+        .tonet-archive-stats {
+          background: #060606;
+          padding: 120px 80px;
+          border-bottom: 1px solid rgba(255,255,255,0.03);
         }
-        .tc-sec-title {
-          font-family: var(--font-primary);
-          font-size: clamp(24px, 3vw, 44px);
-          font-weight: 200;
-          letter-spacing: 0.22em;
-          color: #fff;
-          text-transform: uppercase;
-          margin: 0 0 28px;
-        }
-        .tc-sec-sub {
-          font-family: var(--font-primary);
-          font-size: 11px;
-          font-weight: 300;
-          line-height: 2;
-          letter-spacing: 0.08em;
-          color: rgba(255,255,255,0.38);
-          text-transform: uppercase;
-          margin: 0;
-          max-width: 500px;
-        }
-
-        /* ── SECTION 5: THE FOUNDATIONS ── */
-        .tc-foundations {
-          background: #090909;
-          padding: 200px 80px;
-          border-bottom: 1px solid rgba(255,255,255,0.04);
-        }
-        .tc-foundations-header {
-          text-align: center;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          margin-bottom: 120px;
-        }
-        .tc-foundations-grid {
+        .tonet-archive-stats__container {
+          max-width: 1200px;
+          margin: 0 auto;
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 40px;
-          max-width: 1400px;
-          margin: 0 auto;
-        }
-        .tc-f-card {
-          display: flex;
-          flex-direction: column;
-          text-decoration: none;
-          color: inherit;
-        }
-        .tc-f-img-wrap {
-          aspect-ratio: 3 / 4;
-          overflow: hidden;
-          background: #f7f7f7;
-          border-radius: 4px;
-          margin-bottom: 24px;
-          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .tc-f-img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-          display: block;
-          border-radius: 4px;
-          opacity: 0;
-          transition: opacity 300ms ease-in-out;
-        }
-        .tc-f-card:hover .tc-f-img-wrap {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
-        }
-        .tc-f-card:hover .tc-f-img.visible {
-          opacity: 0.85;
-        }
-        .tc-f-info {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          text-align: center;
-          gap: 6px;
-        }
-        .tc-f-name {
-          font-family: Georgia, serif;
-          font-size: 11px;
-          font-weight: 300;
-          font-style: italic;
-          letter-spacing: 0.04em;
-          color: rgba(255, 255, 255, 0.8) !important;
-          text-align: center;
-          text-transform: none !important;
-        }
-        .tc-f-price {
-          font-family: var(--font-primary), sans-serif;
-          font-size: 10px;
-          font-weight: 300;
-          letter-spacing: 0.08em;
-          color: rgba(255, 255, 255, 0.45) !important;
           text-align: center;
         }
-
-        /* ── SECTION 6: THE COLOUR STUDIES ── */
-        .tc-colour {
-          background: #0d0d0d;
-          padding: 200px 80px;
-          border-bottom: 1px solid rgba(255,255,255,0.04);
-        }
-        .tc-colour-header {
-          text-align: center;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          margin-bottom: 120px;
-        }
-        .tc-moodboard {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 20px;
-          max-width: 1400px;
-          margin: 0 auto;
-        }
-        .tc-mood-item {
-          display: flex;
-          flex-direction: column;
-          background: #090909;
-          overflow: hidden;
-        }
-        .tc-mood-large {
-          grid-column: span 2;
-        }
-        .tc-mood-color {
-          height: 380px;
-          width: 100%;
-          opacity: 0.85;
-          transition: opacity 0.6s ease;
-        }
-        .tc-mood-item:hover .tc-mood-color {
-          opacity: 1;
-        }
-        .tc-mood-desc {
-          padding: 28px 24px;
+        .tonet-archive-stats__item {
           display: flex;
           flex-direction: column;
           gap: 12px;
         }
-        .tc-mood-tag {
-          font-family: var(--font-primary);
-          font-size: 9px;
-          font-weight: 300;
-          letter-spacing: 0.4em;
-          color: rgba(255,255,255,0.3);
-        }
-        .tc-mood-title {
-          font-family: var(--font-primary);
-          font-size: 12px;
-          font-weight: 400;
-          letter-spacing: 0.18em;
-          color: #fff;
-          text-transform: uppercase;
-          margin: 0;
-        }
-        .tc-mood-detail {
-          font-family: var(--font-primary);
-          font-size: 12px;
-          font-weight: 300;
-          line-height: 1.8;
-          color: rgba(255,255,255,0.35);
-          margin: 0;
-        }
-
-        /* ── SECTION 7: ALL GARMENTS ── */
-        .tc-all-garments {
-          background: #090909;
-          padding: 200px 80px;
-        }
-        .tc-all-header {
-          text-align: center;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          margin-bottom: 100px;
-        }
-        .tc-controls {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          border-bottom: 1px solid rgba(255,255,255,0.04);
-          padding-bottom: 24px;
-          margin-bottom: 64px;
-          max-width: 1400px;
-          margin-left: auto;
-          margin-right: auto;
-        }
-        .tc-filters {
-          display: flex;
-          gap: 28px;
-        }
-        .tc-filter-btn {
-          font-family: var(--font-primary);
-          font-size: 10px;
+        .tonet-archive-stats__label {
+          font-size: 8.5px;
           font-weight: 300;
           letter-spacing: 0.35em;
-          color: rgba(255,255,255,0.3);
-          background: transparent;
-          border: none;
-          border-bottom: 1px solid transparent;
-          padding: 0 0 6px;
-          cursor: pointer;
-          text-transform: uppercase;
-          transition: color 0.4s ease, border-color 0.4s ease;
+          color: rgba(255,255,255,0.22);
         }
-        .tc-filter-btn:hover {
-          color: rgba(255,255,255,0.65);
-        }
-        .tc-filter-btn.active {
-          color: #fff;
-          border-bottom-color: rgba(255,255,255,0.5);
-        }
-        .tc-sort-select {
-          background: transparent;
-          color: rgba(255,255,255,0.5);
-          border: none;
-          font-family: var(--font-primary);
-          font-size: 10px;
-          font-weight: 300;
-          letter-spacing: 0.22em;
-          text-transform: uppercase;
-          outline: none;
-          cursor: pointer;
-          padding: 0 12px 6px 0;
-          border-bottom: 1px solid transparent;
-          transition: color 0.4s, border-color 0.4s;
-        }
-        .tc-sort-select:hover {
-          color: #fff;
-          border-bottom-color: rgba(255,255,255,0.15);
-        }
-        .tc-sort-select option {
-          background: #090909;
-          color: #fff;
+        .tonet-archive-stats__value {
+          font-size: 20px;
+          font-weight: 200;
+          letter-spacing: 0.1em;
+          color: rgba(255,255,255,0.7);
         }
 
-        .tc-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 32px 4px;
-          max-width: 1400px;
-          margin: 0 auto;
+        /* ── FILTER SYSTEM (Archive Indexing) ── */
+        .tonet-archive-controls {
+          background: #060606;
+          padding: 80px 80px 40px;
         }
-        .tc-card {
+        .tonet-archive-controls__container {
+          max-width: 1200px;
+          margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          gap: 36px;
+        }
+        .tonet-archive-filter {
+          display: flex;
+          align-items: center;
+          border-bottom: 1px solid rgba(255,255,255,0.02);
+          padding-bottom: 18px;
+        }
+        .tonet-archive-filter__label {
+          font-size: 8.5px;
+          font-weight: 300;
+          letter-spacing: 0.35em;
+          color: rgba(255,255,255,0.25);
+          width: 180px;
+          flex-shrink: 0;
+        }
+        .tonet-archive-filter__options {
+          display: flex;
+          gap: 32px;
+          flex-wrap: wrap;
+        }
+        .tonet-archive-filter__btn {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 8.5px;
+          font-weight: 300;
+          letter-spacing: 0.28em;
+          color: rgba(255,255,255,0.35);
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          padding: 4px 0;
+          transition: color 0.3s;
+          position: relative;
+        }
+        .tonet-archive-filter__btn:hover,
+        .tonet-archive-filter__btn.active {
+          color: #ffffff;
+        }
+        .tonet-archive-filter__btn.active::after {
+          content: '';
+          position: absolute;
+          bottom: -2px;
+          left: 0;
+          width: 100%;
+          height: 1px;
+          background: rgba(255,255,255,0.6);
+        }
+
+        /* ── ARCHITECTURAL GRID ── */
+        .tonet-archive-grid-section {
+          background: #060606;
+          padding: 100px 80px 180px;
+        }
+        .tonet-archive-grid {
+          max-width: 1200px;
+          margin: 0 auto;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 120px 80px;
+        }
+        .tonet-archive-grid__wrapper {
+          display: flex;
+          flex-direction: column;
+          gap: 80px;
+        }
+
+        /* ── PRODUCT CARD ── */
+        .tonet-archive-card {
           display: flex;
           flex-direction: column;
           text-decoration: none;
           color: inherit;
         }
-        .tc-card-img-wrap {
+        .tonet-archive-card__image-wrap {
+          position: relative;
           aspect-ratio: 3 / 4;
-          overflow: hidden;
-          background: #f7f7f7;
+          background: #ededec;
           border-radius: 4px;
+          overflow: hidden;
           transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .tc-card-img {
+        .tonet-archive-card__image {
           width: 100%;
           height: 100%;
           object-fit: contain;
           display: block;
           border-radius: 4px;
+          transition: opacity 400ms ease-in-out;
+        }
+        .tonet-archive-card__image--secondary {
+          position: absolute;
+          inset: 0;
           opacity: 0;
-          transition: opacity 300ms ease-in-out;
         }
-        .tc-card:hover .tc-card-img-wrap {
+
+        /* Hover behaviors on card image */
+        .tonet-archive-card:hover .tonet-archive-card__image-wrap {
           transform: translateY(-4px);
-          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
         }
-        .tc-card:hover .tc-card-img.visible {
-          opacity: 0.85;
+        .tonet-archive-card:hover .tonet-archive-card__image--primary {
+          opacity: 0;
         }
-        .tc-card-info {
-          padding: 20px 0;
+        .tonet-archive-card:hover .tonet-archive-card__image--secondary {
+          opacity: 1;
+        }
+
+        /* Technical hover overlay (Museum metadata) */
+        .tonet-archive-hover-panel {
+          position: absolute;
+          inset: 0;
+          background: rgba(6, 6, 6, 0.94);
+          opacity: 0;
+          z-index: 2;
           display: flex;
           flex-direction: column;
-          align-items: center;
-          text-align: center;
+          justify-content: space-between;
+          padding: 40px;
+          transition: opacity 350ms cubic-bezier(0.16, 1, 0.3, 1);
+          border-radius: 4px;
         }
-        .tc-card-meta {
+        .tonet-archive-card:hover .tonet-archive-hover-panel {
+          opacity: 1;
+        }
+        .tonet-archive-hover-panel__rows {
           display: flex;
           flex-direction: column;
-          align-items: center;
-          text-align: center;
-          gap: 6px;
+          gap: 20px;
         }
-        .tc-card-name {
+        .tonet-archive-hover-panel__row {
+          display: flex;
+          justify-content: space-between;
+          border-bottom: 1px solid rgba(255,255,255,0.04);
+          padding-bottom: 8px;
+        }
+        .tonet-archive-hover-panel__row .lbl {
+          font-size: 8px;
+          font-weight: 300;
+          letter-spacing: 0.28em;
+          color: rgba(255,255,255,0.3);
+        }
+        .tonet-archive-hover-panel__row .val {
+          font-size: 8px;
+          font-weight: 300;
+          letter-spacing: 0.15em;
+          color: #ffffff;
+        }
+        .tonet-archive-hover-panel__actions {
+          display: flex;
+          gap: 16px;
+          align-items: center;
+          margin-top: auto;
+        }
+        .tonet-archive-hover-panel__actions .action-btn {
+          font-size: 8.5px;
+          font-weight: 300;
+          letter-spacing: 0.35em;
+          color: rgba(255,255,255,0.45);
+          transition: color 0.3s;
+        }
+        .tonet-archive-hover-panel__actions .action-btn:hover {
+          color: #ffffff;
+        }
+        .tonet-archive-hover-panel__actions .action-sep {
+          font-size: 8px;
+          color: rgba(255,255,255,0.15);
+        }
+
+        /* Card Metadata labels */
+        .tonet-archive-card__metadata {
+          padding-top: 24px;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .tonet-archive-card__collection {
+          font-size: 8.5px;
+          font-weight: 300;
+          letter-spacing: 0.42em;
+          color: rgba(255,255,255,0.22);
+          text-transform: uppercase;
+        }
+        .tonet-archive-card__title {
           font-family: Georgia, serif;
-          font-size: 11px;
+          font-size: 14px;
           font-weight: 300;
           font-style: italic;
           letter-spacing: 0.04em;
-          color: rgba(255, 255, 255, 0.8) !important;
-          text-align: center;
-          text-transform: none !important;
-          overflow: visible !important;
-          text-overflow: clip !important;
-          white-space: normal !important;
-          flex: none;
+          color: rgba(255, 255, 255, 0.88);
+          line-height: 1.55;
+          margin: 0;
+          white-space: normal;
         }
-        .tc-card-price {
-          font-family: var(--font-primary), sans-serif;
-          font-size: 10px;
-          font-weight: 300;
-          letter-spacing: 0.08em;
-          color: rgba(255, 255, 255, 0.45) !important;
-          text-align: center;
+        .tonet-archive-card__bottom-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
           margin-top: 4px;
         }
-
-        /* Swatches and sizes for All Garments Grid */
-        .tc-swatches {
-          display: flex;
-          gap: 6px;
-          justify-content: center;
-          margin-top: 10px;
-          margin-bottom: 4px;
-        }
-        .tc-swatch {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          border: 1px solid rgba(255,255,255,0.15);
-          flex-shrink: 0;
-          transition: border-color 0.4s ease;
-        }
-        .tc-swatch:hover {
-          border-color: rgba(255,255,255,0.6);
-        }
-        .tc-sizes {
-          display: flex;
-          gap: 4px;
-          flex-wrap: wrap;
-          justify-content: center;
-          margin-top: 8px;
-        }
-        .tc-size {
-          font-family: var(--font-primary);
-          font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.08em;
-          color: rgba(255,255,255,0.3) !important;
-          border: 1px solid rgba(255,255,255,0.1);
-          border-radius: 2px;
-          padding: 3px 7px;
-          line-height: 1;
-          text-transform: uppercase;
-          transition: border-color 0.4s ease, color 0.4s ease;
-        }
-        .tc-size:hover {
-          border-color: rgba(255,255,255,0.4);
-          color: #fff !important;
-        }
-
-        /* Swatches and sizes for Foundations Grid */
-        .tc-f-swatches {
-          display: flex;
-          gap: 6px;
-          justify-content: center;
-          margin-top: 10px;
-          margin-bottom: 4px;
-        }
-        .tc-f-swatch {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          border: 1px solid rgba(255,255,255,0.15);
-          flex-shrink: 0;
-          transition: border-color 0.4s ease;
-        }
-        .tc-f-swatch:hover {
-          border-color: rgba(255,255,255,0.6);
-        }
-        .tc-f-sizes {
-          display: flex;
-          gap: 4px;
-          flex-wrap: wrap;
-          justify-content: center;
-          margin-top: 8px;
-        }
-        .tc-f-size {
-          font-family: var(--font-primary);
-          font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.08em;
-          color: rgba(255,255,255,0.3) !important;
-          border: 1px solid rgba(255,255,255,0.1);
-          border-radius: 2px;
-          padding: 3px 7px;
-          line-height: 1;
-          text-transform: uppercase;
-          transition: border-color 0.4s ease, color 0.4s ease;
-        }
-        .tc-f-size:hover {
-          border-color: rgba(255,255,255,0.4);
-          color: #fff !important;
-        }
-        .tc-empty {
-          grid-column: 1 / -1;
-          padding: 80px 24px;
-          text-align: center;
-          font-family: var(--font-primary);
-          font-size: 12px;
+        .tonet-archive-card__ref {
+          font-size: 8.5px;
           font-weight: 300;
           letter-spacing: 0.15em;
+          color: rgba(255,255,255,0.45);
+        }
+        .tonet-archive-card__status--archived {
+          font-size: 8px;
+          font-weight: 400;
+          letter-spacing: 0.2em;
+          color: #8f4b4b;
+        }
+
+        /* ── EDITORIAL EXCERPT BREAKS ── */
+        .tonet-archive-quote {
+          width: 100%;
+          border-top: 1px solid rgba(255,255,255,0.03);
+          border-bottom: 1px solid rgba(255,255,255,0.03);
+          padding: 80px 0;
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          align-items: center;
+          justify-content: center;
+          grid-column: 1 / -1;
+        }
+        .tonet-archive-quote__text {
+          font-family: Georgia, serif;
+          font-size: clamp(16px, 2.2vw, 24px);
+          font-weight: 300;
+          font-style: italic;
+          letter-spacing: 0.08em;
+          line-height: 1.8;
+          color: rgba(255,255,255,0.48);
+          max-width: 650px;
+          margin: 0;
+        }
+        .tonet-archive-quote__sub {
+          font-size: 8px;
+          font-weight: 300;
+          letter-spacing: 0.45em;
+          color: rgba(255,255,255,0.18);
+        }
+
+        .tonet-archive-empty {
+          grid-column: 1 / -1;
+          padding: 140px 24px;
+          text-align: center;
+          font-size: 10px;
+          font-weight: 300;
+          letter-spacing: 0.35em;
           color: rgba(255,255,255,0.3);
-          text-transform: uppercase;
         }
 
-        /* ── RESPONSIVE ── */
-        @media (max-width: 1200px) {
-          .tc-foundations { padding: 120px 40px; }
-          .tc-foundations-grid { gap: 20px; }
-          .tc-colour { padding: 120px 40px; }
-          .tc-moodboard { gap: 12px; }
-          .tc-all-garments { padding: 120px 40px; }
-          .tc-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-
+        /* ── RESPONSIVE ADAPTATIONS ── */
         @media (max-width: 1024px) {
-          .tc-foundations-grid { grid-template-columns: repeat(2, 1fr); }
-          .tc-moodboard { grid-template-columns: repeat(2, 1fr); }
-          .tc-mood-large { grid-column: auto; }
+          .tonet-archive-stats {
+            padding: 80px 40px;
+          }
+          .tonet-archive-controls {
+            padding: 60px 40px 20px;
+          }
+          .tonet-archive-grid-section {
+            padding: 60px 40px 120px;
+          }
+          .tonet-archive-grid {
+            gap: 80px 40px;
+          }
         }
 
         @media (max-width: 767px) {
-          .tc-hero { height: calc(100dvh + 60px); }
-          .tc-hero-headline {
-            font-size: clamp(36px, 11vw, 56px);
-            letter-spacing: 0.15em;
+          .tonet-archive-stats {
+            padding: 60px 24px;
           }
-          .tc-hero-sub {
-            font-size: 10px;
-            letter-spacing: 0.15em;
-            margin-bottom: 40px;
+          .tonet-archive-stats__container {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 32px 16px;
           }
-          .tc-statement { padding: 100px 24px; }
-          .tc-gender { height: 75vh; padding: 0 24px; }
-          .tc-gender-title { font-size: 38px; }
-          .tc-gender-veil {
-            background: linear-gradient(to top, rgba(0,0,0,0.88) 15%, rgba(0,0,0,0.1) 100%);
+          .tonet-archive-controls {
+            padding: 40px 24px 20px;
           }
-          .tc-gender-her .tc-gender-veil {
-            background: linear-gradient(to top, rgba(0,0,0,0.88) 15%, rgba(0,0,0,0.1) 100%);
-          }
-          .tc-gender-her {
-            justify-content: flex-start;
-            text-align: left;
-          }
-          .tc-foundations { padding: 80px 24px; }
-          .tc-foundations-header { margin-bottom: 60px; }
-          .tc-foundations-grid { grid-template-columns: 1fr; gap: 40px; }
-          .tc-colour { padding: 80px 24px; }
-          .tc-colour-header { margin-bottom: 60px; }
-          .tc-moodboard { grid-template-columns: 1fr; gap: 24px; }
-          .tc-mood-color { height: 280px; }
-          .tc-mood-desc { padding: 20px 0 0 0; }
-          .tc-all-garments { padding: 80px 24px; }
-          .tc-all-header { margin-bottom: 50px; }
-          .tc-controls {
+          .tonet-archive-filter {
             flex-direction: column;
             align-items: flex-start;
-            gap: 20px;
-            margin-bottom: 40px;
+            gap: 12px;
           }
-          .tc-filters {
-            flex-wrap: wrap;
+          .tonet-archive-filter__label {
+            margin-bottom: 4px;
+          }
+          .tonet-archive-filter__options {
             gap: 16px 20px;
           }
-          .tc-filter-btn {
-            font-size: 9px;
-            letter-spacing: 0.25em;
+          .tonet-archive-grid-section {
+            padding: 40px 24px 100px;
           }
-          .tc-grid {
+          .tonet-archive-grid {
             grid-template-columns: 1fr;
-            gap: 24px;
+            gap: 60px;
           }
-          .tc-card-info {
-            padding: 16px 0;
+          .tonet-archive-grid__wrapper {
+            gap: 60px;
           }
-          .tc-card-meta {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 4px;
-          }
-          .tc-card-name {
-            white-space: normal !important;
-            margin-right: 0 !important;
-            line-height: 1.4;
-          }
-          .tc-card-price {
-            margin-top: 2px;
+          .tonet-archive-hover-panel {
+            display: none !important; /* Touch-optimized simple grid interaction on mobile */
           }
         }
       `}</style>
