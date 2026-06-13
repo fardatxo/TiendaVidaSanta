@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Analytics } from '@vercel/analytics/next';
-import { Jost } from "next/font/google";
+import { Jost, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -11,7 +11,7 @@ import { LocaleProvider } from "@/context/LocaleContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { AuthProvider } from "@/context/AuthContext";
 import CartDrawer from "@/components/CartDrawer";
-import ShippingBanner from "@/components/ShippingBanner";
+import AnnouncementBar from "@/components/AnnouncementBar";
 import MenuDrawer from "@/components/MenuDrawer";
 import CookieBanner from "@/components/CookieBanner";
 import TransitionProvider from "@/components/TransitionProvider";
@@ -20,6 +20,13 @@ const jost = Jost({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600"],
   variable: "--font-jost",
+});
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  style: ["normal", "italic"],
+  variable: "--font-cormorant",
 });
 
 export const metadata: Metadata = {
@@ -36,7 +43,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={jost.variable} suppressHydrationWarning>
+    <html lang="en" className={`${jost.variable} ${cormorant.variable}`} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <TransitionProvider>
         <LocaleProvider>
@@ -44,7 +51,7 @@ export default function RootLayout({
             <CartProvider>
               <AuthProvider>
               <WishlistProvider>
-                <ShippingBanner />
+                <AnnouncementBar />
                 <Navbar />
                 <CartDrawer />
                 <MenuDrawer />

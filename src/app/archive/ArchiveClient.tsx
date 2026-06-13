@@ -87,7 +87,7 @@ export default function ArchiveClient() {
         <div className="ar-header">
           <h1 className="ar-title">ARCHIVE ROOM</h1>
           <p className="ar-hero-desc">
-            A private space for collecting, revisiting and tracking selected TONET pieces.
+            A private space for collecting, revisiting and tracking selected TONER TORRENTINNI pieces, reflecting the quiet beauty of nature.
           </p>
         </div>
 

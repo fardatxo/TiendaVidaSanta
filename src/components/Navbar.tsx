@@ -42,12 +42,30 @@ export default function Navbar() {
   // Pages with fullbleed gallery (transparent header overlay)
   const isFullbleed = isProduct || isCollection;
 
-  const BANNER_H = 22;
+  const [hasBanner, setHasBanner] = useState(true);
+
+  useEffect(() => {
+    const dismissed = sessionStorage.getItem("announcement-dismissed") === "true";
+    if (dismissed) {
+      setHasBanner(false);
+    }
+    const handleDismiss = () => {
+      setHasBanner(false);
+    };
+    window.addEventListener("announcement-dismissed", handleDismiss);
+    return () => window.removeEventListener("announcement-dismissed", handleDismiss);
+  }, []);
+
+  const BANNER_H = hasBanner ? 32 : 0;
 
   // Smart header: hide on scroll down, show solid on scroll up
   const [headerVisible, setHeaderVisible] = useState(true);
   const [scrolledPast, setScrolledPast] = useState(false);
   const [navTop, setNavTop] = useState(BANNER_H);
+
+  useEffect(() => {
+    setNavTop(BANNER_H);
+  }, [BANNER_H]);
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
 
@@ -97,10 +115,11 @@ export default function Navbar() {
     if (isFullbleed || isHome) {
       body.style.paddingTop = "0px";
     } else {
-      body.style.paddingTop = "48px";
+      const pad = 48 + BANNER_H;
+      body.style.paddingTop = `${pad}px`;
     }
     return () => { body.style.paddingTop = "48px"; };
-  }, [isFullbleed, isHome]);
+  }, [isFullbleed, isHome, BANNER_H]);
 
   // Determine header style class
   // Home: always transparent. Other pages: solid when scrolled up past threshold.
@@ -235,11 +254,11 @@ export default function Navbar() {
           justify-content: center;
         }
         .acne-logo-text {
-          font-family: var(--font-primary);
-          font-size: 13px;
-          font-weight: 300;
-          letter-spacing: 0.52em;
-          padding-right: 0.52em;
+          font-family: var(--font-brand), var(--font-serif), serif;
+          font-size: 26px;
+          font-weight: 400;
+          letter-spacing: normal;
+          padding-right: 0;
           color: rgba(255,255,255,0.82);
           text-transform: uppercase;
           line-height: 1;
@@ -331,7 +350,7 @@ export default function Navbar() {
         /* ══ MOBILE ══ */
         @media (max-width: 767px) {
           .acne-header-inner { padding: 0 20px; height: 52px; }
-          .acne-logo-text { font-size: 11px; letter-spacing: 0.44em; }
+          .acne-logo-text { font-size: 20px; letter-spacing: normal; padding-right: 0; }
           .acne-mob-icon { width: 32px; height: 52px; }
           .acne-right-icon { width: 32px; height: 52px; }
           .acne-right-icon:first-child { display: none; }

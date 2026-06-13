@@ -28,7 +28,7 @@ export default function CookieBanner() {
     <div className={`ck-bar${dismissing ? ' ck-dismissing' : ''}`} role="dialog" aria-label="Cookie consent">
       <div className="ck-inner">
         <div className="ck-text">
-          <p className="ck-over">Privacy &mdash; House of Tonet</p>
+          <p className="ck-over">Privacy &mdash; House of Toner Torrentinni</p>
           <p className="ck-body">
             This house uses data to curate your experience
             with the care it deserves.{' '}

@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 
 function resolveLabel(href: string): string {
   const path = href.split('?')[0];
-  if (path === '/') return 'Tonet';
+  if (path === '/') return 'Toner Torrentinni';
   if (path.startsWith('/about'))      return 'The House';
   if (path.startsWith('/product/'))   return 'The Garment';
   if (path.startsWith('/collection/')) return 'The Collection';
@@ -14,8 +14,8 @@ function resolveLabel(href: string): string {
   if (path.startsWith('/archive'))    return 'The Archive';
   if (path.startsWith('/account'))    return 'The Account';
   if (path.startsWith('/contact'))    return 'The House';
-  if (path.startsWith('/login'))      return 'Tonet';
-  return 'Tonet';
+  if (path.startsWith('/login'))      return 'Toner Torrentinni';
+  return 'Toner Torrentinni';
 }
 
 type Phase = 'idle' | 'in' | 'out';
@@ -29,7 +29,7 @@ export default function TransitionProvider({
   const pathname = usePathname();
 
   const [phase, setPhase] = useState<Phase>('idle');
-  const [label, setLabel] = useState('Tonet');
+  const [label, setLabel] = useState('Toner Torrentinni');
 
   const navigating = useRef(false);
   const prevPath   = useRef(pathname);

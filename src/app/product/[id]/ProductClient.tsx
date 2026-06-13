@@ -128,6 +128,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   const [ceremonyOpen, setCeremonyOpen] = useState(false);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [archiveVisible, setArchiveVisible] = useState(false);
+  const [sizeDropdownOpen, setSizeDropdownOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'desc' | 'sizefit' | 'contact' | 'shipping'>('desc');
   const archiveSectionRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
   useLocale();
@@ -170,10 +172,10 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   const editorialNotes = useMemo(() => {
     const notes = [
       "An archival piece designed for daily calm.",
-      "A tonet shaped by silence.",
-      "A quiet layer preserved within the House.",
+      "A toner torrentinni piece shaped by the silence of nature.",
+      "A quiet layer preserved within the House, inspired by natural landscapes.",
       "A structured piece designed for daily permanence.",
-      "A restrained tonet for permanent rotation.",
+      "A restrained toner torrentinni garment echoing the simplicity of nature.",
       "A daily layer composed with quiet intention.",
       "Crafted for permanence, worn with intention.",
       "A silhouette born from restraint."
@@ -210,7 +212,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
     const foundFinish = features
       .filter(f => finishKeywords.includes(f.toLowerCase()))
       .map(f => f.charAt(0).toUpperCase() + f.slice(1).toLowerCase());
-    const finishValue = foundFinish.length > 0 ? foundFinish.join(' / ') : 'Soft tonet wash';
+    const finishValue = foundFinish.length > 0 ? foundFinish.join(' / ') : 'Soft wash';
 
     const rawFabric = metadata['Fabric'] || '';
     const formattedFabric = rawFabric ? rawFabric.replace(/,\s*/g, ' / ') : '';
@@ -220,7 +222,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
       { label: 'Weight', value: metadata['Fabric Weight'] || '240 GSM' },
       { label: 'Fit', value: fitValue },
       { label: 'Finish', value: finishValue },
-      { label: 'Production', value: 'Limited tonet production' }
+      { label: 'Production', value: 'Limited TONER TORRENTINNI production' }
     ].filter(r => r.value);
   }, [metadata]);
 
@@ -744,214 +746,224 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         {/* ── INFO PANEL ── */}
         <div className="ss-info mobile-product-info" ref={infoRef}>
           <div className="product-info-column">
-            {/* Title */}
-            <h1 className="ss-title">{product.title}</h1>
-
-          {/* Editorial Notes */}
-          <div className="ss-editorial-subtext">
-            {editorialNotes.map((note, i) => (
-              <span key={i} style={{ display: 'block', marginBottom: i < editorialNotes.length - 1 ? 6 : 0 }}>{note}</span>
-            ))}
-          </div>
-
-          {/* Price + selected shade metadata */}
-          <div className="ss-price-row">
-            <span className="ss-price">{priceFormatted}</span>
-            {selectedColor && (
-              <span className="ss-selected-shade-metadata">
-                <span className="ss-metadata-swatch" style={{ background: colorNameToCSS(selectedColor) }} />
-                <span className="ss-metadata-name">{selectedColor}</span>
-              </span>
-            )}
-            <span className="ss-minimal-metadata">— {getArchiveRef(product.handle)}</span>
-          </div>
-
-          {/* Refined color/shade selection system */}
-          {colorOptions.length > 1 && (
-            <div className="ss-shade-section">
-              <span className="ss-shade-label">TONET SHADE</span>
-              <div className="ss-shade-grid">
-                {colorOptions.map((co) => {
-                  const isSelected = selectedColor === co.value;
-                  return (
-                    <button
-                      key={co.value}
-                      className={`ss-shade-option ${isSelected ? 'active' : ''}`}
-                      onClick={() => handleColorChange(co.value)}
-                      aria-label={`Select shade ${co.value}`}
-                      aria-pressed={isSelected}
-                    >
-                      <span className="ss-shade-swatch" style={{ background: colorNameToCSS(co.value) }} />
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Select Size Grid */}
-          {hasSizes && (
-            <div className="ss-sizes-select-area mobile-inline-sizes">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                <span className="ss-shade-label">SELECT SIZE</span>
+            
+            {/* Dior Title & Subtitle */}
+            <div className="dior-product-header">
+              <div className="dior-header-main">
+                <h1 className="dior-title">{product.title}</h1>
                 <button
                   type="button"
-                  className="ss-size-guide-link"
-                  onClick={() => setSizeGuideOpen(true)}
-                  aria-label="Open size guide"
+                  className={`dior-wishlist-btn ${inWishlist ? 'active' : ''}`}
+                  onClick={() => {
+                    toggle(wishlistItem);
+                    if (!inWishlist) setCeremonyOpen(true);
+                  }}
+                  aria-label="Add to wishlist"
                 >
-                  Sizing
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill={inWishlist ? '#111' : 'none'} stroke="#111" strokeWidth="1">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
                 </button>
               </div>
-              <div className="ss-inline-sizes">
-                {sizeOptions.map((size) => {
-                  const isSelected = selectedSize === size;
-                  const variantForSize = findVariant(selectedColor, size);
-                  const isOutOfStock = variantForSize ? !variantForSize.availableForSale : true;
-                  return (
-                    <button
-                      key={size}
-                      className={`ss-inline-size ${isSelected ? 'active' : ''} ${isOutOfStock ? 'sold-out' : ''}`}
-                      onClick={() => {
-                        if (isOutOfStock) {
-                          openAvailModal(size);
-                        } else {
-                          handleSizeSelectInDrawer(size);
-                        }
-                      }}
-                      aria-label={isOutOfStock ? `Request size ${size} availability` : `Select size ${size}`}
-                      aria-pressed={isSelected}
-                    >
-                      {size}
-                    </button>
-                  );
-                })}
+              <div className="dior-header-sub">
+                <span className="dior-subtitle">{conciseDescription}</span>
+                <span className="dior-reference">Referencia: {getArchiveRef(product.handle)}</span>
               </div>
             </div>
-          )}
 
-          {/* Action row */}
-          <div className="ss-actions">
-            <button
-              className="ss-cta-btn"
-              onClick={handleAddToBag}
-              disabled={adding || !selectedVariant.availableForSale || needsSizeSelection}
-            >
-              {adding
-                ? 'ADDING…'
-                : !selectedVariant.availableForSale
-                ? 'UNAVAILABLE'
-                : needsSizeSelection
-                ? (isGiftCard ? 'SELECT AMOUNT' : 'SELECT A SIZE')
-                : 'ADD TO SELECTION'}
-            </button>
-            <button
-              className={`ss-archive-btn${inWishlist ? ' ss-archive-btn--in' : ''}`}
-              onClick={() => {
-                toggle(wishlistItem);
-                if (!inWishlist) {
-                  setCeremonyOpen(true);
-                }
-              }}
-            >
-              {inWishlist ? 'ARCHIVED · 48H' : 'ADD TO ARCHIVE'}
-            </button>
-          </div>
-
-          {/* Accordion sections */}
-          <div className="ss-accordions mobile-accordions">
-            {/* Description */}
-            {product.description && (
-              <div className="ss-accordion-item">
-                <button className="ss-accordion-header" onClick={() => toggleAccordion('notes')} aria-expanded={expandedAccordion === 'notes'}>
-                  <span>Description</span>
-                  <span className={`ss-accordion-icon${expandedAccordion === 'notes' ? ' open' : ''}`}>
-                    <Plus size={10} strokeWidth={1} />
-                  </span>
-                </button>
-                <div className={`ss-accordion-body${expandedAccordion === 'notes' ? ' open' : ''}`}>
-                  <div className="ss-accordion-body-inner">
-                    <p className="ss-accordion-text">{conciseDescription}</p>
-                  </div>
+            {/* Dior Color Selection ("Otro color") */}
+            {colorOptions.length > 1 && (
+              <div className="dior-color-section">
+                <span className="dior-section-label">Otro color</span>
+                <div className="dior-color-grid">
+                  {colorOptions.map((co) => {
+                    const isSelected = selectedColor === co.value;
+                    return (
+                      <button
+                        key={co.value}
+                        type="button"
+                        className={`dior-color-option ${isSelected ? 'active' : ''}`}
+                        onClick={() => handleColorChange(co.value)}
+                        aria-label={`Select color ${co.value}`}
+                      >
+                        {co.imageUrl ? (
+                          <img src={co.imageUrl} alt={co.value} className="dior-color-thumb" />
+                        ) : (
+                          <span className="dior-color-swatch" style={{ background: colorNameToCSS(co.value) }} />
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {/* TONET RECORD */}
-            {detailsRows.length > 0 && (
-              <div className="ss-accordion-item">
-                <button className="ss-accordion-header" onClick={() => toggleAccordion('record')} aria-expanded={expandedAccordion === 'record'}>
-                  <span>TONET RECORD</span>
-                  <span className={`ss-accordion-icon${expandedAccordion === 'record' ? ' open' : ''}`}>
-                    <Plus size={10} strokeWidth={1} />
-                  </span>
-                </button>
-                <div className={`ss-accordion-body${expandedAccordion === 'record' ? ' open' : ''}`}>
-                  <div className="ss-accordion-body-inner">
-                    <div className="ss-details-table" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                      {detailsRows.map((row, idx) => (
-                        <div key={idx} className="ss-details-row" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                          <span className="ss-details-label" style={{ fontWeight: 400, textTransform: 'uppercase', fontSize: '8px', letterSpacing: '0.25em', color: 'rgba(0, 0, 0, 0.45)' }}>{row.label}</span>
-                          <span className="ss-details-value" style={{ fontWeight: 300, fontSize: '10px', color: 'rgba(0, 0, 0, 0.7)', letterSpacing: '0.05em' }}>{row.value}</span>
-                        </div>
-                      ))}
+            {/* Dior Size Selection Dropdown */}
+            {hasSizes && (
+              <div className="dior-size-section">
+                <div className="dior-size-dropdown-wrap">
+                  <button
+                    type="button"
+                    className={`dior-size-dropdown-trigger ${sizeDropdownOpen ? 'open' : ''}`}
+                    onClick={() => setSizeDropdownOpen(!sizeDropdownOpen)}
+                  >
+                    <span>{selectedSize ? `TALLA: ${selectedSize}` : 'Seleccione su talla'}</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                      <path d="M6 9l6 6 6-6" />
+                    </svg>
+                  </button>
+                  {sizeDropdownOpen && (
+                    <div className="dior-size-dropdown-list">
+                      {sizeOptions.map((size) => {
+                        const isSelected = selectedSize === size;
+                        const variantForSize = findVariant(selectedColor, size);
+                        const isOutOfStock = variantForSize ? !variantForSize.availableForSale : true;
+                        return (
+                          <button
+                            key={size}
+                            type="button"
+                            className={`dior-size-dropdown-item ${isSelected ? 'active' : ''} ${isOutOfStock ? 'sold-out' : ''}`}
+                            onClick={() => {
+                              if (isOutOfStock) {
+                                openAvailModal(size);
+                              } else {
+                                handleSizeSelectInDrawer(size);
+                                setSizeDropdownOpen(false);
+                              }
+                            }}
+                          >
+                            <span>{size}</span>
+                            {isOutOfStock && <span className="sold-out-tag">(Avisar disponibilidad)</span>}
+                          </button>
+                        );
+                      })}
                     </div>
-                  </div>
+                  )}
                 </div>
-              </div>
-            )}
-
-            {/* CARE */}
-            {careLines.length > 0 && (
-              <div className="ss-accordion-item">
-                <button className="ss-accordion-header" onClick={() => toggleAccordion('care')} aria-expanded={expandedAccordion === 'care'}>
-                  <span>CARE</span>
-                  <span className={`ss-accordion-icon${expandedAccordion === 'care' ? ' open' : ''}`}>
-                    <Plus size={10} strokeWidth={1} />
-                  </span>
+                
+                <button
+                  type="button"
+                  className="dior-size-guide-link"
+                  onClick={() => setSizeGuideOpen(true)}
+                >
+                  Guía de tallas
                 </button>
-                <div className={`ss-accordion-body${expandedAccordion === 'care' ? ' open' : ''}`}>
-                  <div className="ss-accordion-body-inner">
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {careLines.map((line, idx) => (
-                        <span key={idx} className="ss-accordion-text ss-care-line">
-                          {line}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
               </div>
             )}
 
-            {/* Delivery & Returns */}
-            <div className="ss-accordion-item">
-              <button className="ss-accordion-header" onClick={() => toggleAccordion('policy')} aria-expanded={expandedAccordion === 'policy'}>
-                <span>Delivery & Returns</span>
-                <span className={`ss-accordion-icon${expandedAccordion === 'policy' ? ' open' : ''}`}>
-                  <Plus size={10} strokeWidth={1} />
+            {/* Dior Actions (Add to Cart + Express Pay) */}
+            <div className="dior-actions-area">
+              <button
+                type="button"
+                className="dior-add-to-cart-btn"
+                onClick={handleAddToBag}
+                disabled={adding || !selectedVariant.availableForSale || needsSizeSelection}
+              >
+                <span className="dior-add-text">
+                  {adding
+                    ? 'Añadiendo...'
+                    : !selectedVariant.availableForSale
+                    ? 'No disponible'
+                    : needsSizeSelection
+                    ? 'Seleccione su talla'
+                    : 'Añadir a la cesta'}
                 </span>
+                <span className="dior-add-price">{priceFormatted}</span>
               </button>
-              <div className={`ss-accordion-body${expandedAccordion === 'policy' ? ' open' : ''}`}>
-                <div className="ss-accordion-body-inner">
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span className="ss-details-label" style={{ fontWeight: 400, textTransform: 'uppercase', fontSize: '8px', letterSpacing: '0.25em', color: 'rgba(0, 0, 0, 0.45)' }}>DELIVERY</span>
-                      <span className="ss-accordion-text" style={{ fontSize: '10px', color: 'rgba(0, 0, 0, 0.7)' }}>
-                        Free standard delivery on all selections. Prepared with care inside our Parisian studio. Estimated arrival {getDeliveryEstimate()}.
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span className="ss-details-label" style={{ fontWeight: 400, textTransform: 'uppercase', fontSize: '8px', letterSpacing: '0.25em', color: 'rgba(0, 0, 0, 0.45)' }}>RETURNS</span>
-                      <span className="ss-accordion-text" style={{ fontSize: '10px', color: 'rgba(0, 0, 0, 0.7)' }}>
-                        Complimentary returns within 14 days of receipt. Tonets must remain in their original, unworn state with archival labels intact.
-                      </span>
+
+              <button
+                type="button"
+                className="dior-express-btn"
+                onClick={handleAddToBag}
+                disabled={adding || !selectedVariant.availableForSale}
+              >
+                <span>Pago exprés</span>
+              </button>
+            </div>
+
+            {/* Dior Tabs */}
+            <div className="dior-tabs-container">
+              <div className="dior-tabs-header">
+                <button
+                  type="button"
+                  className={`dior-tab-btn ${activeTab === 'desc' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('desc')}
+                >
+                  Descripción
+                </button>
+                <button
+                  type="button"
+                  className={`dior-tab-btn ${activeTab === 'sizefit' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('sizefit')}
+                >
+                  Talla y corte
+                </button>
+                <button
+                  type="button"
+                  className={`dior-tab-btn ${activeTab === 'contact' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('contact')}
+                >
+                  Contacto
+                </button>
+                <button
+                  type="button"
+                  className={`dior-tab-btn ${activeTab === 'shipping' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('shipping')}
+                >
+                  Entrega y devolución
+                </button>
+              </div>
+              
+              <div className="dior-tab-content">
+                {activeTab === 'desc' && (
+                  <div>
+                    <p className="dior-tab-text">{conciseDescription}</p>
+                    {product.description && (
+                      <button type="button" className="dior-ver-mas-btn" onClick={() => setExpandedAccordion(expandedAccordion === 'desc' ? null : 'desc')}>
+                        {expandedAccordion === 'desc' ? 'Ver menos —' : 'Ver más +'}
+                      </button>
+                    )}
+                    <div className={`dior-tab-text-more-container ${expandedAccordion === 'desc' ? 'expanded' : ''}`}>
+                      <div className="dior-tab-text-more-content">
+                        <p className="dior-tab-text-more" style={{ marginTop: '12px', marginBottom: 0 }}>
+                          {product.description}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
+                {activeTab === 'sizefit' && (
+                  <div>
+                    <p className="dior-tab-text">Silueta estructurada y ajustada. Fiel a la talla.</p>
+                    {detailsRows.length > 0 && (
+                      <div className="dior-details-list" style={{ marginTop: '12px' }}>
+                        {detailsRows.map((row, idx) => (
+                          <div key={idx} className="dior-details-item" style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #eaeaea', fontSize: '11px' }}>
+                            <span style={{ color: '#666' }}>{row.label}</span>
+                            <span style={{ fontWeight: 400 }}>{row.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+                {activeTab === 'contact' && (
+                  <div>
+                    <p className="dior-tab-text">
+                      ¿Tiene alguna duda o necesita asistencia? Contacte a nuestro Atelier de atención personalizada en <a href="mailto:contact@tonertorrentinni.com" style={{ textDecoration: 'underline' }}>contact@tonertorrentinni.com</a>.
+                    </p>
+                  </div>
+                )}
+                {activeTab === 'shipping' && (
+                  <div>
+                    <p className="dior-tab-text">
+                      Envío estándar gratuito para todos los pedidos de la Maison. Entrega estimada en {getDeliveryEstimate()}. Devolución gratuita en un plazo de 14 días.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
+
           </div>
         </div>
 
@@ -970,7 +982,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             <p className="tn-archival__text">
               {editorialNotes[0]} {product.title} exists within the House as a
               permanent object — not seasonal, not disposable. Each garment is
-              registered, documented, and preserved as part of TONET’s ongoing lineage.
+              registered, documented, and preserved as part of TONER TORRENTINNI’s ongoing lineage, deeply rooted in the raw and silent beauty of nature's landscapes.
             </p>
           </div>
 
@@ -1007,9 +1019,9 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
               <span className="tn-archival__col-label">House Note</span>
               <blockquote className="tn-archival__quote">
                 “A garment should not announce itself. It should remain —
-                quiet, structural, permanent.”
+                quiet, structural, permanent, like the landscapes that define our world.”
               </blockquote>
-              <span className="tn-archival__quote-source">— TONET Research Archive</span>
+              <span className="tn-archival__quote-source">— TONER TORRENTINNI Research Archive</span>
             </div>
 
             {/* Right — Garment Metadata */}
@@ -1039,10 +1051,10 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         <div className="ss-philosophy-inner">
           <span className="ss-philosophy-eyebrow">The House</span>
           <p className="ss-philosophy-text">
-            TONET was not built for the moment. It was constructed for permanence — for those who understand that true elegance is never loud, and that refinement requires no explanation.
+            TONER TORRENTINNI was not built for the moment. It was constructed for permanence — inspired by the eternal cycles of nature, for those who understand that true elegance is never loud, and that refinement requires no explanation.
           </p>
           <p className="ss-philosophy-text">
-            Each tonet belongs to a longer conversation between structure and silence, between the body and its architecture.
+            Each garment belongs to a longer conversation between structure, the organic perfection of nature's landscapes, and the architecture of the body.
           </p>
           <span className="ss-philosophy-note">— House Notes, 2026</span>
         </div>
@@ -1254,7 +1266,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
               <span className="ac-supra">ARCHIVE RECORD</span>
               <h2 className="ac-title">Archive Entry Created</h2>
               <p className="ac-desc">
-                This tonet has been preserved within your private archive and will remain accessible while availability permits.
+                This garment has been preserved within your private archive and will remain accessible while availability permits.
               </p>
             </div>
 
@@ -1271,7 +1283,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
               <div className="ac-details-panel">
                 <div className="ac-tech-grid">
                   <div className="ac-tech-item">
-                    <span className="ac-tech-label">TONET Name</span>
+                    <span className="ac-tech-label">TONER TORRENTINNI Name</span>
                     <span className="ac-tech-value ac-tech-value--name">{product.title.toUpperCase()}</span>
                   </div>
 
@@ -1318,7 +1330,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                 <div className="ac-avail-section">
                   <span className="ac-section-label">Archive Availability</span>
                   <p className="ac-avail-desc">
-                    This tonet remains temporarily preserved inside the House for private consideration.
+                    This toner torrentinni piece remains temporarily preserved inside the House for private consideration.
                   </p>
 
                   <div className="ac-avail-status-block">
@@ -1369,7 +1381,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                 <div className="ac-notes-section">
                   <span className="ac-section-label">House Notes</span>
                   <p className="ac-notes-text">
-                    Archived tonets remain accessible for future consideration. Availability is not guaranteed and may change as pieces enter permanent archive status.
+                    Archived toner torrentinni garments remain accessible for future consideration. Availability is not guaranteed and may change as pieces enter permanent archive status.
                   </p>
                 </div>
               </div>
@@ -1812,7 +1824,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .ss-desktop-gallery { display: none; }
         .ss-carousel {
           width: 100%;
-          aspect-ratio: 3 / 4;
+          aspect-ratio: 1 / 1;
           display: flex;
           overflow: hidden;
           user-select: none;
@@ -1822,17 +1834,17 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .ss-carousel-slide {
           width: 100%;
           flex-shrink: 0;
-          aspect-ratio: 3 / 4;
+          aspect-ratio: 1 / 1;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: #ffffff;
+          background: #f6f6f6;
           overflow: hidden;
         }
         .ss-gallery-img {
           width: 100%;
           height: 100%;
-          object-fit: contain;
+          object-fit: cover;
           display: block;
           pointer-events: none;
         }
@@ -2044,32 +2056,33 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
           /* Gallery column */
           .ss-gallery {
-            width: 60%;
+            width: 52%;
             flex-shrink: 0;
             background: transparent;
             overflow: visible;
           }
 
-          /* Each image block: full width, 3:4 */
+          /* Each image block: full width, 1:1 */
           .ss-desktop-img-block {
             width: 100%;
-            aspect-ratio: 3 / 4;
-            background: #ffffff;
+            aspect-ratio: 1 / 1;
+            background: #f6f6f6;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
+            border-bottom: 2px solid #ffffff;
           }
           .ss-desktop-img-block .ss-gallery-img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover;
             display: block;
           }
 
           /* Info panel: sticky on the right, from header to bottom */
           .ss-info {
-            width: 40%;
+            width: 48%;
             position: sticky;
             top: 60px;
             height: calc(100vh - 60px);
@@ -2273,8 +2286,9 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         /* ══ THE HOUSE PHILOSOPHY ══ */
         .ss-philosophy {
           padding: 100px 32px;
-          background: #0d0d0d;
+          background: #f6f6f6;
           text-align: center;
+          border-top: 1px solid #eaeaea;
         }
         .ss-philosophy-inner {
           max-width: 560px;
@@ -2289,7 +2303,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           font-weight: 300;
           letter-spacing: 0.5em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.2);
+          color: #888888;
           font-family: var(--font-primary);
         }
         .ss-philosophy-text {
@@ -2297,7 +2311,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           font-weight: 300;
           line-height: 1.9;
           letter-spacing: 0.03em;
-          color: rgba(255,255,255,0.48);
+          color: #333333;
           font-family: var(--font-primary);
           margin: 0;
         }
@@ -2306,13 +2320,13 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           font-weight: 300;
           letter-spacing: 0.4em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.16);
+          color: #888888;
           font-family: var(--font-primary);
         }
 
         /* ══ ARCHIVAL RECORD — Garment Documentation ══ */
         .tn-archival {
-          background: #111111;
+          background: #ffffff;
           padding: 120px 40px;
           font-family: var(--font-primary);
           opacity: 0;
@@ -2320,6 +2334,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
                       transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
           will-change: opacity, transform;
+          border-top: 1px solid #eaeaea;
         }
         .tn-archival--visible {
           opacity: 1;
@@ -2347,14 +2362,14 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           font-weight: 300;
           letter-spacing: 0.5em;
           text-transform: uppercase;
-          color: rgba(231, 228, 223, 0.25);
+          color: #888888;
         }
         .tn-archival__text {
           font-size: 14px;
           font-weight: 300;
           line-height: 2.2;
           letter-spacing: 0.04em;
-          color: rgba(231, 228, 223, 0.55);
+          color: #222222;
           margin: 0;
         }
 
@@ -2373,8 +2388,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .tn-archival__col--center {
           text-align: center;
           align-items: center;
-          border-left: 1px solid rgba(231, 228, 223, 0.05);
-          border-right: 1px solid rgba(231, 228, 223, 0.05);
+          border-left: 1px solid #eaeaea;
+          border-right: 1px solid #eaeaea;
           padding: 0 48px;
         }
         .tn-archival__col-label {
@@ -2382,7 +2397,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           font-weight: 300;
           letter-spacing: 0.45em;
           text-transform: uppercase;
-          color: rgba(231, 228, 223, 0.22);
+          color: #888888;
         }
         .tn-archival__col-body {
           display: flex;
@@ -2394,7 +2409,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           justify-content: space-between;
           align-items: baseline;
           gap: 16px;
-          border-bottom: 1px solid rgba(231, 228, 223, 0.04);
+          border-bottom: 1px solid #eaeaea;
           padding-bottom: 10px;
         }
         .tn-archival__meta-key {
@@ -2402,14 +2417,14 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           font-weight: 300;
           letter-spacing: 0.28em;
           text-transform: uppercase;
-          color: rgba(231, 228, 223, 0.28);
+          color: #666666;
           flex-shrink: 0;
         }
         .tn-archival__meta-val {
           font-size: 9.5px;
           font-weight: 300;
           letter-spacing: 0.06em;
-          color: rgba(231, 228, 223, 0.65);
+          color: #111111;
           text-align: right;
         }
 
@@ -2421,7 +2436,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           font-style: italic;
           line-height: 1.9;
           letter-spacing: 0.03em;
-          color: rgba(231, 228, 223, 0.48);
+          color: #222222;
           margin: 0;
           max-width: 280px;
         }
@@ -2430,7 +2445,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           font-weight: 300;
           letter-spacing: 0.35em;
           text-transform: uppercase;
-          color: rgba(231, 228, 223, 0.18);
+          color: #888888;
           margin-top: 8px;
         }
 
@@ -2499,8 +2514,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             border-left: none;
             border-right: none;
             padding: 48px 0;
-            border-top: 1px solid rgba(231, 228, 223, 0.05);
-            border-bottom: 1px solid rgba(231, 228, 223, 0.05);
+            border-top: 1px solid #eaeaea;
+            border-bottom: 1px solid #eaeaea;
           }
           .tn-archival__quote {
             font-size: 13px;
@@ -3155,6 +3170,347 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .ss-shade-option:focus-visible {
           outline: 1px solid rgba(0, 0, 0, 0.4);
           outline-offset: 2px;
+        }
+
+        /* ── DIOR STYLE STYLING ── */
+        .dior-product-header {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          margin-bottom: 32px;
+          border-bottom: 1px solid #eaeaea;
+          padding-bottom: 24px;
+        }
+        .dior-header-main {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 16px;
+        }
+        .dior-title {
+          font-family: var(--font-serif) !important;
+          font-size: 24px;
+          font-weight: 400;
+          color: #000000;
+          line-height: 1.25;
+          margin: 0;
+        }
+        .dior-wishlist-btn {
+          background: none;
+          border: none;
+          padding: 6px;
+          cursor: pointer;
+          color: #000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: transform 0.2s ease;
+        }
+        .dior-wishlist-btn:hover {
+          transform: scale(1.1);
+        }
+        .dior-header-sub {
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          gap: 16px;
+        }
+        .dior-subtitle {
+          font-size: 13px;
+          font-weight: 300;
+          color: #555555;
+          letter-spacing: 0.02em;
+        }
+        .dior-reference {
+          font-size: 10px;
+          font-weight: 300;
+          color: #888888;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+        }
+
+        .dior-color-section {
+          margin-bottom: 32px;
+        }
+        .dior-section-label {
+          display: block;
+          font-size: 11px;
+          font-weight: 400;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          color: #111111;
+          margin-bottom: 12px;
+        }
+        .dior-color-grid {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+        }
+        .dior-color-option {
+          width: 44px;
+          height: 44px;
+          background: #f6f6f6;
+          border: 1px solid #eaeaea;
+          cursor: pointer;
+          padding: 0;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: border-color 0.2s ease;
+        }
+        .dior-color-option.active {
+          border-color: #000000;
+          outline: 1px solid #000000;
+        }
+        .dior-color-thumb {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .dior-color-swatch {
+          width: 16px;
+          height: 16px;
+          display: block;
+          border-radius: 50%;
+          border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .dior-size-section {
+          margin-bottom: 36px;
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+        .dior-size-dropdown-wrap {
+          position: relative;
+          width: 100%;
+        }
+        .dior-size-dropdown-trigger {
+          width: 100%;
+          background: none;
+          border: none;
+          border-bottom: 1px solid #000000;
+          border-radius: 0;
+          padding: 14px 0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 13px;
+          font-weight: 300;
+          color: #000000;
+          cursor: pointer;
+          letter-spacing: 0.05em;
+          text-align: left;
+        }
+        .dior-size-dropdown-trigger svg {
+          transition: transform 0.2s ease;
+        }
+        .dior-size-dropdown-trigger.open svg {
+          transform: rotate(180deg);
+        }
+        .dior-size-dropdown-list {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: #ffffff;
+          border: 1px solid #eaeaea;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+          z-index: 50;
+          display: flex;
+          flex-direction: column;
+          max-height: 240px;
+          overflow-y: auto;
+        }
+        .dior-size-dropdown-item {
+          width: 100%;
+          background: none;
+          border: none;
+          border-bottom: 1px solid #f9f9f9;
+          padding: 12px 16px;
+          font-size: 13px;
+          font-weight: 300;
+          color: #000000;
+          cursor: pointer;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          text-align: left;
+          transition: background 0.2s ease;
+        }
+        .dior-size-dropdown-item:hover {
+          background: #f6f6f6;
+        }
+        .dior-size-dropdown-item.active {
+          background: #eaeaea;
+          font-weight: 400;
+        }
+        .dior-size-dropdown-item.sold-out {
+          color: #bbbbbb;
+          text-decoration: line-through;
+        }
+        .dior-size-dropdown-item .sold-out-tag {
+          font-size: 10px;
+          color: #999999;
+          font-style: italic;
+          text-decoration: none !important;
+          display: inline-block;
+        }
+        .dior-size-guide-link {
+          background: none;
+          border: none;
+          padding: 0;
+          color: #000000;
+          text-decoration: underline;
+          text-underline-offset: 4px;
+          font-size: 12px;
+          font-weight: 300;
+          cursor: pointer;
+          width: fit-content;
+          letter-spacing: 0.02em;
+        }
+
+        .dior-actions-area {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          margin-bottom: 44px;
+        }
+        .dior-add-to-cart-btn {
+          width: 100%;
+          background: #222222;
+          color: #ffffff;
+          border: 1px solid #222222;
+          border-radius: 0;
+          padding: 16px 24px;
+          font-size: 13px;
+          font-weight: 400;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          cursor: pointer;
+          transition: background 0.3s ease, border-color 0.3s ease;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+        }
+        .dior-add-to-cart-btn:hover:not(:disabled) {
+          background: #000000;
+          border-color: #000000;
+        }
+        .dior-add-to-cart-btn:disabled {
+          background: #eaeaea;
+          color: #999999;
+          border-color: #eaeaea;
+          cursor: not-allowed;
+        }
+        .dior-express-btn {
+          width: 100%;
+          background: #eaeaea;
+          color: #555555;
+          border: 1px solid #eaeaea;
+          border-radius: 0;
+          padding: 16px 24px;
+          font-size: 13px;
+          font-weight: 400;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          cursor: pointer;
+          transition: background 0.3s ease;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+        }
+        .dior-express-btn:hover:not(:disabled) {
+          background: #dfdfdf;
+        }
+
+        .dior-tabs-container {
+          width: 100%;
+          border-top: 1px solid #eaeaea;
+          padding-top: 24px;
+          margin-top: 24px;
+        }
+        .dior-tabs-header {
+          display: flex;
+          gap: 20px;
+          border-bottom: 1px solid #eaeaea;
+          padding-bottom: 8px;
+          overflow-x: auto;
+          scrollbar-width: none;
+        }
+        .dior-tabs-header::-webkit-scrollbar {
+          display: none;
+        }
+        .dior-tab-btn {
+          background: none;
+          border: none;
+          padding: 8px 0;
+          font-size: 11px;
+          font-weight: 300;
+          color: #777777;
+          cursor: pointer;
+          position: relative;
+          white-space: nowrap;
+          transition: color 0.2s ease;
+          letter-spacing: 0.05em;
+        }
+        .dior-tab-btn:hover,
+        .dior-tab-btn.active {
+          color: #000000;
+        }
+        .dior-tab-btn.active::after {
+          content: '';
+          position: absolute;
+          bottom: -9px;
+          left: 0;
+          right: 0;
+          height: 1px;
+          background: #000000;
+        }
+        .dior-tab-content {
+          padding-top: 18px;
+        }
+        .dior-tab-text {
+          font-size: 13px;
+          font-weight: 300;
+          line-height: 1.6;
+          color: #444444;
+          margin: 0;
+          letter-spacing: 0.01em;
+        }
+        .dior-ver-mas-btn {
+          background: none;
+          border: none;
+          padding: 0;
+          color: #000000;
+          text-decoration: underline;
+          text-underline-offset: 3px;
+          font-size: 12px;
+          font-weight: 400;
+          cursor: pointer;
+          margin-top: 8px;
+        }
+        .dior-tab-text-more {
+          font-size: 12.5px;
+          font-weight: 300;
+          line-height: 1.6;
+          color: #666666;
+          margin: 0;
+        }
+        .dior-tab-text-more-container {
+          display: grid;
+          grid-template-rows: 0fr;
+          transition: grid-template-rows 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+          opacity: 0;
+          overflow: hidden;
+        }
+        .dior-tab-text-more-container.expanded {
+          grid-template-rows: 1fr;
+          opacity: 1;
+        }
+        .dior-tab-text-more-content {
+          min-height: 0;
         }
       `}</style>
     </>

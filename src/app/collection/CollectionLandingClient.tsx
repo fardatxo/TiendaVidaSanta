@@ -38,11 +38,11 @@ const getGarmentType = (product: Product): 'tops' | 'bottoms' | 'outerwear' => {
 };
 
 const philosophicalQuotes = [
-  "We are not interested in trends. Only permanence.",
-  "Repetition is the ultimate form of restraint.",
-  "A garment is not a transaction. It is an artifact of the House.",
-  "Restraint is not the absence of design. It is the absolute presence of intention.",
-  "Garments are not products. They are pieces of a cumulative archive."
+  "We are not interested in trends. Only permanence and the raw truth of nature.",
+  "Repetition is the ultimate form of restraint, mirroring the eternal cycles of landscapes.",
+  "A garment is not a transaction. It is an artifact of the House of Toner Torrentinni.",
+  "Restraint is not the absence of design. It is the absolute presence of intention, shaped by natural simplicity.",
+  "Garments are not products. They are pieces of a cumulative archive under nature's silent watch."
 ];
 
 export default function CollectionLandingClient({ products }: CollectionLandingClientProps) {
@@ -128,21 +128,20 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
 
   return (
     <div className="tonet-archive">
-      
-      {/* ── HEADER / HERO (Compact 35-45vh Viewport) ── */}
+            {/* ── HEADER / HERO (Compact 35-45vh Viewport) ── */}
       <section className="tonet-archive-hero">
         <div className="tonet-archive-hero__bg-overlay" />
         <img
-          src="/hero/ComfyUI-main_reference_00028_.png"
-          alt="TONET Archival Imagery"
+          src="/hero/collection_garden_landscape.png"
+          alt="TONER TORRENTINNI Archival Imagery"
           className="tonet-archive-hero__image"
           draggable={false}
         />
         <div className="tonet-archive-hero__content">
-          <p className="tonet-archive-hero__eyebrow">HOUSE OF TONET</p>
+          <p className="tonet-archive-hero__eyebrow">HOUSE OF TONER TORRENTINNI</p>
           <h1 className="tonet-archive-hero__title">THE COLLECTION</h1>
           <p className="tonet-archive-hero__subtitle">
-            A registry of garments produced and preserved by the House.
+            A registry of garments produced and preserved by the House, inspired by the geometry of natural landscapes.
           </p>
           
           {/* Subtle Museum Metadata Stats */}
@@ -245,7 +244,7 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
                   {shouldShowQuote && (
                     <div className="tonet-archive-quote archive-reveal">
                       <p className="tonet-archive-quote__text">"{quoteText}"</p>
-                      <span className="tonet-archive-quote__sub">TONET RESEARCH ARCHIVE</span>
+                      <span className="tonet-archive-quote__sub">TONER TORRENTINNI RESEARCH ARCHIVE</span>
                     </div>
                   )}
 
@@ -376,7 +375,7 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
         .tonet-archive-hero__bg-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(6,6,6,0.92) 100%);
+          background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(6, 6, 6, 0.2) 50%, rgba(6, 6, 6, 0.95) 100%);
           z-index: 1;
         }
         .tonet-archive-hero__image {
@@ -385,8 +384,8 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
           width: 100%;
           height: 100%;
           object-fit: cover;
-          opacity: 0.18;
-          filter: grayscale(1);
+          opacity: 0.55;
+          filter: brightness(0.7) contrast(1.05);
         }
         .tonet-archive-hero__content {
           position: relative;

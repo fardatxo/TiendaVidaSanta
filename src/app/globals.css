@@ -8,26 +8,27 @@
 
 
 :root {
-  --background-color: #ffffff;
-  --text-color: #121212;
-  --accent-color: #2a2a2a;
-  --secondary-text-color: #666666;
-  --border-color: #e5e5e5;
+  --background-color: #000000;
+  --text-color: #ffffff;
+  --accent-color: #ffffff;
+  --secondary-text-color: #cfcfcf;
+  --border-color: #1a1a1a;
   --error-color: #d32f2f;
 
   /* ── Typography system ─────────────────────────────────── */
   --font-brand: 'Saint Carell', sans-serif;
-  --font-primary: var(--font-jost), 'Jost', system-ui, sans-serif;
-  --font-serif: var(--font-jost), 'Jost', system-ui, sans-serif;
-  --font-ui: var(--font-jost), 'Jost', system-ui, sans-serif;
+  --font-primary: 'Neue Haas Grotesk', 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
+  --font-serif: 'Canela', var(--font-cormorant), Georgia, serif;
+  --font-display: 'Canela', var(--font-cormorant), Georgia, serif;
+  --font-ui: 'Neue Haas Grotesk', 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
 
   /* Scale */
-  --t-hero:  60px;  /* hero display */
-  --t-h1:    32px;  /* page title */
-  --t-h2:    22px;  /* section title */
-  --t-h3:    14px;  /* section heading / label */
-  --t-prod:  13px;  /* product name / price */
-  --t-btn:   11px;  /* buttons / accordions */
+  --t-hero:  72px;  /* hero display */
+  --t-h1:    48px;  /* section title */
+  --t-h2:    32px;  /* editorial card title */
+  --t-h3:    13px;  /* menu item size */
+  --t-body:  15px;  /* body copy size */
+  --t-discover: 12px; /* discover links size */
   --t-meta:  10px;  /* metadata / footer */
 
   /* Weights */
@@ -38,18 +39,18 @@
   --tk-hero:   -0.03em;
   --tk-h1:     -0.02em;
   --tk-h2:     -0.01em;
-  --tk-h3:      0.06em;
+  --tk-h3:      0.08em;
   --tk-prod:    0.05em;
   --tk-price:   0.04em;
   --tk-meta:    0.04em;
-  --tk-btn:     0.06em;
+  --tk-btn:     0.08em;
   --tk-footer:  0.03em;
 
   /* Kept for back-compat */
   --t-xl:  18px;
   --t-lg:  14px;
   --t-md:  12px;
-  --t-sm:  11px;
+  --t-sm:  15px;
   --t-xs:  10px;
   --w-semibold: 600;
   --tk-tight:  0em;
@@ -58,8 +59,8 @@
   --tk-wider:  0.08em;
 
   /* Line-height */
-  --lh-tight:  1.2;
-  --lh-base:   1.5;
+  --lh-tight:  0.95;
+  --lh-base:   1.6;
   --lh-loose:  1.75;
   /* ──────────────────────────────────────────────────────── */
 
@@ -261,3 +262,35 @@ img {
 .text-center {
   text-align: center;
 }
+
+/* Scroll reveal utility */
+.tn-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.tn-reveal.tn-reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Ensure Saint Carell is used for all TONET brand texts */
+.acne-logo-text,
+.acne-logo,
+.ft-home-logo,
+.ft-logo,
+.ft-copy,
+.hc-season,
+.ls-logo,
+.tn-mani-sig,
+.ss-shade-label,
+.ac-tech-label,
+.tn-archival__quote-source,
+.tonet-archive-hero__eyebrow,
+.tonet-archive-quote__sub,
+.tn-ov-lbl {
+  font-family: var(--font-brand) !important;
+}
+
+

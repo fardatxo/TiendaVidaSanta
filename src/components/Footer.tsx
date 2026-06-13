@@ -2,9 +2,108 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+
+  if (isHome) {
+    return (
+      <footer className="ft-home">
+        <div className="ft-home-inner">
+          <div className="ft-home-logo-wrap">
+            <span className="ft-home-logo">TONER TORRENTINNI</span>
+          </div>
+
+          <div className="ft-home-links">
+            <Link href="/archive" className="ft-home-link">ARCHIVE</Link>
+            <Link href="/collection" className="ft-home-link">JOURNAL</Link>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="ft-home-link">INSTAGRAM</a>
+            <Link href="/contact" className="ft-home-link">CONTACT</Link>
+          </div>
+
+          <div className="ft-home-bottom">
+            <span className="ft-home-copy">TONER TORRENTINNI ©</span>
+          </div>
+        </div>
+
+        <style>{`
+          .ft-home {
+            background: #000000;
+            color: #ffffff;
+            font-family: var(--font-primary);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 120px 80px 60px;
+          }
+          .ft-home-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 60px;
+          }
+          .ft-home-logo-wrap {
+            text-align: center;
+          }
+          .ft-home-logo {
+            font-family: var(--font-brand);
+            font-size: clamp(32px, 6vw, 72px);
+            font-weight: 300;
+            letter-spacing: normal;
+            padding-left: 0px;
+            color: #ffffff;
+            text-transform: uppercase;
+          }
+          .ft-home-links {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 40px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+          }
+          .ft-home-link {
+            font-size: 11px;
+            font-weight: 300;
+            letter-spacing: 0.35em;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            transition: color 0.4s;
+          }
+          .ft-home-link:hover {
+            color: #ffffff;
+            opacity: 1 !important;
+          }
+          .ft-home-bottom {
+            display: flex;
+            justify-content: center;
+          }
+          .ft-home-copy {
+            font-family: var(--font-brand) !important;
+            font-size: 16px;
+            font-weight: 300;
+            color: #ffffff !important;
+            letter-spacing: normal;
+            text-transform: uppercase;
+          }
+          @media (max-width: 767px) {
+            .ft-home {
+              padding: 80px 24px 40px;
+            }
+            .ft-home-inner {
+              gap: 40px;
+            }
+            .ft-home-links {
+              gap: 20px;
+            }
+          }
+        `}</style>
+      </footer>
+    );
+  }
 
   return (
     <footer className="ft">
@@ -52,15 +151,15 @@ export default function Footer() {
           <div className="ft-nav-col">
             <p className="ft-col-head">CONTACT</p>
             <ul className="ft-links">
-              <li><Link href="mailto:info@tonetparis.com">Email</Link></li>
+              <li><Link href="mailto:info@tonertorrentinni.com">Email</Link></li>
               <li><Link href="#">WhatsApp</Link></li>
               <li><Link href="/contact">FAQ</Link></li>
             </ul>
           </div>
           <div className="ft-nav-col">
-            <p className="ft-col-head">TONET</p>
+            <p className="ft-col-head">TONER TORRENTINNI</p>
             <ul className="ft-links">
-              <li><Link href="#">About</Link></li>
+              <li><Link href="/about">About</Link></li>
               <li><Link href="#">Press</Link></li>
               <li><Link href="#">Careers</Link></li>
             </ul>
@@ -79,7 +178,7 @@ export default function Footer() {
 
       {/* ── BOTTOM ── */}
       <div className="ft-bottom">
-        <span className="ft-copy">© TONET PARIS 2025</span>
+        <span className="ft-copy">TONER TORRENTINNI ©</span>
         <span className="ft-locale">ESPAÑA / ESPAÑOL</span>
       </div>
 
@@ -209,10 +308,11 @@ export default function Footer() {
           padding: 28px 100px;
         }
         .ft-copy {
-          font-size: 10px;
+          font-family: var(--font-brand) !important;
+          font-size: 14px;
           font-weight: 300;
-          color: #262626;
-          letter-spacing: 0.08em;
+          color: #ffffff !important;
+          letter-spacing: normal;
         }
         .ft-locale {
           font-size: 10px;

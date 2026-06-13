@@ -56,7 +56,7 @@ export default function LocaleSelectorModal() {
     <>
       <div className="ls-overlay" onClick={isBlocking ? undefined : closeSelector} />
       <div className="ls-modal" role="dialog" aria-modal="true">
-        <div className="ls-logo">★ TONET®</div>
+        <div className="ls-logo">★ TONER TORRENTINNI®</div>
 
         <h2 className="ls-title">{t('locale.title')}</h2>
 
