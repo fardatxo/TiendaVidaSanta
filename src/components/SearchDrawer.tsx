@@ -1,258 +1,453 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import Link from "next/link";
-import { CollectionSummary } from "@/lib/shopify";
+import { useRouter } from "next/navigation";
 import { useUI } from "@/context/UIContext";
-import { useTranslation } from "@/lib/i18n";
-
-interface GridProduct {
-  handle: string;
-  title: string;
-  imageUrl: string;
-}
+import { getProducts, Product } from "@/lib/shopify";
 
 export default function SearchDrawer() {
   const { isSearchOpen, closeSearch } = useUI();
-  const { t } = useTranslation();
+  const router = useRouter();
   const drawerRef = useRef<HTMLDivElement>(null);
-  const [collections, setCollections] = useState<CollectionSummary[]>([]);
-  const [gridProducts, setGridProducts] = useState<GridProduct[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [suggestedProducts, setSuggestedProducts] = useState<any[]>([]);
 
+  // Fallback recommended products for "You Might Like"
+  const fallbackSuggestions = [
+    {
+      handle: 'camiseta-espejada',
+      title: 'tonet core logo tee',
+      price: 350.00,
+      imageUrl: '/hero/ComfyUI-main_reference_00012_.png'
+    },
+    {
+      handle: 'sweater-rombos',
+      title: 'mx1 classic denim jeans',
+      price: 1090.00,
+      imageUrl: '/hero/ComfyUI-main_reference_00028_.png'
+    },
+    {
+      handle: 'bolso-heirloom',
+      title: 'ma-94 court sneaker',
+      price: 790.00,
+      imageUrl: '/hero/ComfyUI-main_reference_00020_.png'
+    }
+  ];
+
+  // Fetch shopify products for suggestions
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (drawerRef.current && !drawerRef.current.contains(event.target as Node)) {
+    if (!isSearchOpen) return;
+    getProducts()
+      .then((prods) => {
+        if (prods && prods.length > 0) {
+          setSuggestedProducts(prods.slice(0, 3));
+        } else {
+          setSuggestedProducts(fallbackSuggestions);
+        }
+      })
+      .catch(() => {
+        setSuggestedProducts(fallbackSuggestions);
+      });
+  }, [isSearchOpen]);
+
+  // Focus input when opened
+  useEffect(() => {
+    if (isSearchOpen) {
+      setTimeout(() => inputRef.current?.focus(), 150);
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+      setSearchQuery("");
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isSearchOpen]);
+
+  // Click outside to close
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (
+        drawerRef.current &&
+        !drawerRef.current.contains(e.target as Node) &&
+        isSearchOpen
+      ) {
         closeSearch();
       }
     };
-    if (isSearchOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.body.style.overflow = "hidden";
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.body.style.overflow = "";
-    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, [isSearchOpen, closeSearch]);
 
-  useEffect(() => {
-    if (loaded) return;
-    import("@/lib/shopify").then(({ getCollections }) => {
-      getCollections(6).then((cols) => {
-        setCollections(cols);
-        setGridProducts(
-          cols.slice(0, 6).map(c => ({ handle: c.handle, title: c.title, imageUrl: c.imageUrl }))
-        );
-        setLoaded(true);
-      });
-    });
-  }, [loaded]);
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    closeSearch();
+    router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+  };
+
+  const handlePopularSearch = (term: string) => {
+    closeSearch();
+    router.push(`/search?q=${encodeURIComponent(term)}`);
+  };
+
+  if (!isSearchOpen) return null;
 
   return (
     <>
-      <div className={`sd-backdrop ${isSearchOpen ? "open" : ""}`} aria-hidden="true" />
+      <div className="sd-backdrop open" aria-hidden="true" />
       
-      <div className={`sd-drawer ${isSearchOpen ? "open" : ""}`} ref={drawerRef} role="dialog" aria-modal="true">
-        
-        {/* HEADER */}
-        <div className="sd-header">
-          <span className="sd-title">{t('search.title')}</span>
-          <button className="sd-close" onClick={closeSearch} aria-label="Close search">
-            {t('search.close')}
-          </button>
-        </div>
-
-        {/* SEARCH INPUT */}
-        <div className="sd-input-sec">
-          <div className="sd-input-box">
-            <Search size={14} strokeWidth={1.5} className="sd-search-icon" />
-            <input type="text" placeholder={t('search.placeholder')} className="sd-input" autoFocus={isSearchOpen} />
+      <div className="sd-overlay open" ref={drawerRef} role="dialog" aria-modal="true">
+        <div className="sd-container">
+          
+          {/* Top Bar with Close Button */}
+          <div className="sd-topbar">
+            <span className="sd-topbar-title">Search</span>
+            <button className="sd-close-btn" onClick={closeSearch} aria-label="Close search">
+              <X size={20} strokeWidth={1} />
+            </button>
           </div>
-        </div>
 
-        {/* SUGGESTIONS */}
-        <div className="sd-section">
-          <div className="sd-section-title">{t('search.suggestions')}</div>
-          <div className="sd-suggestions-list">
-            {collections.length > 0
-              ? collections.map((col) => (
-                  <Link
-                    href={`/collection/${col.handle}`}
-                    key={col.handle}
-                    className="sd-suggestion-link"
-                    onClick={closeSearch}
-                  >
-                    {col.title}
-                  </Link>
-                ))
-              : <span className="sd-empty">{t('search.noCollections')}</span>
-            }
+          {/* Search Input field */}
+          <form className="sd-search-form" onSubmit={handleSearchSubmit}>
+            <div className="sd-input-wrapper">
+              <input
+                ref={inputRef}
+                type="text"
+                className="sd-search-input"
+                placeholder="SEARCH"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <button type="submit" className="sd-search-submit-btn" aria-label="Submit search">
+                <Search size={18} strokeWidth={1.2} />
+              </button>
+            </div>
+          </form>
+
+          {/* Search content grid */}
+          <div className="sd-grid">
+            
+            {/* Left Column: Popular Searches */}
+            <div className="sd-col-popular">
+              <h4 className="sd-section-title">Popular Searches</h4>
+              <ul className="sd-popular-list">
+                <li>
+                  <button onClick={() => handlePopularSearch("skel top")}>
+                    skel top
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => handlePopularSearch("ma-1")}>
+                    ma-1
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => handlePopularSearch("mx1")}>
+                    mx1
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => handlePopularSearch("ma-94")}>
+                    ma-94
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => handlePopularSearch("stars")}>
+                    stars
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => handlePopularSearch("core logo")}>
+                    core logo
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => handlePopularSearch("denim")}>
+                    denim
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Right Column: You Might Like */}
+            <div className="sd-col-suggestions">
+              <h4 className="sd-section-title">You Might Like</h4>
+              <div className="sd-suggestions-grid">
+                {suggestedProducts.map((p) => {
+                  const image = p.imageUrl || p.images?.[0];
+                  const priceStr = typeof p.price === 'number' ? `€${p.price.toFixed(2)}` : p.price;
+                  return (
+                    <Link
+                      href={`/product/${p.handle}`}
+                      key={p.handle}
+                      className="sd-product-card"
+                      onClick={closeSearch}
+                    >
+                      <div className="sd-product-img-wrap">
+                        {image && <img src={image} alt={p.title} className="sd-product-img" />}
+                      </div>
+                      <div className="sd-product-info">
+                        <span className="sd-product-name">{p.title.toLowerCase()}</span>
+                        <span className="sd-product-price">{priceStr}</span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+
           </div>
-        </div>
 
-        {/* SUGGESTED PRODUCTS */}
-        <div className="sd-section sd-section-products">
-          <div className="sd-section-title">{t('search.suggestedProducts')}</div>
-          <div className="sd-products-grid">
-            {gridProducts.map((p) => (
-              <Link href={`/collection/${p.handle}`} onClick={closeSearch} key={p.handle} className="sd-product-card">
-                {p.imageUrl && <img src={p.imageUrl} alt={p.title} />}
-              </Link>
-            ))}
-          </div>
         </div>
-
       </div>
 
       <style>{`
         /* BACKDROP */
         .sd-backdrop {
           position: fixed;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0,0,0,0.32);
-          opacity: 0; pointer-events: none;
-          transition: none;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.4);
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
           z-index: 1000;
+          opacity: 0;
+          transition: opacity 0.5s ease;
         }
-        .sd-backdrop.open { opacity: 1; pointer-events: auto; }
+        .sd-backdrop.open {
+          opacity: 1;
+        }
 
-        /* DRAWER — single vertical column */
-        .sd-drawer {
+        /* OVERLAY CONTAINER */
+        .sd-overlay {
           position: fixed;
-          top: 0; right: 0; bottom: 60px;
-          width: 370px; max-width: 100%;
-          background: #ffffff; color: #000;
+          top: 0; left: 0; right: 0;
+          width: 100%;
+          background: #ffffff;
+          color: #000000;
           z-index: 1001;
-          transform: translateX(100%);
-          transition: none;
-          display: flex; flex-direction: column;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+          font-family: var(--font-primary), sans-serif;
+          transform: translateY(-100%);
+          transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
           overflow-y: auto;
-          border-left: 1px solid #d0d0d0;
-          font-family: Arial, Helvetica, sans-serif;
+          max-height: 90vh;
+          border-bottom: 1px solid #eaeaea;
         }
-        .sd-drawer.open { transform: translateX(0); }
+        .sd-overlay.open {
+          transform: translateY(0);
+        }
 
-        /* HEADER ROW */
-        .sd-header {
+        .sd-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 24px 40px 60px;
+        }
+
+        /* TOPBAR */
+        .sd-topbar {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 5px 16px 20px 10px;
-          border-bottom: 1px solid #111;
-          flex-shrink: 0;
-          background: #ffffff;
+          margin-bottom: 24px;
         }
-        .sd-title {
-          font-size: 11.5px;
-          font-weight: 500;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          color: #111;
-        }
-        .sd-close {
-          background: none; border: none;
-          font-family: inherit;
-          font-size: 11.5px; font-weight: 400;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          color: #0033bb; cursor: pointer;
-          padding: 0;
-        }
-
-        /* INPUT ROW — compact with bordered box */
-        .sd-input-sec {
-          padding: 5px 12px;
-          border-bottom: 1px solid #111;
-          background: #ffffff;
-          flex-shrink: 0;
-          transition: background 0.1s;
-        }
-        .sd-input-sec:focus-within { background: #ddeeff; }
-        .sd-input-box {
-          display: flex; align-items: center;
-          gap: 7px;
-          border: 1px solid #aaa;
-          padding: 4px 8px;
-          background: inherit;
-        }
-        .sd-search-icon { flex-shrink: 0; color: #888; }
-        .sd-input {
-          flex: 1; border: none; background: transparent;
-          font-family: inherit;
-          font-size: 11px; text-transform: uppercase;
-          color: #111; outline: none;
-        }
-        .sd-input::placeholder { color: #bbb; }
-        .sd-input:focus { caret-color: #0033bb; }
-
-        /* SECTIONS */
-        .sd-section {
-          border-bottom: 1px solid #111;
-          flex-shrink: 0;
-        }
-        .sd-section-products {
-          border-bottom: none;
-          flex-shrink: 0;
-        }
-        .sd-section-title {
-          padding: 7px 16px;
+        .sd-topbar-title {
           font-size: 10px;
-          font-weight: 500;
+          font-weight: 400;
           text-transform: uppercase;
-          letter-spacing: 0.1em;
-          color: #444;
-          background: #f0f0f0;
-          border-bottom: 1px solid #ddd;
+          letter-spacing: 0.2em;
+          color: rgba(0, 0, 0, 0.4);
         }
-
-        /* SUGGESTIONS — grey bg, blue links, grey separators */
-        .sd-suggestions-list {
-          display: flex; flex-direction: column;
-          background: #f2f2f2;
-        }
-        .sd-suggestion-link {
-          display: block;
-          padding: 9px 16px;
-          font-size: 12px;
-          color: #0033bb;
-          text-decoration: none;
-          border-bottom: 1px solid #e0e0e0;
-        }
-        .sd-suggestion-link:last-child { border-bottom: none; }
-        .sd-suggestion-link:hover { background: #eeeeee; }
-        .sd-empty {
-          display: block; padding: 8px 16px;
-          font-size: 11px; color: #999;
-          background: #f7f7f7;
-        }
-
-        /* PRODUCT GRID — uniform cells, contained images */
-        .sd-products-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 1px;
-          background: #ccc;
-        }
-        .sd-product-card {
-          aspect-ratio: 1;
-          overflow: hidden;
+        .sd-close-btn {
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: #000000;
+          padding: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: #ffffff;
-          padding: 6px;
+          transition: opacity 0.3s ease;
         }
-        .sd-product-card:hover { background: #f5f5f5; }
-        .sd-product-card img {
-          width: 100%; height: 100%;
-          display: block;
-          object-fit: contain;
+        .sd-close-btn:hover {
+          opacity: 0.6;
         }
 
-        @media (max-width: 480px) {
-          .sd-drawer { width: 100vw; border-left: none; }
+        /* INPUT ROW */
+        .sd-search-form {
+          margin-bottom: 48px;
+        }
+        .sd-input-wrapper {
+          display: flex;
+          align-items: center;
+          border-bottom: 1px solid #000000;
+          padding-bottom: 8px;
+        }
+        .sd-search-input {
+          flex: 1;
+          background: transparent;
+          border: none;
+          outline: none;
+          font-family: inherit;
+          font-size: 24px;
+          font-weight: 300;
+          letter-spacing: 0.05em;
+          color: #000000;
+          text-transform: uppercase;
+        }
+        .sd-search-input::placeholder {
+          color: rgba(0, 0, 0, 0.15);
+        }
+        .sd-search-submit-btn {
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: #000000;
+          padding: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: opacity 0.3s ease;
+        }
+        .sd-search-submit-btn:hover {
+          opacity: 0.6;
+        }
+
+        /* CONTENT GRID */
+        .sd-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 48px;
+        }
+        @media (min-width: 768px) {
+          .sd-grid {
+            grid-template-columns: 35% 65%;
+            gap: 60px;
+          }
+        }
+
+        .sd-section-title {
+          font-size: 10px;
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
+          color: rgba(0, 0, 0, 0.4);
+          margin: 0 0 20px;
+          border-bottom: 1px solid #eaeaea;
+          padding-bottom: 8px;
+        }
+
+        /* POPULAR LIST */
+        .sd-popular-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .sd-popular-list button {
+          background: none;
+          border: none;
+          padding: 0;
+          text-align: left;
+          font-family: inherit;
+          font-size: 11px;
+          font-weight: 300;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: #000000;
+          cursor: pointer;
+          transition: opacity 0.3s ease;
+        }
+        .sd-popular-list button:hover {
+          opacity: 0.6;
+        }
+
+        /* SUGGESTIONS PRODUCTS */
+        .sd-suggestions-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 20px;
+        }
+        .sd-product-card {
+          display: flex;
+          flex-direction: column;
+          text-decoration: none;
+          color: #000000;
+        }
+        .sd-product-img-wrap {
+          aspect-ratio: 3 / 4;
+          background-color: #fcfcfc;
+          overflow: hidden;
+          margin-bottom: 12px;
+        }
+        .sd-product-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          transition: opacity 0.5s ease;
+        }
+        .sd-product-card:hover .sd-product-img {
+          opacity: 0.85;
+        }
+        .sd-product-info {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+        .sd-product-name {
+          font-size: 9px;
+          font-weight: 400;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          line-height: 1.4;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .sd-product-price {
+          font-size: 9px;
+          font-weight: 300;
+          color: rgba(0, 0, 0, 0.55);
+        }
+
+        /* MOBILE STYLING */
+        @media (max-width: 767px) {
+          .sd-overlay {
+            max-height: 100vh;
+            height: 100vh;
+            border-bottom: none;
+          }
+          .sd-container {
+            padding: 16px 20px 80px;
+          }
+          .sd-search-form {
+            margin-bottom: 32px;
+          }
+          .sd-search-input {
+            font-size: 18px;
+          }
+          .sd-grid {
+            gap: 36px;
+          }
+          .sd-suggestions-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+          }
+          .sd-suggestions-grid .sd-product-card:last-child {
+            display: none; /* Hide third product card on mobile to balance columns */
+          }
+          
+          /* Active states */
+          .sd-popular-list button:active,
+          .sd-product-card:active {
+            opacity: 0.5;
+          }
         }
       `}</style>
     </>

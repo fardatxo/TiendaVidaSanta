@@ -275,12 +275,9 @@ img {
   transform: translateY(0);
 }
 
-/* Ensure Saint Carell is used for all TONET brand texts */
-.acne-logo-text,
-.acne-logo,
+/* Ensure Saint Carell is used for designated brand texts */
 .ft-home-logo,
 .ft-logo,
-.ft-copy,
 .hc-season,
 .ls-logo,
 .tn-mani-sig,

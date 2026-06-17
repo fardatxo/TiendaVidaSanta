@@ -7,6 +7,11 @@ import { usePathname } from "next/navigation";
 export default function Footer() {
   const [email, setEmail] = useState("");
   const pathname = usePathname();
+  const [expandedCol, setExpandedCol] = useState<string | null>(null);
+
+  const toggleCol = (colName: string) => {
+    setExpandedCol(prev => prev === colName ? null : colName);
+  };
 
   return (
     <footer className="ft">
@@ -30,49 +35,49 @@ export default function Footer() {
             </div>
             <p className="ft-nl-sub">suscríbete para recibir novedades, lanzamientos y más.</p>
           </div>
-          <div className="ft-socials">
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
-              </svg>
-            </a>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="X">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-              </svg>
-            </a>
-            <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V9a8.2 8.2 0 0 0 4.79 1.52V7.07a4.85 4.85 0 0 1-1.02-.38z"/>
-              </svg>
-            </a>
+          <div className="ft-socials-text">
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">instagram</a>
+            <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer">tiktok</a>
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">facebook</a>
+            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">youtube</a>
           </div>
         </div>
 
         {/* Right: Nav columns */}
         <div className="ft-nav">
           <div className="ft-nav-col">
-            <p className="ft-col-head">contacto</p>
-            <ul className="ft-links">
-              <li><Link href="mailto:info@tonertorrentinni.com">email</Link></li>
-              <li><Link href="#">whatsapp</Link></li>
-              <li><Link href="/contact">faq</Link></li>
+            <p className="ft-col-head" onClick={() => toggleCol('customer-service')}>
+              customer service
+              <span className="ft-col-toggle">{expandedCol === 'customer-service' ? ' —' : ' +'}</span>
+            </p>
+            <ul className={`ft-links ${expandedCol === 'customer-service' ? 'open' : ''}`}>
+              <li><Link href="/contact">contact us</Link></li>
+              <li><Link href="#">shipping</Link></li>
+              <li><Link href="#">returns</Link></li>
+              <li><Link href="#">size guide</Link></li>
             </ul>
           </div>
           <div className="ft-nav-col">
-            <p className="ft-col-head">tonet</p>
-            <ul className="ft-links">
-              <li><Link href="/about">sobre nosotros</Link></li>
-              <li><Link href="#">prensa</Link></li>
-              <li><Link href="#">empleo</Link></li>
+            <p className="ft-col-head" onClick={() => toggleCol('corporate-info')}>
+              corporate info
+              <span className="ft-col-toggle">{expandedCol === 'corporate-info' ? ' —' : ' +'}</span>
+            </p>
+            <ul className={`ft-links ${expandedCol === 'corporate-info' ? 'open' : ''}`}>
+              <li><Link href="/about">about tonet</Link></li>
+              <li><Link href="#">careers</Link></li>
+              <li><Link href="#">stockists</Link></li>
             </ul>
           </div>
           <div className="ft-nav-col">
-            <p className="ft-col-head">legal</p>
-            <ul className="ft-links">
-              <li><Link href="#">privacidad</Link></li>
-              <li><Link href="#">condiciones</Link></li>
-              <li><Link href="#">cookies</Link></li>
+            <p className="ft-col-head" onClick={() => toggleCol('brand-world')}>
+              brand world
+              <span className="ft-col-toggle">{expandedCol === 'brand-world' ? ' —' : ' +'}</span>
+            </p>
+            <ul className={`ft-links ${expandedCol === 'brand-world' ? 'open' : ''}`}>
+              <li><Link href="/collection">runways</Link></li>
+              <li><Link href="/collection">campaigns</Link></li>
+              <li><Link href="/stores">stores</Link></li>
+              <li><Link href="/stores">store locator</Link></li>
             </ul>
           </div>
         </div>
@@ -81,8 +86,8 @@ export default function Footer() {
 
       {/* ── BOTTOM ── */}
       <div className="ft-bottom">
-        <span className="ft-copy">tonet ©</span>
-        <span className="ft-locale">españa / es / eur</span>
+        <span className="ft-copy">© 2026 tonet</span>
+        <span className="ft-locale">spain / en / eur</span>
       </div>
 
       <style>{`
@@ -90,7 +95,7 @@ export default function Footer() {
           background: #ffffff;
           color: #000000;
           font-family: var(--font-primary), sans-serif;
-          border-top: 1px solid #000000;
+          border-top: 1px solid rgba(0, 0, 0, 0.08);
           text-transform: lowercase;
         }
         .ft a { text-decoration: none; }
@@ -146,9 +151,9 @@ export default function Footer() {
           cursor: pointer;
           padding: 0 0 0 8px;
           line-height: 1;
-          transition: opacity 0.3s;
+          transition: opacity 0.3s ease;
         }
-        .ft-nl-btn:hover { opacity: 0.7; }
+        .ft-nl-btn:hover { opacity: 0.6; }
         .ft-nl-sub {
           font-size: 10px;
           font-weight: 300;
@@ -157,20 +162,21 @@ export default function Footer() {
           letter-spacing: 0.02em;
         }
 
-        /* ── SOCIALS ── */
-        .ft-socials {
+        /* ── SOCIALS TEXT LINKS ── */
+        .ft-socials-text {
           display: flex;
-          gap: 24px;
+          gap: 20px;
           align-items: center;
           margin-top: auto;
         }
-        .ft-socials a {
-          color: #000000;
-          display: flex;
-          align-items: center;
-          transition: opacity 0.3s;
+        .ft-socials-text a {
+          color: rgba(0, 0, 0, 0.55);
+          font-size: 11px;
+          font-weight: 300;
+          letter-spacing: 0.02em;
+          transition: color 0.3s ease;
         }
-        .ft-socials a:hover { opacity: 0.7; }
+        .ft-socials-text a:hover { color: #000000; }
 
         /* ── NAV ── */
         .ft-nav {
@@ -199,9 +205,9 @@ export default function Footer() {
         .ft-links li a {
           font-size: 11px;
           font-weight: 300;
-          color: #666666;
+          color: rgba(0, 0, 0, 0.55);
           letter-spacing: 0.02em;
-          transition: color 0.3s;
+          transition: color 0.3s ease;
         }
         .ft-links li a:hover { color: #000000; }
 
@@ -215,19 +221,23 @@ export default function Footer() {
         .ft-copy {
           font-size: 11px;
           font-weight: 300;
-          color: #000000 !important;
+          color: rgba(0, 0, 0, 0.55) !important;
           letter-spacing: 0.05em;
           font-family: var(--font-primary), sans-serif !important;
         }
         .ft-locale {
           font-size: 10px;
           font-weight: 300;
-          color: #666666;
+          color: rgba(0, 0, 0, 0.55);
           letter-spacing: 0.08em;
           cursor: pointer;
-          transition: color 0.3s;
+          transition: color 0.3s ease;
         }
         .ft-locale:hover { color: #000000; }
+        
+        .ft-col-toggle {
+          display: none;
+        }
 
         /* ── MOBILE ── */
         @media (max-width: 767px) {
@@ -243,24 +253,57 @@ export default function Footer() {
             padding-bottom: 40px;
             margin-bottom: 40px;
           }
-          .ft-socials { margin-top: 32px; }
+          .ft-socials-text {
+            margin-top: 24px;
+            justify-content: flex-start;
+          }
           .ft-nav {
             padding-left: 0;
-            flex-direction: row;
-            gap: 0;
-            justify-content: flex-start;
-            gap: 40px;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
           }
-          .ft-nav-col { flex: none; }
-          .ft-col-head { margin-bottom: 16px; }
-          .ft-links { gap: 10px; }
+          .ft-nav-col {
+            width: 100%;
+          }
+          .ft-col-head {
+            margin-bottom: 0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eaeaea;
+            padding: 14px 0; /* Ensures >= 44px tap target */
+          }
+          .ft-col-toggle {
+            display: inline;
+            font-size: 12px;
+            font-weight: 300;
+            color: #888888;
+          }
+          .ft-links {
+            display: none;
+            padding-top: 12px;
+            padding-bottom: 16px;
+            gap: 10px;
+          }
+          .ft-links.open {
+            display: flex;
+          }
           .ft-bottom {
             padding: 20px;
           }
-        }
-
-        @media (max-width: 480px) {
-          .ft-nav { flex-direction: column; gap: 32px; }
+          .ft-nl-input {
+            font-size: 16px; /* Prevents auto-zoom on iOS */
+          }
+          .ft-col-head:active {
+            background-color: #f9f9f9;
+          }
+          .ft-links li a:active,
+          .ft-socials-text a:active,
+          .ft-locale:active {
+            opacity: 0.5;
+          }
         }
       `}</style>
 

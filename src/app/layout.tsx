@@ -13,6 +13,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import CartDrawer from "@/components/CartDrawer";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import MenuDrawer from "@/components/MenuDrawer";
+import SearchDrawer from "@/components/SearchDrawer";
 import CookieBanner from "@/components/CookieBanner";
 import TransitionProvider from "@/components/TransitionProvider";
 
@@ -55,6 +56,7 @@ export default function RootLayout({
                 <Navbar />
                 <CartDrawer />
                 <MenuDrawer />
+                <SearchDrawer />
                 <main>{children}</main>
                 <Footer />
                 <CookieBanner />

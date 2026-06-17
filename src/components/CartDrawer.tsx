@@ -74,7 +74,7 @@ export default function CartDrawer() {
         {/* ── HEADER ── */}
         <div className="cd-header">
           <div className="cd-header-spacer" />
-          <span className="cd-title">The Selection</span>
+          <span className="cd-title">Shopping Bag</span>
           <button className="cd-close" onClick={closeCart} aria-label="Close">
             <X size={18} strokeWidth={1.4} />
           </button>
@@ -84,9 +84,9 @@ export default function CartDrawer() {
         <div className="cd-body">
           {items.length === 0 ? (
             <div className="cd-empty-state">
-              <p className="cd-empty-text">No garments have been selected.</p>
+              <p className="cd-empty-text">Your bag is empty</p>
               <button className="cd-continue-btn" onClick={closeCart}>
-                Return to the House
+                Continue Shopping
               </button>
             </div>
           ) : (
@@ -143,12 +143,12 @@ export default function CartDrawer() {
         .cd-backdrop {
           position: fixed;
           inset: 0;
-          background: rgba(0,0,0,0.55);
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
+          background: rgba(0,0,0,0.4);
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
           opacity: 0;
           pointer-events: none;
-          transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1);
+          transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1);
           z-index: 1000;
         }
         .cd-backdrop.open { opacity: 1; pointer-events: auto; }
@@ -157,16 +157,16 @@ export default function CartDrawer() {
         .cd-drawer {
           position: fixed;
           top: 0; right: 0; bottom: 0;
-          width: min(100vw, 480px);
-          background: #0d0d0d;
-          border-left: 1px solid rgba(255,255,255,0.05);
+          width: min(100vw, 400px);
+          background: #ffffff;
+          border-left: 1px solid #eaeaea;
           z-index: 1001;
           display: flex;
           flex-direction: column;
           transform: translateX(100%);
-          transition: transform 0.95s cubic-bezier(0.16,1,0.3,1);
-          font-family: var(--font-primary);
-          color: rgba(255,255,255,0.82);
+          transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
+          font-family: var(--font-primary), sans-serif;
+          color: #000000;
           overflow: hidden;
         }
         .cd-drawer.open { transform: translateX(0); }
@@ -176,29 +176,28 @@ export default function CartDrawer() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 24px 32px;
-          border-bottom: 1px solid rgba(255,255,255,0.05);
+          padding: 20px 24px;
+          border-bottom: 1px solid #eaeaea;
           flex-shrink: 0;
         }
         .cd-header-spacer { width: 28px; }
         .cd-title {
-          font-size: 9px;
-          font-weight: 300;
-          letter-spacing: 0.5em;
-          padding-right: 0.5em;
+          font-size: 10px;
+          font-weight: 500;
+          letter-spacing: 0.15em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.5);
+          color: rgba(0, 0, 0, 0.4);
         }
         .cd-close {
           background: none; border: none;
           cursor: pointer;
-          color: rgba(255,255,255,0.28);
+          color: #000000;
           padding: 4px;
           display: flex; align-items: center; justify-content: center;
           width: 28px; height: 28px;
-          transition: color 0.5s;
+          transition: opacity 0.3s;
         }
-        .cd-close:hover { color: rgba(255,255,255,0.75); }
+        .cd-close:hover { opacity: 0.6; }
         .cd-close svg { stroke: currentColor; }
 
         /* ══ BODY ══ */
@@ -206,7 +205,6 @@ export default function CartDrawer() {
           flex: 1;
           min-height: 0;
           overflow-y: auto;
-          -webkit-overflow-scrolling: touch;
           scrollbar-width: none;
         }
         .cd-body::-webkit-scrollbar { display: none; }
@@ -218,32 +216,35 @@ export default function CartDrawer() {
           align-items: center;
           justify-content: center;
           height: 100%;
-          padding: 0 32px 48px;
-          gap: 32px;
+          padding: 0 24px 48px;
+          gap: 24px;
         }
         .cd-empty-text {
-          font-size: 9px;
+          font-size: 11px;
           font-weight: 300;
-          letter-spacing: 0.4em;
+          letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.18);
+          color: rgba(0, 0, 0, 0.4);
           margin: 0;
         }
         .cd-continue-btn {
           width: 100%;
           background: transparent;
-          color: rgba(255,255,255,0.45);
-          border: 1px solid rgba(255,255,255,0.12);
+          color: #000000;
+          border: 1px solid #000000;
           padding: 16px;
-          font-size: 9px;
+          font-size: 10px;
           font-family: inherit;
-          font-weight: 300;
-          letter-spacing: 0.38em;
+          font-weight: 400;
+          letter-spacing: 0.15em;
           text-transform: uppercase;
           cursor: pointer;
-          transition: border-color 0.5s, color 0.5s;
+          transition: background 0.3s, color 0.3s;
         }
-        .cd-continue-btn:hover { border-color: rgba(255,255,255,0.32); color: rgba(255,255,255,0.75); }
+        .cd-continue-btn:hover {
+          background: #000000;
+          color: #ffffff;
+        }
 
         /* ══ ITEM ══ */
         .cd-item {
@@ -251,12 +252,12 @@ export default function CartDrawer() {
           flex-direction: row;
           padding: 20px 24px;
           gap: 16px;
-          border-bottom: 1px solid rgba(255,255,255,0.05);
+          border-bottom: 1px solid #eaeaea;
         }
         .cd-item-img {
-          width: 40%;
+          width: 35%;
           flex-shrink: 0;
-          background: #1a1a1a;
+          background: #fcfcfc;
           aspect-ratio: 3 / 4;
           display: flex;
           align-items: center;
@@ -266,7 +267,7 @@ export default function CartDrawer() {
         .cd-item-img img {
           width: 100%;
           height: 100%;
-          object-fit: contain;
+          object-fit: cover;
           display: block;
         }
         .cd-item-info {
@@ -278,17 +279,17 @@ export default function CartDrawer() {
         }
         .cd-item-name {
           font-size: 9px;
-          font-weight: 300;
+          font-weight: 400;
           text-transform: uppercase;
-          letter-spacing: 0.32em;
+          letter-spacing: 0.1em;
           line-height: 1.5;
-          color: rgba(255,255,255,0.72);
+          color: #000000;
         }
         .cd-item-variant {
-          font-size: 8px;
+          font-size: 9px;
           font-weight: 300;
-          color: rgba(255,255,255,0.25);
-          letter-spacing: 0.3em;
+          color: rgba(0, 0, 0, 0.45);
+          letter-spacing: 0.08em;
           text-transform: uppercase;
         }
         .cd-qty-row {
@@ -301,36 +302,36 @@ export default function CartDrawer() {
           background: none;
           border: none;
           cursor: pointer;
-          color: rgba(255,255,255,0.28);
+          color: rgba(0, 0, 0, 0.45);
           line-height: 1;
           padding: 0;
           width: 20px; height: 20px;
           display: flex; align-items: center; justify-content: center;
-          transition: color 0.4s;
+          transition: color 0.3s;
         }
-        .cd-qty-btn:hover { color: rgba(255,255,255,0.72); }
+        .cd-qty-btn:hover { color: #000000; }
         .cd-qty-btn svg { stroke: currentColor; }
         .cd-qty-val {
           font-size: 10px;
           font-weight: 300;
           min-width: 16px;
           text-align: center;
-          color: rgba(255,255,255,0.5);
-          letter-spacing: 0.1em;
+          color: #000000;
+          letter-spacing: 0.05em;
         }
         .cd-item-price {
-          font-size: 9px;
+          font-size: 9.5px;
           font-weight: 300;
-          letter-spacing: 0.2em;
-          color: rgba(255,255,255,0.32);
+          letter-spacing: 0.05em;
+          color: rgba(0, 0, 0, 0.55);
           margin-top: auto;
         }
 
         /* ══ FOOTER ══ */
         .cd-footer {
           flex-shrink: 0;
-          border-top: 1px solid rgba(255,255,255,0.05);
-          padding: 24px 32px 32px;
+          border-top: 1px solid #eaeaea;
+          padding: 20px 24px 28px;
           display: flex;
           flex-direction: column;
           gap: 20px;
@@ -341,17 +342,17 @@ export default function CartDrawer() {
           align-items: center;
         }
         .cd-subtotal-label {
-          font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.45em;
+          font-size: 9px;
+          font-weight: 400;
+          letter-spacing: 0.15em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.22);
+          color: rgba(0, 0, 0, 0.4);
         }
         .cd-subtotal-price {
-          font-size: 10px;
-          font-weight: 300;
-          letter-spacing: 0.1em;
-          color: rgba(255,255,255,0.52);
+          font-size: 11px;
+          font-weight: 400;
+          letter-spacing: 0.05em;
+          color: #000000;
         }
         .cd-cta-group {
           display: flex;
@@ -362,43 +363,50 @@ export default function CartDrawer() {
         .cd-checkout-btn {
           width: 100%;
           border: none;
-          padding: 17px 8px;
-          font-size: 9px;
+          padding: 16px 8px;
+          font-size: 10px;
           font-family: inherit;
-          font-weight: 300;
+          font-weight: 400;
           text-transform: uppercase;
-          letter-spacing: 0.38em;
+          letter-spacing: 0.15em;
           cursor: pointer;
           border-radius: 0;
-          background: rgba(255,255,255,0.88);
-          color: #0d0d0d;
-          transition: background 0.5s;
+          background: #000000;
+          color: #ffffff;
+          transition: opacity 0.3s;
         }
-        .cd-checkout-btn:hover { background: rgba(255,255,255,1); }
+        .cd-checkout-btn:hover { opacity: 0.85; }
         .cd-favorites-btn {
           width: 100%;
-          padding: 15px 8px;
-          font-size: 9px;
+          padding: 14px 8px;
+          font-size: 10px;
           font-family: inherit;
           font-weight: 300;
           text-transform: uppercase;
-          letter-spacing: 0.38em;
+          letter-spacing: 0.15em;
           cursor: pointer;
           border-radius: 0;
           background: transparent;
-          color: rgba(255,255,255,0.25);
-          border: 1px solid rgba(255,255,255,0.08);
-          transition: border-color 0.5s, color 0.5s;
+          color: rgba(0, 0, 0, 0.6);
+          border: 1px solid rgba(0, 0, 0, 0.1);
+          transition: color 0.3s, border-color 0.3s;
         }
-        .cd-favorites-btn:hover { border-color: rgba(255,255,255,0.28); color: rgba(255,255,255,0.6); }
+        .cd-favorites-btn:hover { border-color: rgba(0, 0, 0, 0.3); color: #000000; }
 
         /* ══ MOBILE ══ */
         @media (max-width: 767px) {
           .cd-drawer { width: 100vw; border-left: none; }
-          .cd-header { padding: 22px 24px; }
+          .cd-header { padding: 16px 20px; }
           .cd-item { padding: 16px 20px; }
-          .cd-footer { padding: 20px 24px 28px; }
-          .cd-empty-state { padding: 0 24px 48px; }
+          .cd-footer { padding: 16px 20px 24px; }
+          .cd-empty-state { padding: 0 20px 48px; }
+          
+          /* Active touch feedbacks */
+          .cd-qty-btn:active,
+          .cd-checkout-btn:active,
+          .cd-favorites-btn:active {
+            opacity: 0.6;
+          }
         }
       `}</style>
     </>

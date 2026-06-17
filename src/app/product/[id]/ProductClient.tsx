@@ -113,6 +113,29 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
     } catch {}
   }, [product.handle]);
 
+  useEffect(() => {
+    const el = ctlCarouselRef.current;
+    if (!el) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+
+      const canScrollLeft = el.scrollLeft > 0;
+      const canScrollRight = el.scrollLeft < el.scrollWidth - el.clientWidth - 1;
+
+      if ((e.deltaY > 0 && canScrollRight) || (e.deltaY < 0 && canScrollLeft)) {
+        e.preventDefault();
+        el.scrollBy({
+          left: e.deltaY,
+          behavior: 'smooth'
+        });
+      }
+    };
+
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    return () => el.removeEventListener('wheel', handleWheel);
+  }, [completeOutfit]);
+
   const images = product.images.length > 0 ? product.images : [product.imageUrl].filter(Boolean);
   const [selectedVariant, setSelectedVariant] = useState<ShopifyVariant>(
     product.variants[0] ?? { id: '', title: '', availableForSale: true, price: { amount: String(product.price), currencyCode: product.currencyCode }, selectedOptions: [] }
@@ -128,6 +151,41 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   const [ceremonyOpen, setCeremonyOpen] = useState(false);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [sizeDropdownOpen, setSizeDropdownOpen] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const mobileCarouselRef = useRef<HTMLDivElement>(null);
+
+  const [ctlScrollProgress, setCtlScrollProgress] = useState(0);
+  const ctlCarouselRef = useRef<HTMLDivElement>(null);
+
+  const handleCtlScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    if (maxScroll > 0) {
+      setCtlScrollProgress(el.scrollLeft / maxScroll);
+    }
+  };
+
+  const getProductType = (p: RecommendedProduct): 'footwear' | 'top' | 'pants' | 'accessory' => {
+    const title = p.title.toLowerCase();
+    if (title.includes('shoe') || title.includes('sneaker') || title.includes('slide') || title.includes('boot') || title.includes('loafer')) {
+      return 'footwear';
+    }
+    if (title.includes('short') || title.includes('pant') || title.includes('trouser') || title.includes('jeans') || title.includes('denim')) {
+      return 'pants';
+    }
+    if (title.includes('sunglasses') || title.includes('eyewear') || title.includes('glasses') || title.includes('hat') || title.includes('cap') || title.includes('bag') || title.includes('wallet')) {
+      return 'accessory';
+    }
+    return 'top';
+  };
+  const handleMobileScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const container = e.currentTarget;
+    const scrollLeft = container.scrollLeft;
+    const width = container.clientWidth;
+    if (width > 0) {
+      setCurrentSlide(Math.round(scrollLeft / width));
+    }
+  };
   const { t } = useTranslation();
   const { toggle, has, items } = useWishlist();
   const inWishlist = has(product.handle);
@@ -333,220 +391,160 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
   return (
     <>
-      <div className="aw-pdp-page">
-        <div className="aw-pdp-layout">
+      <div className="tonet-pdp-page">
+        {/* Collection/Season tag below header */}
+        <div className="tonet-pdp-season">
+          {product.tags?.find(t => t.toUpperCase() === t) || "HIGH SUMMER"}
+        </div>
+
+        <div className="tonet-pdp-layout">
           
-          {/* MOBILE ONLY: Purchase info at the top */}
-          <div className="aw-purchase-section-mobile">
-            <h1 className="aw-product-title">{product.title.toLowerCase()}</h1>
-            <div className="aw-product-price">
-              <span>{priceFormatted}</span>
-            </div>
-
-            {/* Colors Selection - Mobile */}
-            {colorOptions.length > 1 && (
-              <div className="aw-color-section">
-                <span className="aw-color-label">colors</span>
-                <div className="aw-color-grid">
-                  {colorOptions.map((co) => {
-                    const isSelected = selectedColor === co.value;
-                    return (
-                      <button
-                        key={co.value}
-                        type="button"
-                        className={`aw-color-option ${isSelected ? 'active' : ''}`}
-                        onClick={() => handleColorChange(co.value)}
-                        aria-label={`Select color ${co.value}`}
-                      >
-                        <span className="aw-color-swatch" style={{ background: colorNameToCSS(co.value) }} />
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-            
-            {/* Size selector trigger */}
-            {hasSizes && (
-              <div className="aw-size-selector-container">
-                <button 
-                  type="button"
-                  className="aw-size-selector-trigger"
-                  onClick={() => setSizeDropdownOpen(true)}
-                >
-                  <span>{selectedSize ? `talla: ${selectedSize.toLowerCase()} v` : 'Seleccionar Talla v'}</span>
-                </button>
-              </div>
-            )}
-
-            {/* Add to Cart button */}
-            <button 
-              className="aw-add-to-cart-btn"
-              onClick={handleAddToBag}
-              disabled={adding || (!needsSizeSelection && !selectedVariant.availableForSale)}
-            >
-              {adding ? 'Añadiendo...' : 'Añadir A La Cesta'}
-            </button>
-          </div>
-
-          {/* GALLERY COLUMN (DESKTOP STACKED, MOBILE CAROUSEL) */}
-          <div className="aw-gallery-column">
-            {/* Mobile Carousel (CSS scroll snap) */}
-            <div className="aw-mobile-gallery">
-              <div className="aw-mobile-carousel">
+          {/* GALLERY COLUMN (Left side ~65% on desktop) */}
+          <div className="tonet-gallery-column">
+            {/* Mobile Carousel (horizontal scroll snapping) */}
+            <div className="tonet-mobile-gallery">
+              <div className="tonet-mobile-carousel" ref={mobileCarouselRef} onScroll={handleMobileScroll}>
                 {images.map((img, i) => (
-                  <div key={i} className="aw-mobile-slide">
-                    <img src={img} alt={`${product.title} - ${i}`} className="aw-pdp-img" />
+                  <div key={i} className="tonet-mobile-slide">
+                    <img src={img} alt={`${product.title} - ${i}`} className="tonet-pdp-img" />
                   </div>
                 ))}
               </div>
+              
+              {/* Carousel Dots */}
+              {images.length > 1 && (
+                <div className="tonet-mobile-dots">
+                  {images.map((_, i) => (
+                    <span
+                      key={i}
+                      className={`tonet-mobile-dot ${currentSlide === i ? 'active' : ''}`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Desktop Stacked */}
-            <div className="aw-desktop-gallery">
+            {/* Desktop Gallery (Minimal vertical stack of images, no controls/arrows/sliders) */}
+            <div className="tonet-desktop-gallery">
               {images.map((img, i) => (
-                <div key={i} className="aw-desktop-img-wrapper">
-                  <img src={img} alt={`${product.title} - ${i}`} className="aw-pdp-img" />
+                <div key={i} className="tonet-desktop-img-wrapper">
+                  <img src={img} alt={`${product.title} - ${i}`} className="tonet-pdp-img" />
                 </div>
               ))}
             </div>
           </div>
 
-          {/* INFO COLUMN (DESKTOP ONLY) */}
-          <div className="aw-info-column">
-            <div className="aw-info-sticky">
+          {/* INFO COLUMN (Right side buy box ~25% on desktop, sticky) */}
+          <div className="tonet-info-column">
+            <div className="tonet-info-sticky">
               
-              {/* Product flatlay image at the top of the details panel */}
-              <div className="aw-info-flatlay">
-                <img src={images[1] || images[0]} alt={product.title} className="aw-flatlay-img" />
+              {/* Product Title (uppercase, clean sans-serif) */}
+              <h1 className="tonet-product-title">{product.title.toUpperCase()}</h1>
+              
+              {/* Price and Color Swatch row */}
+              <div className="tonet-product-meta-row">
+                <span className="tonet-product-price">{priceFormatted}</span>
+                
+                {/* Color swatch indicator and name */}
+                <div className="tonet-color-selector">
+                  <span className="tonet-color-swatch" style={{ background: colorNameToCSS(selectedColor) }} />
+                  <span className="tonet-color-name">{selectedColor.toUpperCase()}</span>
+                  
+                  {colorOptions.length > 1 && (
+                    <div className="tonet-color-options-inline">
+                      {colorOptions.map((co) => {
+                        const isSelected = selectedColor === co.value;
+                        return (
+                          <button
+                            key={co.value}
+                            type="button"
+                            className={`tonet-color-dot-opt ${isSelected ? 'active' : ''}`}
+                            onClick={() => handleColorChange(co.value)}
+                            aria-label={`Select color ${co.value}`}
+                            style={{ background: colorNameToCSS(co.value) }}
+                          />
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
 
-              <h1 className="aw-product-title">{product.title.toLowerCase()}</h1>
-              
-              <div className="aw-product-price">
-                <span>{priceFormatted}</span>
+              {/* SELECT SIZE Button */}
+              <div className="tonet-size-selector-wrap">
+                <button 
+                  type="button"
+                  className="tonet-select-size-btn"
+                  onClick={() => setSizeDropdownOpen(true)}
+                >
+                  <span>{selectedSize ? `SIZE: ${selectedSize.toUpperCase()}` : 'SELECT SIZE'} ▾</span>
+                </button>
               </div>
 
-              {/* Colors Selection - Desktop */}
-              {colorOptions.length > 1 && (
-                <div className="aw-color-section">
-                  <span className="aw-color-label">colors</span>
-                  <div className="aw-color-grid">
-                    {colorOptions.map((co) => {
-                      const isSelected = selectedColor === co.value;
-                      return (
-                        <button
-                          key={co.value}
-                          type="button"
-                          className={`aw-color-option ${isSelected ? 'active' : ''}`}
-                          onClick={() => handleColorChange(co.value)}
-                          aria-label={`Select color ${co.value}`}
-                        >
-                          <span className="aw-color-swatch" style={{ background: colorNameToCSS(co.value) }} />
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Size selector trigger */}
-              {hasSizes && (
-                <div className="aw-size-selector-container">
-                  <button 
-                    type="button"
-                    className="aw-size-selector-trigger"
-                    onClick={() => setSizeDropdownOpen(true)}
-                  >
-                    <span>{selectedSize ? `talla: ${selectedSize.toLowerCase()} v` : 'Seleccionar Talla v'}</span>
-                  </button>
-                </div>
-              )}
-
-              {/* Add to Cart button */}
-              <button 
-                className="aw-add-to-cart-btn"
-                onClick={handleAddToBag}
-                disabled={adding || (!needsSizeSelection && !selectedVariant.availableForSale)}
-              >
-                {adding ? 'Añadiendo...' : 'Añadir A La Cesta'}
-              </button>
-
-              {/* Wishlist triggers */}
-              <button
-                type="button"
-                className={`aw-wishlist-action ${inWishlist ? 'active' : ''}`}
-                onClick={() => {
-                  toggle(wishlistItem);
-                  if (!inWishlist) setCeremonyOpen(true);
-                }}
-              >
-                {inWishlist ? 'en tu archivo (eliminar)' : 'guardar en el archivo'}
-              </button>
+              {/* Short Description (uppercase, compact) */}
+              <div className="tonet-product-description">
+                <p>{(product.description || "").split('Item Number:')[0]?.trim().toUpperCase()}</p>
+              </div>
 
               {/* Accordions */}
-              <div className="aw-accordions">
-                <div className="aw-accordion-item">
-                  <button className="aw-accordion-header" onClick={() => toggleAccordion('desc')}>
-                    <span>descripción</span>
-                    <span>{expandedAccordion === 'desc' ? '—' : '+'}</span>
+              <div className="tonet-accordions">
+                
+                {/* DESCRIPTION */}
+                <div className="tonet-accordion-item">
+                  <button className="tonet-accordion-header" onClick={() => toggleAccordion('desc')}>
+                    <span>DESCRIPTION</span>
+                    <span className="tonet-accordion-icon">{expandedAccordion === 'desc' ? '—' : '+'}</span>
                   </button>
                   {expandedAccordion === 'desc' && (
-                    <div className="aw-accordion-content">
-                      <p>{product.description?.split('Item Number:')[0]?.trim()}</p>
-                      <ul className="aw-specs-list">
+                    <div className="tonet-accordion-content">
+                      <p>{product.description?.split('Item Number:')[0]?.trim().toUpperCase()}</p>
+                      <ul className="tonet-specs-list">
                         {detailsRows.map((row, i) => (
-                          <li key={i}>— {row.label.toLowerCase()}: {row.value.toLowerCase()}</li>
+                          <li key={i}>— {row.label.toUpperCase()}: {row.value.toUpperCase()}</li>
                         ))}
                       </ul>
                     </div>
                   )}
                 </div>
 
-                <div className="aw-accordion-item">
-                  <button className="aw-accordion-header" onClick={() => toggleAccordion('comp')}>
-                    <span>composición</span>
-                    <span>{expandedAccordion === 'comp' ? '—' : '+'}</span>
+                {/* SIZE AND FIT */}
+                <div className="tonet-accordion-item">
+                  <button className="tonet-accordion-header" onClick={() => toggleAccordion('fit')}>
+                    <span>SIZE & FIT</span>
+                    <span className="tonet-accordion-icon">{expandedAccordion === 'fit' ? '—' : '+'}</span>
                   </button>
-                  {expandedAccordion === 'comp' && (
-                    <div className="aw-accordion-content">
-                      <p>{metadata['Fabric'] ? metadata['Fabric'].toLowerCase() : '54 % lana, 25 % poliamida, 20 % algodón y 1 % elastano'}</p>
+                  {expandedAccordion === 'fit' && (
+                    <div className="tonet-accordion-content">
+                      <p>FITS TRUE TO SIZE. WE RECOMMEND TAKING YOUR NORMAL SIZE. FITS VARY DEPENDING ON CONSTRUCTION AND MATERIAL.</p>
+                      <button type="button" className="tonet-size-guide-link" onClick={() => setSizeGuideOpen(true)}>
+                        VIEW SIZE GUIDE
+                      </button>
                     </div>
                   )}
                 </div>
 
-                <div className="aw-accordion-item">
-                  <button className="aw-accordion-header" onClick={() => toggleAccordion('care')}>
-                    <span>manténlo en buen estado</span>
-                    <span>{expandedAccordion === 'care' ? '—' : '+'}</span>
+                {/* CARE AND MAINTENANCE */}
+                <div className="tonet-accordion-item">
+                  <button className="tonet-accordion-header" onClick={() => toggleAccordion('care')}>
+                    <span>CARE & MAINTENANCE</span>
+                    <span className="tonet-accordion-icon">{expandedAccordion === 'care' ? '—' : '+'}</span>
                   </button>
                   {expandedAccordion === 'care' && (
-                    <div className="aw-accordion-content">
-                      <p>{metadata['Care Instructions'] ? metadata['Care Instructions'].toLowerCase() : 'limpieza en seco únicamente. planchar a baja temperatura.'}</p>
+                    <div className="tonet-accordion-content">
+                      <p>{metadata['Care Instructions'] ? metadata['Care Instructions'].toUpperCase() : 'DRY CLEAN ONLY. HANDLE WITH CARE.'}</p>
                     </div>
                   )}
                 </div>
 
-                <div className="aw-accordion-item">
-                  <button className="aw-accordion-header" onClick={() => toggleAccordion('support')}>
-                    <span>atención al cliente</span>
-                    <span>{expandedAccordion === 'support' ? '—' : '+'}</span>
-                  </button>
-                  {expandedAccordion === 'support' && (
-                    <div className="aw-accordion-content">
-                      <p>contáctanos a contact@tonertorrentinni.com. estamos a tu disposición para ayudarte con cualquier consulta sobre tallas, envíos o devoluciones.</p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="aw-accordion-item">
-                  <button className="aw-accordion-header" onClick={() => toggleAccordion('shipping')}>
-                    <span>devoluciones y envíos</span>
-                    <span>{expandedAccordion === 'shipping' ? '—' : '+'}</span>
+                {/* SHIPPING / RETURNS */}
+                <div className="tonet-accordion-item">
+                  <button className="tonet-accordion-header" onClick={() => toggleAccordion('shipping')}>
+                    <span>SHIPPING / RETURNS</span>
+                    <span className="tonet-accordion-icon">{expandedAccordion === 'shipping' ? '—' : '+'}</span>
                   </button>
                   {expandedAccordion === 'shipping' && (
-                    <div className="aw-accordion-content">
-                      <p>envío estándar gratuito en todos los pedidos. entrega estimada en 2-4 días hábiles. devoluciones gratuitas en un plazo de 14 días.</p>
+                    <div className="tonet-accordion-content">
+                      <p>COMPLIMENTARY STANDARD SHIPPING ON ALL ORDERS. DELIVERY TIME TAKES BETWEEN 2 TO 4 BUSINESS DAYS. EASY RETURN WITHIN 14 DAYS FROM RECEIPT OF SHIPMENT.</p>
                     </div>
                   )}
                 </div>
@@ -555,84 +553,82 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             </div>
           </div>
 
-          {/* MOBILE ONLY: Accordions below the image gallery */}
-          <div className="aw-accordions-mobile mobile-only">
-            <div className="aw-accordion-item">
-              <button className="aw-accordion-header" onClick={() => toggleAccordion('desc')}>
-                <span>descripción</span>
-                <span>{expandedAccordion === 'desc' ? '—' : '+'}</span>
-              </button>
-              {expandedAccordion === 'desc' && (
-                <div className="aw-accordion-content">
-                  <p>{product.description?.split('Item Number:')[0]?.trim()}</p>
-                  <ul className="aw-specs-list">
-                    {detailsRows.map((row, i) => (
-                      <li key={i}>— {row.label.toLowerCase()}: {row.value.toLowerCase()}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-
-            <div className="aw-accordion-item">
-              <button className="aw-accordion-header" onClick={() => toggleAccordion('comp')}>
-                <span>composición</span>
-                <span>{expandedAccordion === 'comp' ? '—' : '+'}</span>
-              </button>
-              {expandedAccordion === 'comp' && (
-                <div className="aw-accordion-content">
-                  <p>{metadata['Fabric'] ? metadata['Fabric'].toLowerCase() : '54 % lana, 25 % poliamida, 20 % algodón y 1 % elastano'}</p>
-                </div>
-              )}
-            </div>
-
-            <div className="aw-accordion-item">
-              <button className="aw-accordion-header" onClick={() => toggleAccordion('care')}>
-                <span>manténlo en buen estado</span>
-                <span>{expandedAccordion === 'care' ? '—' : '+'}</span>
-              </button>
-              {expandedAccordion === 'care' && (
-                <div className="aw-accordion-content">
-                  <p>{metadata['Care Instructions'] ? metadata['Care Instructions'].toLowerCase() : 'limpieza en seco únicamente. planchar a baja temperatura.'}</p>
-                </div>
-              )}
-            </div>
-
-            <div className="aw-accordion-item">
-              <button className="aw-accordion-header" onClick={() => toggleAccordion('support')}>
-                <span>atención al cliente</span>
-                <span>{expandedAccordion === 'support' ? '—' : '+'}</span>
-              </button>
-              {expandedAccordion === 'support' && (
-                <div className="aw-accordion-content">
-                  <p>contáctanos a contact@tonertorrentinni.com. estamos a tu disposición para ayudarte con cualquier consulta sobre tallas, envíos o devoluciones.</p>
-                </div>
-              )}
-            </div>
-
-            <div className="aw-accordion-item">
-              <button className="aw-accordion-header" onClick={() => toggleAccordion('shipping')}>
-                <span>devoluciones y envíos</span>
-                <span>{expandedAccordion === 'shipping' ? '—' : '+'}</span>
-              </button>
-              {expandedAccordion === 'shipping' && (
-                <div className="aw-accordion-content">
-                  <p>envío estándar gratuito en todos los pedidos. entrega estimada en 2-4 días hábiles. devoluciones gratuitas en un plazo de 14 días.</p>
-                </div>
-              )}
-            </div>
-          </div>
-
         </div>
 
-        {/* RELATED & RECOMMENDED WITHIN THE HOUSE */}
+        {/* COMPLETE THE LOOK SECTION */}
+        {completeOutfit.length > 0 && (
+          <section className="amiri-ctl-section">
+            <div className="amiri-ctl-header">
+              <span className="amiri-ctl-logo">TONET</span>
+              <h2 className="amiri-ctl-title">COMPLETE THE LOOK</h2>
+            </div>
+            
+            <div className="amiri-ctl-carousel-wrapper">
+              <div 
+                className="amiri-ctl-carousel" 
+                ref={ctlCarouselRef}
+                onScroll={handleCtlScroll}
+              >
+                {completeOutfit.map((p) => {
+                  const pType = getProductType(p);
+                  const symbol = p.currencyCode === 'USD' ? '$' : '€';
+                  const formattedPrice = Number.isInteger(p.price)
+                    ? `${symbol}${p.price} ${p.currencyCode}`
+                    : `${symbol}${p.price.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${p.currencyCode}`;
+                  
+                  return (
+                    <div className="amiri-ctl-item" key={p.handle}>
+                      <Link href={`/product/${p.handle}`} className="amiri-ctl-card">
+                        <div className="amiri-ctl-image-panel">
+                          {p.imageUrl && (
+                            <img 
+                              src={p.imageUrl} 
+                              alt={p.title} 
+                              className={`amiri-ctl-image amiri-ctl-image--${pType}`}
+                            />
+                          )}
+                        </div>
+                        <div className="amiri-ctl-meta">
+                          <span className="amiri-ctl-name">{p.title.toUpperCase()}</span>
+                          <span className="amiri-ctl-price">{formattedPrice}</span>
+                        </div>
+                      </Link>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Discreet pill indicator */}
+              {completeOutfit.length > 1 && (
+                <div className="amiri-ctl-indicator-track">
+                  <div 
+                    className="amiri-ctl-indicator-pill" 
+                    style={{
+                      width: `${100 / completeOutfit.length}%`,
+                      transform: `translateX(${ctlScrollProgress * (completeOutfit.length - 1) * 100}%)`
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* Floating circular monogram badge at bottom right of the visible panels track */}
+              <div className="amiri-ctl-monogram-badge" onClick={() => router.push('/contact')} aria-label="Tonet Concierge">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 6h16M12 6v14" />
+                </svg>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* RELATED CAROUSEL (YOU MIGHT ALSO LIKE) */}
         {recommended.length > 0 && (
-          <section className="aw-house-carousel">
-            <h2 className="aw-carousel-header">te puede interesar</h2>
-            <div className="aw-carousel-wrap">
-              <div className="aw-carousel-track">
+          <section className="tonet-related-carousel">
+            <h2 className="tonet-carousel-title">YOU MIGHT ALSO LIKE</h2>
+            <div className="tonet-carousel-wrap">
+              <div className="tonet-carousel-track">
                 {recommended.slice(0, 8).map((p) => (
-                  <div className="aw-carousel-item" key={p.handle}>
+                  <div className="tonet-carousel-item" key={p.handle}>
                     <RecommendedCard product={p} />
                   </div>
                 ))}
@@ -642,21 +638,29 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         )}
       </div>
 
-      {/* ══ SIZE SELECTOR OVERLAY MODAL / DRAWER ══ */}
+      {/* FLOATING TONET CONCIERGE CHAT BADGE */}
+      <div className="tonet-concierge-badge" onClick={() => router.push('/contact')} aria-label="Tonet Concierge">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+          {/* Elegant T monogram */}
+          <path d="M4 6h16M12 6v14" />
+        </svg>
+      </div>
+
+      {/* ══ SIZE SELECTOR OVERLAY MODAL ══ */}
       {sizeDropdownOpen && (
-        <div className="aw-size-selector-overlay" onClick={() => setSizeDropdownOpen(false)}>
-          <div className="aw-size-selector-modal" onClick={e => e.stopPropagation()}>
-            <div className="aw-size-modal-header">
-              <div className="aw-size-header-left">
-                <button type="button" className="aw-size-close-btn" onClick={() => setSizeDropdownOpen(false)}>ⓧ</button>
-                <button type="button" className="aw-size-guide-btn" onClick={() => { setSizeDropdownOpen(false); setSizeGuideOpen(true); }}>guia de tallas</button>
+        <div className="tonet-size-selector-overlay" onClick={() => setSizeDropdownOpen(false)}>
+          <div className="tonet-size-selector-modal" onClick={e => e.stopPropagation()}>
+            <div className="tonet-size-modal-header">
+              <div className="tonet-size-header-left">
+                <button type="button" className="tonet-size-close-btn" onClick={() => setSizeDropdownOpen(false)}>✕</button>
+                <button type="button" className="tonet-size-guide-btn" onClick={() => { setSizeDropdownOpen(false); setSizeGuideOpen(true); }}>SIZE GUIDE</button>
               </div>
             </div>
             
-            <div className="aw-size-modal-body">
-              <span className="aw-size-modal-title">seleccionar talla</span>
+            <div className="tonet-size-modal-body">
+              <span className="tonet-size-modal-title">SELECT SIZE</span>
               
-              <div className="aw-size-modal-grid">
+              <div className="tonet-size-modal-grid">
                 {sizeOptions.map(size => {
                   const isAvailable = isSizeAvailable(size);
                   const isSelected = selectedSize === size;
@@ -664,7 +668,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                     <button
                       key={size}
                       type="button"
-                      className={`aw-size-box-btn ${!isAvailable ? 'sold-out' : ''} ${isSelected ? 'selected' : ''}`}
+                      className={`tonet-size-box-btn ${!isAvailable ? 'sold-out' : ''} ${isSelected ? 'selected' : ''}`}
                       onClick={() => {
                         if (isAvailable) {
                           handleSizeSelectInDrawer(size);
@@ -680,13 +684,13 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
               </div>
               
               {selectedSize && isSizeAvailable(selectedSize) && (
-                <div className="aw-stock-warning">stock bajo</div>
+                <div className="tonet-stock-warning">LOW STOCK</div>
               )}
             </div>
 
             <button 
               type="button"
-              className="aw-size-modal-cta"
+              className="tonet-size-modal-cta"
               onClick={() => {
                 if (selectedSize) {
                   handleAddToBag();
@@ -695,7 +699,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
               }}
               disabled={adding || !selectedSize}
             >
-              {adding ? 'Añadiendo...' : 'Añadir A La Cesta'}
+              {adding ? 'ADDING...' : 'ADD TO BAG'}
             </button>
           </div>
         </div>
@@ -703,52 +707,52 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
       {/* ══ AVAILABILITY REQUEST MODAL ══ */}
       {availModal && (
-        <div className="arm-overlay" onClick={() => setAvailModal(false)}>
-          <div className="arm-modal" onClick={e => e.stopPropagation()}>
-            <div className="arm-header">
-              <span className="arm-title">avisar disponibilidad</span>
-              <button className="arm-close" onClick={() => setAvailModal(false)} aria-label="Close">
+        <div className="tonet-modal-overlay" onClick={() => setAvailModal(false)}>
+          <div className="tonet-modal" onClick={e => e.stopPropagation()}>
+            <div className="tonet-modal-header">
+              <span className="tonet-modal-title">NOTIFY AVAILABILITY</span>
+              <button className="tonet-modal-close" onClick={() => setAvailModal(false)} aria-label="Close">
                 ✕
               </button>
             </div>
 
             {availSubmitted ? (
-              <div className="arm-success">
-                <span className="arm-success-title">solicitud registrada.</span>
-                <p className="arm-success-sub">te contactaremos si vuelve a haber stock.</p>
+              <div className="tonet-modal-success">
+                <span className="tonet-modal-success-title">REQUEST REGISTERED.</span>
+                <p className="tonet-modal-success-sub">WE WILL NOTIFY YOU IF STOCK BECOMES AVAILABLE.</p>
               </div>
             ) : (
-              <form className="arm-body" onSubmit={handleAvailSubmit}>
-                <p className="arm-desc">
-                  deja tu email para recibir un aviso en cuanto esta talla esté disponible.
+              <form className="tonet-modal-body" onSubmit={handleAvailSubmit}>
+                <p className="tonet-modal-desc">
+                  LEAVE YOUR EMAIL ADDRESS TO RECEIVE AN ALERT AS SOON AS THIS SIZE BECOMES AVAILABLE.
                 </p>
 
-                <div className="arm-field">
-                  <label className="arm-field-label">talla seleccionada</label>
-                  <div className="arm-sizes-list">
-                    {availSizes.map(s => <span key={s} className="arm-size-tag">{s.toLowerCase()}</span>)}
+                <div className="tonet-modal-field">
+                  <label className="tonet-modal-field-label">SELECTED SIZE</label>
+                  <div className="tonet-modal-sizes-list">
+                    {availSizes.map(s => <span key={s} className="tonet-modal-size-tag">{s.toUpperCase()}</span>)}
                   </div>
                 </div>
 
-                <div className="arm-field">
-                  <label className="arm-field-label" htmlFor="arm-email">correo electrónico</label>
+                <div className="tonet-modal-field">
+                  <label className="tonet-modal-field-label" htmlFor="tonet-email">EMAIL ADDRESS</label>
                   <input
-                    id="arm-email"
-                    className="arm-input"
+                    id="tonet-email"
+                    className="tonet-modal-input"
                     type="email"
                     required
-                    placeholder="tu@email.com"
+                    placeholder="EMAIL@DOMAIN.COM"
                     value={availEmail}
                     onChange={e => setAvailEmail(e.target.value)}
                   />
                 </div>
 
                 <button
-                  className="arm-cta"
+                  className="tonet-modal-cta"
                   type="submit"
                   disabled={availSubmitting || !availEmail}
                 >
-                  {availSubmitting ? 'registrando…' : 'avisar disponibilidad'}
+                  {availSubmitting ? 'SENDING…' : 'NOTIFY ME'}
                 </button>
               </form>
             )}
@@ -758,31 +762,31 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
       {/* ══ SIZE GUIDE MODAL ══ */}
       {sizeGuideOpen && (
-        <div className="arm-overlay" onClick={() => setSizeGuideOpen(false)}>
-          <div className="arm-modal" onClick={e => e.stopPropagation()}>
-            <div className="arm-header">
-              <span className="arm-title">guía de tallas</span>
-              <button className="arm-close" onClick={() => setSizeGuideOpen(false)} aria-label="Close">
+        <div className="tonet-modal-overlay" onClick={() => setSizeGuideOpen(false)}>
+          <div className="tonet-modal" onClick={e => e.stopPropagation()}>
+            <div className="tonet-modal-header">
+              <span className="tonet-modal-title">SIZE GUIDE</span>
+              <button className="tonet-modal-close" onClick={() => setSizeGuideOpen(false)} aria-label="Close">
                 ✕
               </button>
             </div>
 
-            <div className="arm-body">
-              <p className="arm-desc" style={{ marginBottom: '16px' }}>
-                las medidas son aproximadas y se toman en plano.
+            <div className="tonet-modal-body">
+              <p className="tonet-modal-desc" style={{ marginBottom: '16px' }}>
+                MEASUREMENTS ARE APPROXIMATE AND TAKEN FLAT.
               </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '11px', letterSpacing: '0.05em' }}>
                 {([
-                  { size: 'XS', chest: '54 cm', length: '66 cm' },
-                  { size: 'S',  chest: '56 cm', length: '68 cm' },
-                  { size: 'M',  chest: '58 cm', length: '70 cm' },
-                  { size: 'L',  chest: '60 cm', length: '72 cm' },
-                  { size: 'XL', chest: '62 cm', length: '74 cm' },
+                  { size: 'XS', chest: '54 CM', length: '66 CM' },
+                  { size: 'S',  chest: '56 CM', length: '68 CM' },
+                  { size: 'M',  chest: '58 CM', length: '70 CM' },
+                  { size: 'L',  chest: '60 CM', length: '72 CM' },
+                  { size: 'XL', chest: '62 CM', length: '74 CM' },
                 ] as const).map((row) => (
-                  <div key={row.size} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eaeaea', paddingBottom: '6px' }}>
+                  <div key={row.size} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f2f2f2', paddingBottom: '6px' }}>
                     <span style={{ fontWeight: 400 }}>{row.size}</span>
-                    <span>pecho {row.chest}</span>
-                    <span>largo {row.length}</span>
+                    <span>CHEST {row.chest}</span>
+                    <span>LENGTH {row.length}</span>
                   </div>
                 ))}
               </div>
@@ -793,60 +797,60 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
       {/* ══ CINEMATIC ARCHIVAL CEREMONY MODAL ══ */}
       {ceremonyOpen && (
-        <div className="ac-overlay" onClick={() => setCeremonyOpen(false)}>
-          <div className="ac-modal" onClick={e => e.stopPropagation()}>
-            <button className="ac-close" onClick={() => setCeremonyOpen(false)} aria-label="Close">
+        <div className="tonet-ceremony-overlay" onClick={() => setCeremonyOpen(false)}>
+          <div className="tonet-ceremony-modal" onClick={e => e.stopPropagation()}>
+            <button className="tonet-ceremony-close" onClick={() => setCeremonyOpen(false)} aria-label="Close">
               ✕
             </button>
 
-            <div className="ac-header">
-              <span className="ac-supra">registro de archivo</span>
-              <h2 className="ac-title">prenda guardada en el archivo</h2>
-              <p className="ac-desc">
-                esta pieza ha sido registrada de forma temporal en tu archivo personal.
+            <div className="tonet-ceremony-header">
+              <span className="tonet-ceremony-supra">ARCHIVE REGISTRY</span>
+              <h2 className="tonet-ceremony-title">GARMENT ARCHIVED</h2>
+              <p className="tonet-ceremony-desc">
+                THIS PIECE HAS BEEN TEMPORARILY RECORDED IN YOUR DIGITAL ARCHIVE.
               </p>
             </div>
 
-            <div className="ac-split">
-              <div className="ac-image-panel">
+            <div className="tonet-ceremony-split">
+              <div className="tonet-ceremony-image">
                 {product.imageUrl && (
                   <img src={product.imageUrl} alt={product.title} className="ac-tonet-img" />
                 )}
               </div>
 
-              <div className="ac-details-panel">
-                <div className="ac-tech-grid">
-                  <div className="ac-tech-item">
-                    <span className="ac-tech-label">nombre</span>
-                    <span className="ac-tech-value">{product.title.toLowerCase()}</span>
+              <div className="tonet-ceremony-details">
+                <div className="tonet-ceremony-grid">
+                  <div className="tonet-ceremony-item">
+                    <span className="tonet-ceremony-label">NAME</span>
+                    <span className="tonet-ceremony-value">{product.title.toUpperCase()}</span>
                   </div>
 
-                  <div className="ac-tech-item">
-                    <span className="ac-tech-label">colección</span>
-                    <span className="ac-tech-value">{getHouseState(product.handle).toLowerCase()}</span>
+                  <div className="tonet-ceremony-item">
+                    <span className="tonet-ceremony-label">COLLECTION</span>
+                    <span className="tonet-ceremony-value">{getHouseState(product.handle).toUpperCase()}</span>
                   </div>
 
-                  <div className="ac-tech-item">
-                    <span className="ac-tech-label">referencia</span>
-                    <span className="ac-tech-value">{getArchiveRef(product.handle).toLowerCase()}</span>
+                  <div className="tonet-ceremony-item">
+                    <span className="tonet-ceremony-label">REF</span>
+                    <span className="tonet-ceremony-value">{getArchiveRef(product.handle).toUpperCase()}</span>
                   </div>
 
-                  <div className="ac-tech-item">
-                    <span className="ac-tech-label">estado</span>
-                    <span className="ac-tech-value">
-                      {selectedVariant.availableForSale ? 'disponible' : 'archivado temporalmente'}
+                  <div className="tonet-ceremony-item">
+                    <span className="tonet-ceremony-label">STATUS</span>
+                    <span className="tonet-ceremony-value">
+                      {selectedVariant.availableForSale ? 'AVAILABLE' : 'TEMPORARILY ARCHIVED'}
                     </span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="ac-actions">
-              <Link href="/archive" className="ac-btn-primary">
-                ver archivo
+            <div className="tonet-ceremony-actions">
+              <Link href="/archive" className="tonet-ceremony-btn-primary">
+                VIEW ARCHIVE
               </Link>
-              <button className="ac-btn-secondary" onClick={() => setCeremonyOpen(false)}>
-                volver a la tienda
+              <button className="tonet-ceremony-btn-secondary" onClick={() => setCeremonyOpen(false)}>
+                RETURN TO STORE
               </button>
             </div>
           </div>
@@ -855,20 +859,38 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
       <style>{`
         /* ══════════════════════════════════════
-           ALEXANDER WANG PDP STYLES
+           TONET PDP HIGH-FIDELITY STYLES
         ══════════════════════════════════════ */
 
-        .aw-pdp-page {
+        .tonet-pdp-page {
           background-color: #ffffff;
           color: #000000;
           min-height: 100vh;
           font-family: var(--font-primary), sans-serif;
           font-variant-numeric: lining-nums tabular-nums;
-          padding-top: 56px;
-          text-transform: lowercase;
+          padding-top: 100px;
+          position: relative;
         }
 
-        .aw-pdp-layout {
+        /* Small collection label top-left */
+        .tonet-pdp-season {
+          position: absolute;
+          top: 72px;
+          left: 40px;
+          font-size: 10px;
+          font-weight: 400;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          color: #000000;
+          z-index: 10;
+        }
+        @media (min-width: 1024px) {
+          .tonet-pdp-season {
+            left: 64px;
+          }
+        }
+
+        .tonet-pdp-layout {
           display: grid;
           grid-template-columns: 1fr;
           gap: 0;
@@ -876,259 +898,284 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
 
         @media (min-width: 1024px) {
-          .aw-pdp-layout {
+          .tonet-pdp-layout {
             grid-template-columns: 50% 50%;
+            column-gap: 0;
+            padding: 0 64px;
+            max-width: 1440px;
+            margin: 0 auto;
+            box-sizing: border-box;
           }
         }
 
-        /* ── GALLERY COLUMN ── */
-        .aw-gallery-column {
+        /* ── GALLERY COLUMN (Left side ~50% width) ── */
+        .tonet-gallery-column {
           width: 100%;
         }
 
         /* Mobile Swipe Gallery */
-        .aw-mobile-gallery {
+        .tonet-mobile-gallery {
           display: block;
           width: 100%;
           overflow: hidden;
         }
-        .aw-mobile-carousel {
+        .tonet-mobile-carousel {
           display: flex;
           overflow-x: auto;
           scroll-snap-type: x mandatory;
           scrollbar-width: none;
           -ms-overflow-style: none;
         }
-        .aw-mobile-carousel::-webkit-scrollbar {
+        .tonet-mobile-carousel::-webkit-scrollbar {
           display: none;
         }
-        .aw-mobile-slide {
+        .tonet-mobile-slide {
           flex: 0 0 100%;
           width: 100%;
           scroll-snap-align: start;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: #f6f6f6;
+          padding: 24px 20px;
+          box-sizing: border-box;
+          aspect-ratio: 3 / 4;
         }
-        .aw-mobile-slide img {
+        .tonet-mobile-slide img {
           width: 100%;
+          max-width: 380px;
           height: auto;
           display: block;
-          object-fit: cover;
+          object-fit: contain;
+          mix-blend-mode: multiply;
         }
 
-        /* Desktop Stacked Gallery */
-        .aw-desktop-gallery {
+        .tonet-mobile-dots {
+          display: flex;
+          justify-content: center;
+          gap: 8px;
+          margin-top: 8px;
+          margin-bottom: 24px;
+        }
+        .tonet-mobile-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background-color: #e0e0e0;
+          transition: background-color 0.3s;
+        }
+        .tonet-mobile-dot.active {
+          background-color: #000000;
+        }
+
+        /* Desktop Stacked Gallery (with extreme whitespace, no controls) */
+        .tonet-desktop-gallery {
           display: none;
           flex-direction: column;
-          gap: 0;
+          gap: 40px;
+          padding-bottom: 120px;
         }
         @media (min-width: 1024px) {
-          .aw-mobile-gallery { display: none; }
-          .aw-desktop-gallery { display: flex; }
+          .tonet-mobile-gallery { display: none; }
+          .tonet-desktop-gallery { display: flex; }
         }
-        .aw-desktop-img-wrapper {
+        .tonet-desktop-img-wrapper {
           width: 100%;
+          background: #f6f6f6;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          aspect-ratio: 3 / 4;
         }
-        .aw-desktop-img-wrapper img {
+        .tonet-desktop-img-wrapper img {
           width: 100%;
-          height: auto;
-          display: block;
+          height: 100%;
+          object-fit: contain;
+          mix-blend-mode: multiply;
         }
 
-        /* ── INFO COLUMN (DESKTOP) ── */
-        .aw-info-column {
-          display: none;
-          padding: 60px 48px;
+        /* ── INFO COLUMN (Right side buy box ~27%) ── */
+        .tonet-info-column {
+          display: block;
+          padding: 24px 20px 80px;
+          box-sizing: border-box;
+          width: 100%;
         }
         @media (min-width: 1024px) {
-          .aw-info-column {
-            display: block;
+          .tonet-info-column {
+            padding: 40px 0 120px 64px;
           }
         }
-        .aw-info-sticky {
-          position: sticky;
-          top: 112px;
+        .tonet-info-sticky {
+          position: relative;
           display: flex;
           flex-direction: column;
           align-items: center;
           text-align: center;
           width: 100%;
-          max-width: 420px;
-          margin: 0 auto;
         }
-
-        /* Flatlay Image in detail panel */
-        .aw-info-flatlay {
-          width: 100%;
-          max-width: 320px;
-          aspect-ratio: 3 / 4;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-          margin-bottom: 24px;
-        }
-        .aw-flatlay-img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
+        @media (min-width: 1024px) {
+          .tonet-info-sticky {
+            position: sticky;
+            top: 130px;
+            align-items: flex-start;
+            text-align: left;
+            max-width: 460px;
+          }
         }
 
         /* Title */
-        .aw-product-title {
+        .tonet-product-title {
           font-family: var(--font-primary), sans-serif;
-          font-size: 14px;
-          font-weight: 300;
-          letter-spacing: 0.08em;
+          font-size: 16px;
+          font-weight: 400;
+          letter-spacing: 0.1em;
           line-height: 1.4;
-          margin: 0 0 8px;
-          text-transform: lowercase;
+          margin: 0 0 12px;
+          text-transform: uppercase;
           color: #000000;
         }
+        @media (min-width: 1024px) {
+          .tonet-product-title {
+            font-size: 18px;
+            margin-bottom: 16px;
+          }
+        }
 
-        /* Price */
-        .aw-product-price {
-          font-size: 13px;
-          font-weight: 300;
-          letter-spacing: 0.05em;
-          margin-bottom: 24px;
+        /* Meta Row (price + color inline) */
+        .tonet-product-meta-row {
           display: flex;
-          gap: 12px;
+          align-items: center;
           justify-content: center;
-        }
-        .aw-price-original {
-          text-decoration: line-through;
-          color: #888888;
-        }
-        .aw-price-sale {
+          gap: 16px;
+          margin-bottom: 24px;
+          width: 100%;
+          font-size: 11px;
+          letter-spacing: 0.08em;
           color: #000000;
         }
-
-        /* Colors selection styling */
-        .aw-color-section {
-          margin-bottom: 24px;
+        @media (min-width: 1024px) {
+          .tonet-product-meta-row {
+            justify-content: flex-start;
+            margin-bottom: 32px;
+          }
+        }
+        .tonet-product-price {
+          font-weight: 300;
+          text-transform: uppercase;
+        }
+        
+        .tonet-color-selector {
           display: flex;
-          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+        }
+        .tonet-color-swatch {
+          width: 8px;
+          height: 8px;
+          display: block;
+          border: 1px solid rgba(0, 0, 0, 0.15);
+        }
+        .tonet-color-name {
+          font-weight: 400;
+        }
+        .tonet-color-options-inline {
+          display: flex;
           align-items: center;
           gap: 8px;
-          width: 100%;
+          margin-left: 8px;
         }
-        .aw-color-label {
-          font-size: 11px;
-          font-weight: 300;
-          color: #000000;
-          text-transform: lowercase;
-          letter-spacing: 0.05em;
-        }
-        .aw-color-grid {
-          display: flex;
-          justify-content: center;
-          gap: 12px;
-        }
-        .aw-color-option {
-          background: transparent;
-          border: 1px solid #cccccc;
+        .tonet-color-dot-opt {
+          width: 10px;
+          height: 10px;
           border-radius: 50%;
-          width: 24px;
-          height: 24px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          border: 1px solid transparent;
           cursor: pointer;
           padding: 0;
-          transition: all 0.2s ease;
           box-sizing: border-box;
+          transition: border-color 0.2s;
         }
-        .aw-color-option.active {
+        .tonet-color-dot-opt.active {
           border-color: #000000;
         }
-        .aw-color-option:hover {
-          box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
-        }
-        .aw-color-swatch {
-          width: 14px;
-          height: 14px;
-          border-radius: 50%;
-          border: 1px solid rgba(0,0,0,0.05);
-          display: block;
-        }
 
-        /* Size Selector */
-        .aw-size-selector-container {
-          position: relative;
+        /* SELECT SIZE CTA Button */
+        .tonet-size-selector-wrap {
+          margin-bottom: 32px;
           width: 100%;
-          margin-bottom: 16px;
-        }
-        .aw-size-selector-trigger {
-          width: 100%;
-          background: transparent;
-          border: none;
-          outline: none;
-          padding: 12px 0;
-          font-size: 13px;
-          font-weight: 400;
-          letter-spacing: 0.08em;
-          color: #000000;
-          cursor: pointer;
-          transition: opacity 0.3s;
           display: flex;
           justify-content: center;
-          align-items: center;
         }
-        .aw-size-selector-trigger:hover {
-          opacity: 0.7;
+        @media (min-width: 1024px) {
+          .tonet-size-selector-wrap {
+            margin-bottom: 40px;
+            justify-content: flex-start;
+          }
         }
-
-        /* Add to Cart Button */
-        .aw-add-to-cart-btn {
-          width: 100%;
-          background: transparent;
-          color: #000000;
+        .tonet-select-size-btn {
+          background-color: #000000;
+          color: #ffffff;
           border: none;
-          padding: 16px 0;
-          font-size: 14px;
-          font-weight: 700;
-          letter-spacing: 0.05em;
-          cursor: pointer;
-          transition: opacity 0.3s;
-          margin-bottom: 16px;
-          text-align: center;
-        }
-        .aw-add-to-cart-btn:hover {
-          opacity: 0.7;
-        }
-        .aw-add-to-cart-btn:disabled {
-          color: #999999;
-          cursor: not-allowed;
-        }
-
-        /* Wishlist action */
-        .aw-wishlist-action {
-          background: none;
-          border: none;
-          outline: none;
+          padding: 14px 24px;
           font-size: 11px;
-          font-weight: 300;
-          letter-spacing: 0.08em;
-          text-transform: lowercase;
-          color: #666666;
+          font-family: var(--font-primary), sans-serif;
+          font-weight: 400;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
           cursor: pointer;
-          padding: 8px 0;
-          margin-bottom: 40px;
-          transition: color 0.3s;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 80%;
+          min-width: 240px;
+          border-radius: 0;
+          transition: opacity 0.3s;
         }
-        .aw-wishlist-action:hover {
-          color: #000000;
+        @media (min-width: 1024px) {
+          .tonet-select-size-btn {
+            width: 100%;
+            max-width: 100%;
+            min-width: auto;
+          }
+        }
+        .tonet-select-size-btn:hover {
+          opacity: 0.85;
         }
 
-        /* Accordions */
-        .aw-accordions {
-          width: 100%;
-          border-top: 1px solid #eaeaea;
+        /* Description block */
+        .tonet-product-description {
+          font-size: 10px;
+          font-weight: 300;
+          line-height: 1.6;
+          letter-spacing: 0.08em;
+          color: #000000;
+          margin-bottom: 32px;
+          text-transform: uppercase;
+          text-align: center;
+          width: 80%;
         }
-        .aw-accordion-item {
-          border-bottom: 1px solid #eaeaea;
+        @media (min-width: 1024px) {
+          .tonet-product-description {
+            font-size: 10.5px;
+            margin-bottom: 40px;
+            text-align: left;
+            width: 100%;
+          }
+        }
+        .tonet-product-description p {
+          margin: 0;
+        }
+
+        /* Minimal Accordions */
+        .tonet-accordions {
+          width: 100%;
+          border-top: 1px solid rgba(0, 0, 0, 0.04);
+        }
+        .tonet-accordion-item {
+          border-bottom: 1px solid rgba(0, 0, 0, 0.04);
           width: 100%;
         }
-        .aw-accordion-header {
+        .tonet-accordion-header {
           width: 100%;
           background: transparent;
           border: none;
@@ -1137,155 +1184,155 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           justify-content: space-between;
           align-items: center;
           padding: 16px 0;
-          font-size: 12px;
-          font-weight: 300;
-          letter-spacing: 0.08em;
+          font-size: 11px;
+          font-family: var(--font-primary), sans-serif;
+          font-weight: 400;
+          letter-spacing: 0.1em;
           color: #000000;
-          text-transform: lowercase;
+          text-transform: uppercase;
           cursor: pointer;
         }
-        .aw-accordion-content {
-          padding: 0 0 24px;
+        .tonet-accordion-icon {
+          font-size: 11px;
+          font-weight: 300;
+          color: #888888;
+        }
+        .tonet-accordion-content {
+          padding: 0 0 20px;
           text-align: left;
-          font-size: 12px;
+          font-size: 10.5px;
           line-height: 1.6;
           font-weight: 300;
-          letter-spacing: 0.04em;
-          color: #333333;
+          letter-spacing: 0.05em;
+          color: #555555;
+          text-transform: uppercase;
         }
-        .aw-accordion-content p {
-          margin-bottom: 12px;
+        .tonet-accordion-content p {
+          margin: 0 0 10px;
         }
-        .aw-specs-list {
+        .tonet-specs-list {
           list-style: none;
+          padding: 0;
+          margin: 12px 0 0;
           display: flex;
           flex-direction: column;
           gap: 6px;
         }
-
-        /* ── MOBILE ONLY PURCHASE SECTION ── */
-        .aw-purchase-section-mobile {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          text-align: center;
-          padding: 24px 20px;
-          border-bottom: 1px solid #eaeaea;
-        }
-        @media (min-width: 1024px) {
-          .aw-purchase-section-mobile {
-            display: none;
-          }
-        }
-        .aw-purchase-section-mobile .aw-size-selector-container {
-          border-bottom: 1px solid #eaeaea;
-        }
-        .aw-purchase-section-mobile .aw-add-to-cart-btn {
-          margin-bottom: 0;
-        }
-
-        /* Mobile Accordions */
-        .aw-accordions-mobile {
+        .tonet-size-guide-link {
+          background: none;
+          border: none;
+          padding: 0;
+          margin-top: 8px;
+          font-size: 10px;
+          font-weight: 400;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: #000000;
+          text-decoration: underline;
+          text-underline-offset: 3px;
+          cursor: pointer;
           display: block;
-          padding: 0 20px;
-          border-top: 1px solid #eaeaea;
-          margin-bottom: 80px;
-        }
-        @media (min-width: 1024px) {
-          .aw-accordions-mobile {
-            display: none;
-          }
         }
 
         /* ── RELATED CAROUSEL ── */
-        .aw-house-carousel {
-          padding: 80px 20px;
+        .tonet-related-carousel {
+          padding: 60px 20px;
           background-color: #ffffff;
-          border-top: 1px solid #eaeaea;
           text-align: center;
+          border-top: 1px solid rgba(0, 0, 0, 0.04);
         }
-        .aw-carousel-header {
-          font-size: 13px;
-          font-weight: 300;
-          letter-spacing: 0.1em;
-          text-transform: lowercase;
-          margin-bottom: 40px;
+        @media (min-width: 1024px) {
+          .tonet-related-carousel {
+            padding: 100px 64px;
+          }
         }
-        .aw-carousel-wrap {
+        .tonet-carousel-title {
+          font-size: 11px;
+          font-weight: 400;
+          letter-spacing: 0.15em;
+          color: #000000;
+          margin-bottom: 32px;
+          text-transform: uppercase;
+        }
+        .tonet-carousel-wrap {
           width: 100%;
           overflow-x: auto;
           scrollbar-width: none;
         }
-        .aw-carousel-wrap::-webkit-scrollbar {
+        .tonet-carousel-wrap::-webkit-scrollbar {
           display: none;
         }
-        .aw-carousel-track {
+        .tonet-carousel-track {
           display: flex;
           gap: 20px;
           width: max-content;
+          margin: 0 auto;
         }
-        .aw-carousel-item {
+        .tonet-carousel-item {
           width: 220px;
         }
 
-        /* ── SIZE SELECTOR OVERLAY MODAL / DRAWER ── */
-        .aw-size-selector-overlay {
+        /* ── FLOATING CONCIERGE CHAT BADGE ── */
+        .tonet-concierge-badge {
           position: fixed;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0, 0, 0, 0.3);
+          bottom: 24px;
+          right: 24px;
+          width: 44px;
+          height: 44px;
+          background-color: #000000;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          cursor: pointer;
+          z-index: 999;
+          transition: transform 0.2s ease;
+        }
+        .tonet-concierge-badge:hover {
+          transform: scale(1.05);
+        }
+        .tonet-concierge-badge:active {
+          transform: scale(0.95);
+        }
+
+        /* ── SIZE SELECTOR OVERLAY MODAL ── */
+        .tonet-size-selector-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(255, 255, 255, 0.9);
+          backdrop-filter: blur(2px);
+          -webkit-backdrop-filter: blur(2px);
           z-index: 2000;
           display: flex;
-          align-items: flex-end;
+          align-items: center;
           justify-content: center;
         }
-        @media (min-width: 1024px) {
-          .aw-size-selector-overlay {
-            background: transparent;
-            align-items: center;
-            justify-content: center;
-          }
-        }
-        .aw-size-selector-modal {
+        .tonet-size-selector-modal {
           background: #ffffff;
           border: 1px solid #000000;
-          width: 100%;
-          padding: 24px;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+          width: 90%;
+          max-width: 360px;
+          padding: 32px;
+          box-shadow: 0 20px 45px rgba(0,0,0,0.06);
           display: flex;
           flex-direction: column;
-          gap: 16px;
-          text-align: center;
+          gap: 20px;
           box-sizing: border-box;
+          position: relative;
         }
-        @media (max-width: 1023px) {
-          .aw-size-selector-modal {
-            border-bottom: none;
-            border-left: none;
-            border-right: none;
-            border-top: 1px solid #000000;
-            padding-bottom: 40px;
-          }
-        }
-        @media (min-width: 1024px) {
-          .aw-size-selector-modal {
-            position: fixed;
-            bottom: 40px;
-            right: 40px;
-            width: 450px;
-          }
-        }
-        .aw-size-modal-header {
+        .tonet-size-modal-header {
           display: flex;
           justify-content: flex-start;
           align-items: center;
           width: 100%;
         }
-        .aw-size-header-left {
+        .tonet-size-header-left {
           display: flex;
           align-items: center;
-          gap: 4px;
+          gap: 12px;
         }
-        .aw-size-close-btn {
+        .tonet-size-close-btn {
           background: none;
           border: none;
           outline: none;
@@ -1294,45 +1341,49 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           color: #000000;
           padding: 0;
         }
-        .aw-size-guide-btn {
+        .tonet-size-guide-btn {
           background: none;
           border: none;
           outline: none;
           font-size: 11px;
-          font-weight: 300;
-          color: #000000;
+          font-weight: 400;
+          letter-spacing: 0.05em;
+          color: #888888;
           cursor: pointer;
-          text-transform: lowercase;
+          text-transform: uppercase;
           padding: 0;
         }
-        .aw-size-modal-body {
+        .tonet-size-guide-btn:hover {
+          color: #000000;
+        }
+        .tonet-size-modal-body {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 12px;
+          gap: 16px;
           width: 100%;
         }
-        .aw-size-modal-title {
-          font-size: 13px;
-          font-weight: 300;
-          letter-spacing: 0.05em;
-          text-transform: lowercase;
+        .tonet-size-modal-title {
+          font-size: 12px;
+          font-weight: 400;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
           color: #000000;
         }
-        .aw-size-modal-grid {
+        .tonet-size-modal-grid {
           display: flex;
           justify-content: center;
           align-items: center;
-          gap: 20px;
+          gap: 12px;
           flex-wrap: wrap;
           margin: 8px 0;
           width: 100%;
         }
-        .aw-size-box-btn {
+        .tonet-size-box-btn {
           border: 1px solid transparent;
           background: transparent;
           color: #000000;
-          padding: 6px 12px;
+          padding: 8px 16px;
           font-size: 12px;
           font-weight: 400;
           cursor: pointer;
@@ -1340,73 +1391,73 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           letter-spacing: 0.05em;
           box-sizing: border-box;
         }
-        .aw-size-box-btn:hover {
-          border-color: #e0e0e0;
+        .tonet-size-box-btn:hover {
+          border-color: #eaeaea;
         }
-        .aw-size-box-btn.selected {
+        .tonet-size-box-btn.selected {
           border: 1px solid #000000;
-          background: transparent;
-          color: #000000;
         }
-        .aw-size-box-btn.sold-out {
+        .tonet-size-box-btn.sold-out {
           color: #cccccc;
           text-decoration: line-through;
           cursor: not-allowed;
         }
-        .aw-stock-warning {
+        .tonet-stock-warning {
           color: #ff0000;
-          font-size: 11px;
-          font-weight: 400;
-          margin-top: 4px;
-          text-transform: lowercase;
+          font-size: 10px;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
         }
-        .aw-size-modal-cta {
+        .tonet-size-modal-cta {
           width: 100%;
-          background: transparent;
-          color: #000000;
+          background: #000000;
+          color: #ffffff;
           border: none;
           padding: 14px 0;
-          font-size: 14px;
-          font-weight: 700;
-          letter-spacing: 0.05em;
+          font-size: 11px;
+          font-weight: 400;
+          letter-spacing: 0.1em;
           cursor: pointer;
           transition: opacity 0.3s;
           text-align: center;
+          text-transform: uppercase;
         }
-        .aw-size-modal-cta:hover {
-          opacity: 0.7;
+        .tonet-size-modal-cta:hover {
+          opacity: 0.85;
         }
-        .aw-size-modal-cta:disabled {
-          color: #999999;
+        .tonet-size-modal-cta:disabled {
+          background-color: #cccccc;
+          color: #ffffff;
           cursor: not-allowed;
         }
 
         /* ── MODALS ── */
-        .arm-overlay, .ac-overlay {
+        .tonet-modal-overlay, .tonet-ceremony-overlay {
           position: fixed;
-          top: 0; left: 0; right: 0; bottom: 0;
+          inset: 0;
           background: rgba(255, 255, 255, 0.95);
           backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
           display: flex;
           align-items: center;
           justify-content: center;
           z-index: 10000;
         }
-        .arm-modal, .ac-modal {
+        .tonet-modal, .tonet-ceremony-modal {
           background: #ffffff;
           border: 1px solid #000000;
-          width: 100%;
-          max-width: 480px;
+          width: 90%;
+          max-width: 440px;
           padding: 32px;
           position: relative;
           color: #000000;
-          box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+          box-shadow: 0 20px 50px rgba(0,0,0,0.06);
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          gap: 24px;
+          gap: 20px;
         }
-        .arm-close, .ac-close {
+        .tonet-modal-close, .tonet-ceremony-close {
           position: absolute;
           top: 20px;
           right: 20px;
@@ -1415,98 +1466,361 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           color: #000000;
           font-size: 14px;
           cursor: pointer;
+          padding: 0;
         }
-        .arm-title, .ac-title {
-          font-size: 14px;
-          font-weight: 400;
-          letter-spacing: 0.08em;
-          text-transform: lowercase;
-        }
-        .arm-desc, .ac-desc {
+        .tonet-modal-title, .tonet-ceremony-title {
           font-size: 12px;
-          font-weight: 300;
-          line-height: 1.5;
-          color: #666666;
+          font-weight: 400;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
         }
-        .arm-field {
+        .tonet-modal-desc, .tonet-ceremony-desc {
+          font-size: 11px;
+          font-weight: 300;
+          line-height: 1.6;
+          letter-spacing: 0.05em;
+          color: #666666;
+          margin: 0;
+          text-transform: uppercase;
+        }
+        .tonet-modal-field {
           display: flex;
           flex-direction: column;
           gap: 8px;
         }
-        .arm-field-label, .ac-tech-label {
-          font-size: 11px;
-          font-weight: 300;
+        .tonet-modal-field-label, .tonet-ceremony-label {
+          font-size: 10px;
+          font-weight: 400;
+          letter-spacing: 0.05em;
           color: #999999;
-          text-transform: lowercase;
+          text-transform: uppercase;
         }
-        .arm-input {
+        .tonet-modal-input {
           border: none;
           border-bottom: 1px solid #000000;
-          padding: 10px 0;
-          font-size: 13px;
+          padding: 8px 0;
+          font-size: 12px;
           outline: none;
           background: transparent;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
         }
-        .arm-cta, .ac-btn-primary {
+        .tonet-modal-cta, .tonet-ceremony-btn-primary {
           background: #000000;
           color: #ffffff;
           border: 1px solid #000000;
           padding: 14px 0;
-          font-size: 12px;
+          font-size: 11px;
+          font-weight: 400;
+          letter-spacing: 0.1em;
           text-align: center;
-          text-transform: lowercase;
+          text-transform: uppercase;
           cursor: pointer;
           transition: opacity 0.3s;
           display: block;
           width: 100%;
         }
-        .arm-cta:hover, .ac-btn-primary:hover {
-          opacity: 0.8;
+        .tonet-modal-cta:hover, .tonet-ceremony-btn-primary:hover {
+          opacity: 0.85;
         }
 
-        .ac-split {
+        .tonet-ceremony-split {
           display: grid;
-          grid-template-columns: 100px 1fr;
-          gap: 24px;
+          grid-template-columns: 80px 1fr;
+          gap: 20px;
           align-items: center;
         }
-        .ac-image-panel {
+        .tonet-ceremony-image {
           aspect-ratio: 3/4;
-          background: #f5f5f5;
+          background: #ffffff;
           overflow: hidden;
         }
-        .ac-tonet-img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-        .ac-tech-grid {
+        .tonet-ceremony-grid {
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: 8px;
         }
-        .ac-tech-item {
+        .tonet-ceremony-item {
           display: flex;
           justify-content: space-between;
-          font-size: 12px;
+          font-size: 11px;
+          letter-spacing: 0.05em;
         }
-        .ac-tech-value {
+        .tonet-ceremony-value {
           font-weight: 400;
+          color: #000000;
         }
-        .ac-actions {
+        .tonet-ceremony-actions {
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: 10px;
         }
-        .ac-btn-secondary {
+        .tonet-ceremony-btn-secondary {
           background: transparent;
-          border: 1px solid #cccccc;
-          color: #000000;
+          border: 1px solid #eaeaea;
+          color: #666666;
           padding: 14px 0;
-          font-size: 12px;
+          font-size: 11px;
           cursor: pointer;
-          text-transform: lowercase;
+          text-transform: uppercase;
           text-align: center;
+          letter-spacing: 0.1em;
+          transition: color 0.2s, border-color 0.2s;
+        }
+        .tonet-ceremony-btn-secondary:hover {
+          border-color: #000000;
+          color: #000000;
+        }
+
+        /* ── COMPLETE THE LOOK SECTION ── */
+        .amiri-ctl-section {
+          background-color: #ffffff;
+          padding: 80px 0;
+          width: 100%;
+          overflow: hidden;
+          border-top: 1px solid rgba(0, 0, 0, 0.04);
+        }
+        @media (min-width: 1024px) {
+          .amiri-ctl-section {
+            padding: 120px 0;
+          }
+        }
+
+        .amiri-ctl-header {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-bottom: 40px;
+        }
+        @media (min-width: 1024px) {
+          .amiri-ctl-header {
+            margin-bottom: 48px;
+          }
+        }
+
+        .amiri-ctl-logo {
+          font-family: var(--font-serif), Georgia, serif;
+          font-size: 26px;
+          font-weight: 500;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: #000000;
+          margin-bottom: 8px;
+          line-height: 1;
+        }
+        @media (min-width: 1024px) {
+          .amiri-ctl-logo {
+            font-size: 30px;
+            margin-bottom: 12px;
+          }
+        }
+
+        .amiri-ctl-title {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10px;
+          font-weight: 400;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          color: #000000;
+          margin: 0;
+          line-height: 1;
+        }
+        @media (min-width: 1024px) {
+          .amiri-ctl-title {
+            font-size: 11px;
+          }
+        }
+
+        .amiri-ctl-carousel-wrapper {
+          position: relative;
+          width: 100%;
+          padding: 0 40px;
+          box-sizing: border-box;
+        }
+        @media (min-width: 1024px) {
+          .amiri-ctl-carousel-wrapper {
+            padding: 0 64px;
+          }
+        }
+
+        .amiri-ctl-carousel {
+          display: flex;
+          overflow-x: auto;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+          scroll-snap-type: x mandatory;
+          gap: 0;
+          width: 100%;
+        }
+        .amiri-ctl-carousel::-webkit-scrollbar {
+          display: none;
+        }
+
+        .amiri-ctl-item {
+          flex: 0 0 75%;
+          width: 75%;
+          scroll-snap-align: center;
+          border-right: 1px solid rgba(0, 0, 0, 0.04);
+          box-sizing: border-box;
+        }
+        @media (min-width: 1024px) {
+          .amiri-ctl-item {
+            flex: 0 0 22%;
+            width: 22%;
+            min-width: 280px;
+            max-width: 330px;
+            scroll-snap-align: start;
+          }
+        }
+
+        .amiri-ctl-card {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+          text-decoration: none;
+          color: inherit;
+        }
+
+        .amiri-ctl-image-panel {
+          width: 100%;
+          aspect-ratio: 4 / 5;
+          background-color: #f6f6f6;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 24px;
+          box-sizing: border-box;
+        }
+        @media (min-width: 1024px) {
+          .amiri-ctl-image-panel {
+            padding: 32px;
+          }
+        }
+
+        .amiri-ctl-image {
+          display: block;
+          object-fit: contain;
+          mix-blend-mode: multiply;
+          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .amiri-ctl-card:hover .amiri-ctl-image {
+          transform: scale(1.02);
+        }
+
+        /* ── Optical image scaling classes ── */
+        .amiri-ctl-image--top {
+          max-width: 75%;
+          max-height: 60%;
+        }
+        .amiri-ctl-image--pants {
+          max-width: 70%;
+          max-height: 52%;
+        }
+        .amiri-ctl-image--footwear {
+          max-width: 80%;
+          max-height: 48%;
+        }
+        .amiri-ctl-image--accessory {
+          max-width: 60%;
+          max-height: 35%;
+        }
+
+        .amiri-ctl-meta {
+          padding-top: 16px;
+          padding-bottom: 8px;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          text-align: left;
+          padding-left: 8px;
+        }
+        @media (min-width: 1024px) {
+          .amiri-ctl-meta {
+            padding-left: 12px;
+          }
+        }
+
+        .amiri-ctl-name {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10px;
+          font-weight: 400;
+          letter-spacing: 0.08em;
+          color: #000000;
+          text-transform: uppercase;
+          line-height: 1.4;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        @media (min-width: 1024px) {
+          .amiri-ctl-name {
+            font-size: 10.5px;
+          }
+        }
+
+        .amiri-ctl-price {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 9.5px;
+          font-weight: 300;
+          letter-spacing: 0.05em;
+          color: #555555;
+          text-transform: uppercase;
+        }
+        @media (min-width: 1024px) {
+          .amiri-ctl-price {
+            font-size: 10px;
+          }
+        }
+
+        /* ── Discreet scroll pill indicator ── */
+        .amiri-ctl-indicator-track {
+          width: 80px;
+          height: 1.5px;
+          background-color: rgba(0, 0, 0, 0.06);
+          margin: 32px auto 0;
+          position: relative;
+          border-radius: 1px;
+          overflow: hidden;
+        }
+        .amiri-ctl-indicator-pill {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          background-color: rgba(0, 0, 0, 0.4);
+          border-radius: 1px;
+          transition: transform 0.1s ease-out;
+        }
+
+        /* ── Floating Circular Monogram Badge ── */
+        .amiri-ctl-monogram-badge {
+          position: absolute;
+          bottom: 48px;
+          right: 28px;
+          width: 44px;
+          height: 44px;
+          background-color: #000000;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          cursor: pointer;
+          z-index: 10;
+          transition: transform 0.2s ease;
+        }
+        @media (min-width: 1024px) {
+          .amiri-ctl-monogram-badge {
+            right: 52px;
+            bottom: 60px;
+          }
+        }
+        .amiri-ctl-monogram-badge:hover {
+          transform: scale(1.05);
+        }
+        .amiri-ctl-monogram-badge:active {
+          transform: scale(0.95);
         }
       `}</style>
     </>

@@ -167,37 +167,26 @@ export default function MenuDrawer() {
             </button>
           </div>
 
-          {/* Collections */}
+          {/* Categories */}
           <p className="md-nav-eyebrow">Navigate</p>
           <nav className="md-nav">
-            {collections.map(c => (
-              <button
-                key={c.handle}
-                className={`md-nav-item ${activeHandle === c.handle ? 'md-nav-active' : ''}`}
-                onClick={() => { setSearchOpen(false); setActiveHandle(activeHandle === c.handle ? null : c.handle); }}
-              >
-                {c.title}
-              </button>
-            ))}
+            <Link href="/collection/men" className="md-nav-item" onClick={closeMenu}>MEN</Link>
+            <Link href="/collection/women" className="md-nav-item" onClick={closeMenu}>WOMEN</Link>
+            <Link href="/collection" className="md-nav-item" onClick={closeMenu}>COLLECTIONS</Link>
+            <Link href="/collection/runways" className="md-nav-item" onClick={closeMenu}>RUNWAYS</Link>
+            <Link href="/about" className="md-nav-item" onClick={closeMenu}>WORLD OF TONET</Link>
           </nav>
 
-          {/* Archive section */}
-          <p className="md-nav-eyebrow md-archive-eyebrow">Archive</p>
+          {/* Corporate section */}
+          <p className="md-nav-eyebrow md-archive-eyebrow">Company</p>
           <div className="md-archive-links">
-            <Link href="/archive" className="md-archive-link" onClick={closeMenu}>Personal Archive</Link>
-            <Link href="/archive?tab=acquisitions" className="md-archive-link" onClick={closeMenu}>Past Acquisitions</Link>
-            <Link href="/archive?tab=requests" className="md-archive-link" onClick={closeMenu}>Availability Requests</Link>
-            <Link href="/archive?tab=registry" className="md-archive-link" onClick={closeMenu}>Collection Registry</Link>
-          </div>
-
-          {/* Bottom links */}
-          <div className="md-bottom-links">
-            <Link href="/stores" className="md-bottom-link" onClick={closeMenu}>Stores</Link>
-            <Link href="/product/e-gift-card" className="md-bottom-link" onClick={closeMenu}>Gift cards</Link>
+            <Link href="/about" className="md-archive-link" onClick={closeMenu}>About Tonet</Link>
+            <Link href="/contact" className="md-archive-link" onClick={closeMenu}>Customer Service</Link>
+            <Link href="/stores" className="md-archive-link" onClick={closeMenu}>Stores</Link>
           </div>
 
           <div className="md-locale">
-            Spain | English
+            españa / es / eur
           </div>
         </div>
 
@@ -259,12 +248,12 @@ export default function MenuDrawer() {
         .md-backdrop {
           position: fixed;
           inset: 0;
-          background: rgba(0,0,0,0.6);
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
+          background: rgba(0,0,0,0.3);
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
           opacity: 0;
           pointer-events: none;
-          transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
           z-index: 1000;
         }
         .md-backdrop.open { opacity: 1; pointer-events: auto; }
@@ -277,18 +266,18 @@ export default function MenuDrawer() {
           flex-direction: row;
           z-index: 1001;
           transform: translateX(-100%);
-          transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .md-drawer.open { transform: translateX(0); }
 
         /* ══ LEFT COLUMN ══ */
         .md-col-left {
           width: 320px;
-          background: #0c0c0c;
+          background: #ffffff;
           display: flex;
           flex-direction: column;
           overflow-y: auto;
-          border-right: 1px solid rgba(255,255,255,0.04);
+          border-right: 1px solid #eaeaea;
           scrollbar-width: none;
         }
         .md-col-left::-webkit-scrollbar { display: none; }
@@ -297,7 +286,7 @@ export default function MenuDrawer() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 24px 40px;
+          padding: 20px 40px;
         }
         .md-topbar-btn {
           display: flex;
@@ -306,115 +295,115 @@ export default function MenuDrawer() {
           background: none !important;
           border: none !important;
           cursor: pointer;
-          color: rgba(255,255,255,0.35) !important;
+          color: rgba(0, 0, 0, 0.6) !important;
           transform: none !important;
           border-radius: 0 !important;
           padding: 6px !important;
-          transition: color 0.5s !important;
+          transition: opacity 0.3s !important;
         }
-        .md-topbar-btn:hover { color: rgba(255,255,255,0.75) !important; opacity: 1 !important; }
+        .md-topbar-btn:hover { opacity: 0.6 !important; }
         .md-topbar-btn svg { stroke: currentColor; }
 
         /* Nav eyebrow */
         .md-nav-eyebrow {
           font-family: var(--font-primary);
           font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.5em;
+          font-weight: 400;
+          letter-spacing: 0.3em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.13);
-          padding: 40px 40px 14px;
+          color: rgba(0, 0, 0, 0.4);
+          padding: 30px 40px 10px;
           margin: 0;
         }
 
         .md-nav {
           display: flex;
           flex-direction: column;
-          padding: 0 0 48px;
+          padding: 0 0 32px;
           flex: 1;
         }
         .md-nav-item {
           display: block;
           width: 100%;
           text-align: left;
-          padding: 11px 40px;
+          padding: 12px 40px;
           font-family: var(--font-primary);
-          font-size: 10px;
+          font-size: 11px;
           font-weight: 300;
-          color: rgba(255,255,255,0.52);
+          color: rgba(0, 0, 0, 0.75);
           background: none !important;
           border: none !important;
           cursor: pointer;
           text-decoration: none;
           line-height: 1.5;
-          letter-spacing: 0.32em !important;
+          letter-spacing: 0.2em !important;
           text-transform: uppercase;
           border-radius: 0 !important;
           transform: none !important;
-          transition: color 0.5s;
+          transition: color 0.3s;
         }
-        .md-nav-item:hover { color: rgba(255,255,255,0.9) !important; opacity: 1 !important; }
-        .md-nav-active { color: rgba(255,255,255,0.88) !important; font-weight: 300; }
-        .md-nav-item:not(.md-nav-active) { color: rgba(255,255,255,0.52); }
-        .md-expanded .md-nav-item:not(.md-nav-active) { color: rgba(255,255,255,0.18); }
+        .md-nav-item:hover { color: #000000 !important; }
+        .md-nav-active { color: #000000 !important; font-weight: 400; }
+        .md-nav-item:not(.md-nav-active) { color: rgba(0, 0, 0, 0.7); }
+        .md-expanded .md-nav-item:not(.md-nav-active) { color: rgba(0, 0, 0, 0.3); }
 
         .md-archive-eyebrow { padding-top: 16px !important; }
         .md-archive-links {
           display: flex;
           flex-direction: column;
-          padding: 0 0 24px;
+          padding: 0 0 20px;
         }
         .md-archive-link {
           display: block;
-          padding: 9px 40px;
+          padding: 10px 40px;
           font-family: var(--font-primary);
-          font-size: 9px;
+          font-size: 10px;
           font-weight: 300;
-          letter-spacing: 0.32em;
+          letter-spacing: 0.2em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.32);
+          color: rgba(0, 0, 0, 0.5);
           text-decoration: none;
-          transition: color 0.5s;
+          transition: color 0.3s;
         }
-        .md-archive-link:hover { color: rgba(255,255,255,0.7) !important; }
+        .md-archive-link:hover { color: #000000 !important; }
 
         .md-bottom-links {
           display: flex;
           flex-direction: column;
-          padding: 20px 0;
-          border-top: 1px solid rgba(255,255,255,0.04);
+          padding: 16px 0;
+          border-top: 1px solid #eaeaea;
           margin-top: auto;
         }
         .md-bottom-link {
           display: block;
-          padding: 6px 40px;
+          padding: 8px 40px;
+          font-family: var(--font-primary);
+          font-size: 10px;
+          font-weight: 300;
+          letter-spacing: 0.25em;
+          text-transform: uppercase;
+          color: rgba(0, 0, 0, 0.6);
+          text-decoration: none;
+          transition: color 0.3s;
+        }
+        .md-bottom-link:hover { color: #000000 !important; }
+
+        .md-locale {
+          padding: 10px 40px 24px;
           font-family: var(--font-primary);
           font-size: 9px;
           font-weight: 300;
-          letter-spacing: 0.38em;
-          text-transform: uppercase;
-          color: rgba(255,255,255,0.16);
-          text-decoration: none;
-          transition: color 0.5s;
-        }
-        .md-bottom-link:hover { color: rgba(255,255,255,0.5) !important; opacity: 1 !important; }
-
-        .md-locale {
-          padding: 10px 40px 28px;
-          font-family: var(--font-primary);
-          font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.4em;
-          text-transform: uppercase;
-          color: rgba(255,255,255,0.08);
+          letter-spacing: 0.15em;
+          text-transform: lowercase;
+          color: rgba(0, 0, 0, 0.4);
         }
 
         /* ══ RIGHT COLUMN ══ */
         .md-col-right {
           width: 0;
           overflow: hidden;
-          background: #0e0e0e;
-          transition: width 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+          background: #ffffff;
+          transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
           display: flex;
           flex-direction: column;
           overflow-y: auto;
@@ -422,40 +411,38 @@ export default function MenuDrawer() {
         }
         .md-col-right::-webkit-scrollbar { display: none; }
         .md-col-right-open {
-          width: 300px;
-          border-left: 1px solid rgba(255,255,255,0.04);
+          width: 320px;
+          border-left: 1px solid #eaeaea;
         }
 
         /* ══ SEARCH ══ */
-        .md-search-form { padding: 52px 40px 20px; }
+        .md-search-form { padding: 48px 40px 20px; }
         .md-search-input {
           width: 100%;
-          padding: 12px 0;
+          padding: 10px 0;
           font-family: var(--font-primary);
-          font-size: 12px;
+          font-size: 13px;
           font-weight: 300;
-          letter-spacing: 0.08em;
-          color: rgba(255,255,255,0.82);
+          letter-spacing: 0.05em;
+          color: #000000;
           background: transparent;
           border: none;
-          border-bottom: 1px solid rgba(255,255,255,0.12);
+          border-bottom: 1px solid #000000;
           border-radius: 0;
           outline: none;
-          transition: border-color 0.55s;
         }
-        .md-search-input:focus { border-bottom-color: rgba(255,255,255,0.45); }
         .md-search-input::placeholder {
-          color: rgba(255,255,255,0.18);
-          letter-spacing: 0.15em;
+          color: rgba(0, 0, 0, 0.35);
+          letter-spacing: 0.08em;
         }
         .md-search-popular-title {
-          padding: 32px 40px 14px;
+          padding: 24px 40px 12px;
           font-family: var(--font-primary);
           font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.5em;
+          font-weight: 400;
+          letter-spacing: 0.3em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.13);
+          color: rgba(0, 0, 0, 0.4);
           margin: 0;
         }
         .md-search-tag {
@@ -466,28 +453,28 @@ export default function MenuDrawer() {
           border: none !important;
           cursor: pointer;
           font-family: var(--font-primary);
-          font-size: 10px;
+          font-size: 11px;
           font-weight: 300;
-          letter-spacing: 0.28em;
+          letter-spacing: 0.15em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.42);
+          color: rgba(0, 0, 0, 0.6);
           padding: 10px 40px;
           line-height: 1.5;
           border-radius: 0 !important;
           transform: none !important;
-          transition: color 0.5s;
+          transition: color 0.3s;
         }
-        .md-search-tag:hover { color: rgba(255,255,255,0.88) !important; opacity: 1 !important; }
+        .md-search-tag:hover { color: #000000 !important; }
 
         /* ══ COLLECTION PANEL ══ */
         .md-sub-title {
           font-family: var(--font-primary);
           font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.5em;
+          font-weight: 400;
+          letter-spacing: 0.3em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.16);
-          padding: 52px 40px 24px;
+          color: rgba(0, 0, 0, 0.4);
+          padding: 48px 40px 20px;
           margin: 0;
         }
         .md-sub-nav { display: flex; flex-direction: column; }
@@ -495,31 +482,31 @@ export default function MenuDrawer() {
           display: block;
           padding: 10px 40px;
           font-family: var(--font-primary);
-          font-size: 10px;
+          font-size: 11px;
           font-weight: 300;
-          letter-spacing: 0.28em;
+          letter-spacing: 0.15em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.42);
+          color: rgba(0, 0, 0, 0.6);
           text-decoration: none;
           line-height: 1.5;
-          transition: color 0.5s;
+          transition: color 0.3s;
         }
-        .md-sub-item:hover { color: rgba(255,255,255,0.88) !important; opacity: 1 !important; }
+        .md-sub-item:hover { color: #000000 !important; }
 
         /* ══ BACK BUTTON ══ */
         .md-back-btn {
           display: none;
           align-items: center;
-          padding: 28px 40px 8px;
+          padding: 24px 40px 8px;
           background: none !important;
           border: none !important;
           cursor: pointer;
-          color: rgba(255,255,255,0.22) !important;
+          color: rgba(0, 0, 0, 0.4) !important;
           transform: none !important;
           border-radius: 0 !important;
-          transition: color 0.5s !important;
+          transition: opacity 0.3s !important;
         }
-        .md-back-btn:hover { color: rgba(255,255,255,0.6) !important; opacity: 1 !important; }
+        .md-back-btn:hover { opacity: 0.6 !important; }
         .md-back-btn svg { stroke: currentColor; }
 
         /* ══ MOBILE ══ */
@@ -532,7 +519,7 @@ export default function MenuDrawer() {
             position: absolute;
             top: 0; left: 0; bottom: 0;
             transform: translateX(0);
-            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
           }
           .md-col-left-hidden-mobile { transform: translateX(-100%); pointer-events: none; }
           .md-col-right {
@@ -542,23 +529,34 @@ export default function MenuDrawer() {
             transform: translateX(100%);
             overflow-y: auto;
             border-left: none;
-            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
           }
           .md-col-right-open { transform: translateX(0); pointer-events: auto; border-left: none; }
+          
           .md-back-btn { display: flex; }
-          .md-nav-eyebrow { padding: 32px 28px 12px; }
-          .md-nav-item { padding: 11px 28px; }
-          .md-topbar { padding: 24px 28px; }
-          .md-bottom-link { padding: 6px 28px; }
-          .md-locale { padding: 10px 28px 28px; }
-          .md-search-form { padding: 48px 28px 20px; }
-          .md-search-popular-title { padding: 28px 28px 14px; }
-          .md-search-tag { padding: 10px 28px; }
-          .md-sub-title { padding: 48px 28px 20px; }
-          .md-sub-item { padding: 10px 28px; }
-          .md-back-btn { padding: 28px 28px 8px; }
-          .md-archive-link { padding: 9px 28px; }
+          .md-nav-eyebrow { padding: 24px 24px 10px; }
+          .md-nav-item { padding: 14px 24px; font-size: 11px; }
+          .md-topbar { padding: 16px 24px; }
+          .md-bottom-link { padding: 14px 24px; font-size: 10px; }
+          .md-locale { padding: 14px 24px 24px; font-size: 9px; }
+          .md-search-form { padding: 40px 24px 20px; }
+          .md-search-popular-title { padding: 24px 24px 12px; }
+          .md-search-tag { padding: 14px 24px; font-size: 11px; }
+          .md-sub-title { padding: 40px 24px 20px; }
+          .md-sub-item { padding: 14px 24px; font-size: 11px; }
+          .md-back-btn { padding: 24px 24px 8px; }
+          .md-archive-link { padding: 14px 24px; font-size: 10px; }
+          
+          /* Touch states */
+          .md-nav-item:active,
+          .md-archive-link:active,
+          .md-bottom-link:active,
+          .md-sub-item:active,
+          .md-search-tag:active {
+            background-color: #f7f7f7 !important;
+            color: #000000 !important;
+          }
         }
       `}</style>
     </>
