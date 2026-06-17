@@ -44,7 +44,7 @@ export default function LandingPage() {
       {/* ══════ SPLIT-SCREEN HERO ══════ */}
       <div className="landing-split">
 
-        {/* Left Half — Moda Y Accesorios */}
+        {/* Left Half — Moda mujer y accesorios */}
         <Link href="/fashion" className="landing-half">
           <video
             ref={leftVideoRef}
@@ -58,13 +58,13 @@ export default function LandingPage() {
           </video>
           <div className="landing-overlay" />
           <div className="landing-content">
-            <h2 className="landing-category">Moda Y Accesorios</h2>
+            <h2 className="landing-category">Moda mujer y accesorios</h2>
             <span className="landing-discover">Descubrir</span>
           </div>
         </Link>
 
-        {/* Right Half — Perfume Y Belleza */}
-        <Link href="/about" className="landing-half">
+        {/* Right Half — Moda hombre y accesorios */}
+        <Link href="/fashion" className="landing-half">
           <video
             ref={rightVideoRef}
             autoPlay
@@ -77,7 +77,7 @@ export default function LandingPage() {
           </video>
           <div className="landing-overlay" />
           <div className="landing-content">
-            <h2 className="landing-category">Perfume Y Belleza</h2>
+            <h2 className="landing-category">Moda hombre y accesorios</h2>
             <span className="landing-discover">Descubrir</span>
           </div>
         </Link>
