@@ -1660,8 +1660,10 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           flex: 0 0 75%;
           width: 75%;
           scroll-snap-align: center;
-          border-right: 1px solid rgba(0, 0, 0, 0.04);
           box-sizing: border-box;
+        }
+        .amiri-ctl-item:not(:last-child) {
+          border-right: 2px solid #ffffff;
         }
         @media (min-width: 1024px) {
           .amiri-ctl-item {
