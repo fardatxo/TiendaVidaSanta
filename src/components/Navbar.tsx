@@ -16,7 +16,6 @@ export default function Navbar() {
   const router = useRouter();
 
   const isHome = pathname === "/";
-  const isFashion = pathname === "/fashion";
   const isProduct = pathname.startsWith("/product/");
   const isCollection = pathname.startsWith("/collection");
   const hasSubnav = isProduct || isCollection;
@@ -86,22 +85,16 @@ export default function Navbar() {
 
   // Body padding: always pad body to accommodate the header height (44px) + banner
   useEffect(() => {
-    if (isHome) return;
     const body = document.body;
     const headerHeight = 44;
     const pad = headerHeight + BANNER_H;
     body.style.paddingTop = `${pad}px`;
     return () => { body.style.paddingTop = "48px"; };
-  }, [BANNER_H, isHome]);
-
-  // Hide navbar completely on the landing page
-  if (isHome) {
-    return null;
-  }
+  }, [BANNER_H]);
 
   return (
     <>
-      <header className={`acne-header ${isFashion ? 'transparent-mode' : 'solid'} ${!headerVisible ? "header-hidden" : ""}`} style={{top: `${navTop}px`}}>
+      <header className={`acne-header solid ${!headerVisible ? "header-hidden" : ""}`} style={{top: `${navTop}px`}}>
         <div className="acne-header-inner">
           {/* LEFT: Back button (on mobile product page) / Menu trigger (on other mobile pages) + Nav links (desktop) */}
           <div className="acne-nav-left">
@@ -187,19 +180,6 @@ export default function Navbar() {
         .acne-header .acne-logo-text { color: rgba(0, 0, 0, 0.85); }
         .acne-header svg { stroke: rgba(0, 0, 0, 0.85); }
         .acne-header .cart-badge { background: rgba(0, 0, 0, 0.65); }
-
-        /* Transparent mode (fashion page) */
-        .acne-header.transparent-mode {
-          background: transparent;
-          border-bottom: none;
-        }
-        .acne-header.transparent-mode .acne-nav-links a,
-        .acne-header.transparent-mode .acne-search-text-btn,
-        .acne-header.transparent-mode .acne-mob-icon,
-        .acne-header.transparent-mode .acne-right-icon,
-        .acne-header.transparent-mode .acne-logo-text { color: rgba(255, 255, 255, 0.9); }
-        .acne-header.transparent-mode svg { stroke: rgba(255, 255, 255, 0.9); }
-        .acne-header.transparent-mode .cart-badge { background: rgba(255, 255, 255, 0.8); }
 
         /* ══ LAYOUT ══ */
         .acne-header-inner {

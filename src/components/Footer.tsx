@@ -7,11 +7,6 @@ import { usePathname } from "next/navigation";
 export default function Footer() {
   const [email, setEmail] = useState("");
   const pathname = usePathname();
-  const isHome = pathname === "/";
-
-  if (isHome) {
-    return null;
-  }
 
   return (
     <footer className="ft">
@@ -21,63 +16,63 @@ export default function Footer() {
 
         {/* Left: Newsletter + Socials */}
         <div className="ft-left">
-          <p className="ft-nl-label">Enter the Private Circle.</p>
+          <p className="ft-nl-label">boletín de noticias</p>
           <div className="ft-nl">
             <div className="ft-nl-row">
               <input
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="email address"
+                placeholder="dirección de correo electrónico"
                 className="ft-nl-input"
               />
               <button className="ft-nl-btn" aria-label="Submit">→</button>
             </div>
-            <p className="ft-nl-sub">Not frequent. Not loud.</p>
+            <p className="ft-nl-sub">suscríbete para recibir novedades, lanzamientos y más.</p>
           </div>
           <div className="ft-socials">
-            <Link href="#" aria-label="Instagram">
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
               </svg>
-            </Link>
-            <Link href="#" aria-label="X">
+            </a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="X">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
               </svg>
-            </Link>
-            <Link href="#" aria-label="TikTok">
+            </a>
+            <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V9a8.2 8.2 0 0 0 4.79 1.52V7.07a4.85 4.85 0 0 1-1.02-.38z"/>
               </svg>
-            </Link>
+            </a>
           </div>
         </div>
 
         {/* Right: Nav columns */}
         <div className="ft-nav">
           <div className="ft-nav-col">
-            <p className="ft-col-head">CONTACT</p>
+            <p className="ft-col-head">contacto</p>
             <ul className="ft-links">
-              <li><Link href="mailto:info@tonertorrentinni.com">Email</Link></li>
-              <li><Link href="#">WhatsApp</Link></li>
-              <li><Link href="/contact">FAQ</Link></li>
+              <li><Link href="mailto:info@tonertorrentinni.com">email</Link></li>
+              <li><Link href="#">whatsapp</Link></li>
+              <li><Link href="/contact">faq</Link></li>
             </ul>
           </div>
           <div className="ft-nav-col">
-            <p className="ft-col-head">TONER TORRENTINNI</p>
+            <p className="ft-col-head">tonet</p>
             <ul className="ft-links">
-              <li><Link href="/about">About</Link></li>
-              <li><Link href="#">Press</Link></li>
-              <li><Link href="#">Careers</Link></li>
+              <li><Link href="/about">sobre nosotros</Link></li>
+              <li><Link href="#">prensa</Link></li>
+              <li><Link href="#">empleo</Link></li>
             </ul>
           </div>
           <div className="ft-nav-col">
-            <p className="ft-col-head">LEGAL</p>
+            <p className="ft-col-head">legal</p>
             <ul className="ft-links">
-              <li><Link href="#">Privacy</Link></li>
-              <li><Link href="#">Terms</Link></li>
-              <li><Link href="#">Cookies</Link></li>
+              <li><Link href="#">privacidad</Link></li>
+              <li><Link href="#">condiciones</Link></li>
+              <li><Link href="#">cookies</Link></li>
             </ul>
           </div>
         </div>
@@ -86,47 +81,49 @@ export default function Footer() {
 
       {/* ── BOTTOM ── */}
       <div className="ft-bottom">
-        <span className="ft-copy">TONER TORRENTINNI ©</span>
-        <span className="ft-locale">ESPAÑA / ESPAÑOL</span>
+        <span className="ft-copy">tonet ©</span>
+        <span className="ft-locale">españa / es / eur</span>
       </div>
 
       <style>{`
         .ft {
-          background: #080808;
-          color: #fff;
-          font-family: var(--font-primary);
+          background: #ffffff;
+          color: #000000;
+          font-family: var(--font-primary), sans-serif;
+          border-top: 1px solid #000000;
+          text-transform: lowercase;
         }
         .ft a { text-decoration: none; }
 
         /* ── BODY ── */
         .ft-body {
           display: flex;
-          padding: 120px 100px 100px;
-          border-bottom: 1px solid rgba(255,255,255,0.05);
+          padding: 80px 40px 60px;
+          border-bottom: 1px solid #eaeaea;
         }
 
         /* ── LEFT ── */
         .ft-left {
           flex: 0 0 40%;
-          padding-right: 100px;
+          padding-right: 60px;
           display: flex;
           flex-direction: column;
         }
         .ft-nl-label {
           font-size: 11px;
-          font-weight: 300;
-          letter-spacing: 0.32em;
-          color: rgba(255,255,255,0.45);
-          margin: 0 0 56px;
-          text-transform: uppercase;
+          font-weight: 400;
+          letter-spacing: 0.15em;
+          color: #000000;
+          margin: 0 0 32px;
+          text-transform: lowercase;
         }
-        .ft-nl { margin-bottom: 80px; }
+        .ft-nl { margin-bottom: 40px; }
         .ft-nl-row {
           display: flex;
           align-items: center;
-          border-bottom: 1px solid rgba(255,255,255,0.09);
-          padding-bottom: 20px;
-          margin-bottom: 28px;
+          border-bottom: 1px solid #000000;
+          padding-bottom: 8px;
+          margin-bottom: 12px;
         }
         .ft-nl-input {
           flex: 1;
@@ -134,62 +131,62 @@ export default function Footer() {
           border: none;
           outline: none;
           font-family: inherit;
-          font-size: 13px;
+          font-size: 12px;
           font-weight: 300;
-          color: #fff;
+          color: #000000;
           padding: 0;
           letter-spacing: 0.02em;
         }
-        .ft-nl-input::placeholder { color: #282828; }
+        .ft-nl-input::placeholder { color: #888888; }
         .ft-nl-btn {
           background: transparent;
           border: none;
-          color: #333333;
-          font-size: 18px;
+          color: #000000;
+          font-size: 16px;
           cursor: pointer;
-          padding: 0 0 0 12px;
+          padding: 0 0 0 8px;
           line-height: 1;
-          transition: color 0.4s;
+          transition: opacity 0.3s;
         }
-        .ft-nl-btn:hover { color: #999; }
+        .ft-nl-btn:hover { opacity: 0.7; }
         .ft-nl-sub {
           font-size: 10px;
           font-weight: 300;
-          color: #2c2c2c;
+          color: #888888;
           margin: 0;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.02em;
         }
 
         /* ── SOCIALS ── */
         .ft-socials {
           display: flex;
-          gap: 32px;
+          gap: 24px;
           align-items: center;
           margin-top: auto;
         }
         .ft-socials a {
-          color: #303030;
+          color: #000000;
           display: flex;
           align-items: center;
-          transition: color 0.4s;
+          transition: opacity 0.3s;
         }
-        .ft-socials a:hover { color: #666; }
+        .ft-socials a:hover { opacity: 0.7; }
 
         /* ── NAV ── */
         .ft-nav {
           flex: 1;
           display: flex;
-          padding-left: 100px;
-          gap: 88px;
+          padding-left: 60px;
+          gap: 60px;
         }
         .ft-nav-col { flex: 1; }
         .ft-col-head {
-          font-size: 10px;
+          font-size: 11px;
           font-weight: 400;
-          letter-spacing: 0.2em;
-          color: #303030;
-          margin: 0 0 44px;
-          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          color: #000000;
+          margin: 0 0 24px;
+          text-transform: lowercase;
         }
         .ft-links {
           list-style: none;
@@ -197,73 +194,73 @@ export default function Footer() {
           margin: 0;
           display: flex;
           flex-direction: column;
-          gap: 22px;
+          gap: 12px;
         }
         .ft-links li a {
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 300;
-          color: #3c3c3c;
-          letter-spacing: 0.03em;
-          transition: color 0.4s;
+          color: #666666;
+          letter-spacing: 0.02em;
+          transition: color 0.3s;
         }
-        .ft-links li a:hover { color: #aaa; }
+        .ft-links li a:hover { color: #000000; }
 
         /* ── BOTTOM ── */
         .ft-bottom {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 28px 100px;
+          padding: 24px 40px;
         }
         .ft-copy {
-          font-family: var(--font-brand) !important;
-          font-size: 14px;
+          font-size: 11px;
           font-weight: 300;
-          color: #ffffff !important;
-          letter-spacing: normal;
+          color: #000000 !important;
+          letter-spacing: 0.05em;
+          font-family: var(--font-primary), sans-serif !important;
         }
         .ft-locale {
           font-size: 10px;
           font-weight: 300;
-          color: #262626;
-          letter-spacing: 0.12em;
+          color: #666666;
+          letter-spacing: 0.08em;
           cursor: pointer;
-          transition: color 0.4s;
+          transition: color 0.3s;
         }
-        .ft-locale:hover { color: #666; }
+        .ft-locale:hover { color: #000000; }
 
         /* ── MOBILE ── */
         @media (max-width: 767px) {
           .ft-body {
             flex-direction: column;
-            padding: 64px 28px 48px;
+            padding: 40px 20px 30px;
             gap: 0;
           }
           .ft-left {
             flex: none;
             padding-right: 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding-bottom: 60px;
-            margin-bottom: 56px;
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 40px;
+            margin-bottom: 40px;
           }
-          .ft-socials { margin-top: 40px; }
+          .ft-socials { margin-top: 32px; }
           .ft-nav {
             padding-left: 0;
             flex-direction: row;
             gap: 0;
             justify-content: flex-start;
-            gap: 48px;
+            gap: 40px;
           }
           .ft-nav-col { flex: none; }
-          .ft-col-head { margin-bottom: 24px; }
-          .ft-links { gap: 14px; }
+          .ft-col-head { margin-bottom: 16px; }
+          .ft-links { gap: 10px; }
           .ft-bottom {
-            padding: 22px 28px;
+            padding: 20px;
           }
         }
 
         @media (max-width: 480px) {
-          .ft-nav { flex-direction: column; gap: 40px; }
+          .ft-nav { flex-direction: column; gap: 32px; }
         }
       `}</style>
 

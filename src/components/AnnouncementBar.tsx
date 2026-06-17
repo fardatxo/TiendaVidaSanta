@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
 
 const ANNOUNCEMENTS = [
   "DISFRUTE DE ENVÍO GRATUITO EN TODOS SUS PEDIDOS",
@@ -9,12 +8,6 @@ const ANNOUNCEMENTS = [
 ];
 
 export default function AnnouncementBar() {
-  const pathname = usePathname();
-  
-  // Hide on landing and fashion pages for immersive experience
-  if (pathname === "/" || pathname === "/fashion") {
-    return null;
-  }
   const [visible, setVisible] = useState(false);
   const [index, setIndex] = useState(0);
   const [fadeState, setFadeState] = useState("in");
@@ -61,7 +54,7 @@ export default function AnnouncementBar() {
       <style>{`
         .ann-bar {
           height: 32px;
-          background-color: #3a3a3a;
+          background-color: #000000;
           color: #ffffff;
           display: flex;
           align-items: center;
