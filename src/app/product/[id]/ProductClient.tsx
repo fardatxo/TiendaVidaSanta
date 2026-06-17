@@ -1373,12 +1373,19 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           }
         }
         .tonet-carousel-title {
-          font-size: 11px;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10px;
           font-weight: 400;
           letter-spacing: 0.15em;
           color: #000000;
-          margin-bottom: 32px;
+          margin: 0 auto 32px;
           text-transform: uppercase;
+          line-height: 1;
+        }
+        @media (min-width: 1024px) {
+          .tonet-carousel-title {
+            font-size: 11px;
+          }
         }
         .tonet-carousel-wrap {
           width: 100%;
