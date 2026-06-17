@@ -154,6 +154,23 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   const [currentSlide, setCurrentSlide] = useState(0);
   const mobileCarouselRef = useRef<HTMLDivElement>(null);
 
+  const [stickyBarVisible, setStickyBarVisible] = useState(false);
+  const mainButtonWrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = mainButtonWrapRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      const isAbove = entry.boundingClientRect.top < 0;
+      setStickyBarVisible(!entry.isIntersecting && isAbove);
+    }, {
+      root: null,
+      threshold: 0,
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
 
   const [ctlScrollProgress, setCtlScrollProgress] = useState(0);
   const ctlCarouselRef = useRef<HTMLDivElement>(null);
@@ -502,7 +519,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
               </div>
 
               {/* SELECT SIZE / ADD TO BAG Button */}
-              <div className="tonet-size-selector-wrap">
+              <div className="tonet-size-selector-wrap" ref={mainButtonWrapRef}>
                 {hasSizes ? (
                   <button 
                     type="button"
@@ -918,6 +935,35 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           </div>
         </div>
       )}
+
+      {/* Floating Sticky Buy Bar */}
+      <div className={`tonet-sticky-buy-bar ${stickyBarVisible ? 'visible' : ''}`}>
+        <div className="tonet-sticky-buy-bar-inner">
+          <div className="tonet-sticky-buy-left">
+            {product.imageUrl && (
+              <div className="tonet-sticky-buy-thumb">
+                <img src={product.imageUrl} alt={product.title} />
+              </div>
+            )}
+            <span className="tonet-sticky-buy-price">{priceFormatted}</span>
+          </div>
+          
+          <button 
+            type="button" 
+            className="tonet-sticky-buy-btn"
+            onClick={hasSizes ? () => setSizeDropdownOpen(true) : handleAddToBag}
+            disabled={adding}
+          >
+            <span>
+              {hasSizes 
+                ? (selectedSize ? `SIZE: ${selectedSize.toUpperCase()}` : 'SELECT SIZE') 
+                : (adding ? 'ADDING...' : 'ADD TO BAG')
+              }
+            </span>
+            {hasSizes && <span className="tonet-sticky-arrow"> ▾</span>}
+          </button>
+        </div>
+      </div>
 
       <style>{`
         /* ══════════════════════════════════════
@@ -1959,6 +2005,102 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
         .amiri-ctl-monogram-badge:active {
           transform: scale(0.95);
+        }
+
+        /* ── STICKY BUY BAR ── */
+        .tonet-sticky-buy-bar {
+          position: fixed;
+          top: 54px;
+          left: 0;
+          right: 0;
+          height: 54px;
+          background: #000000;
+          color: #ffffff;
+          z-index: 490;
+          transform: translateY(-100%);
+          opacity: 0;
+          transition: transform 0.3s ease, opacity 0.3s ease;
+          pointer-events: none;
+        }
+        .tonet-sticky-buy-bar.visible {
+          transform: translateY(0);
+          opacity: 1;
+          pointer-events: auto;
+        }
+        .tonet-sticky-buy-bar-inner {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 100%;
+          padding: 0 16px;
+          box-sizing: border-box;
+          width: 100%;
+        }
+        .tonet-sticky-buy-left {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .tonet-sticky-buy-thumb {
+          width: 32px;
+          height: 32px;
+          background: #ffffff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+        }
+        .tonet-sticky-buy-thumb img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+        .tonet-sticky-buy-price {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 11px;
+          font-weight: 400;
+          letter-spacing: 0.05em;
+        }
+        .tonet-sticky-buy-btn {
+          background: transparent;
+          border: none;
+          color: #ffffff;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 11px;
+          font-weight: 400;
+          letter-spacing: 0.1em;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          padding: 0;
+          text-transform: uppercase;
+          outline: none;
+        }
+        .tonet-sticky-buy-btn:hover {
+          opacity: 0.8;
+        }
+        .tonet-sticky-arrow {
+          font-size: 10px;
+          margin-left: 2px;
+        }
+
+        @media (min-width: 1024px) {
+          .tonet-sticky-buy-bar {
+            top: 64px;
+            left: auto;
+            right: 64px;
+            width: 400px;
+            height: 54px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(-20px);
+          }
+          .tonet-sticky-buy-bar.visible {
+            transform: translateY(0);
+            opacity: 1;
+          }
+          .tonet-sticky-buy-bar-inner {
+            padding: 0 24px;
+          }
         }
       `}</style>
     </>
