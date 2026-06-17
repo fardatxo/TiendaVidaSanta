@@ -1018,8 +1018,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           .tonet-info-sticky {
             position: sticky;
             top: 130px;
-            align-items: flex-start;
-            text-align: left;
+            align-items: center;
+            text-align: center;
             max-width: 460px;
           }
         }
@@ -1034,11 +1034,13 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           margin: 0 0 12px;
           text-transform: uppercase;
           color: #000000;
+          text-align: center;
         }
         @media (min-width: 1024px) {
           .tonet-product-title {
             font-size: 18px;
             margin-bottom: 16px;
+            text-align: center;
           }
         }
 
@@ -1056,7 +1058,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
         @media (min-width: 1024px) {
           .tonet-product-meta-row {
-            justify-content: flex-start;
+            justify-content: center;
             margin-bottom: 32px;
           }
         }
@@ -1109,7 +1111,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         @media (min-width: 1024px) {
           .tonet-size-selector-wrap {
             margin-bottom: 40px;
-            justify-content: flex-start;
+            justify-content: center;
           }
         }
         .tonet-select-size-btn {
@@ -1124,7 +1126,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           text-transform: uppercase;
           cursor: pointer;
           display: flex;
-          justify-content: space-between;
+          justify-content: center;
           align-items: center;
           width: 80%;
           min-width: 240px;
@@ -1158,7 +1160,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           .tonet-product-description {
             font-size: 10.5px;
             margin-bottom: 40px;
-            text-align: left;
+            text-align: center;
             width: 100%;
           }
         }
