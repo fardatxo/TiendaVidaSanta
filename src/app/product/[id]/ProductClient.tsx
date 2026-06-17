@@ -1058,7 +1058,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           justify-content: center;
           gap: 8px;
           margin-top: 8px;
-          margin-bottom: 24px;
+          margin-bottom: 12px;
         }
         .tonet-mobile-dot {
           width: 5px;
@@ -1162,7 +1162,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         /* ── INFO COLUMN (Right side buy box ~27%) ── */
         .tonet-info-column {
           display: block;
-          padding: 24px 20px 80px;
+          padding: 12px 20px 80px;
           box-sizing: border-box;
           width: 100%;
         }
