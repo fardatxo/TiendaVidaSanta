@@ -21,11 +21,6 @@ export default function Navbar() {
   const isCollection = pathname.startsWith("/collection");
   const hasSubnav = isProduct || isCollection;
 
-  // Hide navbar completely on the landing page
-  if (isHome) {
-    return null;
-  }
-
   const [collections, setCollections] = useState<{handle: string; title: string}[]>([]);
   useEffect(() => {
     if (!hasSubnav) return;
@@ -91,12 +86,18 @@ export default function Navbar() {
 
   // Body padding: always pad body to accommodate the header height (44px) + banner
   useEffect(() => {
+    if (isHome) return;
     const body = document.body;
     const headerHeight = 44;
     const pad = headerHeight + BANNER_H;
     body.style.paddingTop = `${pad}px`;
     return () => { body.style.paddingTop = "48px"; };
-  }, [BANNER_H]);
+  }, [BANNER_H, isHome]);
+
+  // Hide navbar completely on the landing page
+  if (isHome) {
+    return null;
+  }
 
   return (
     <>
