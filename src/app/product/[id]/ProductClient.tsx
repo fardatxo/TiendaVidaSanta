@@ -151,8 +151,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   const [ceremonyOpen, setCeremonyOpen] = useState(false);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [sizeDropdownOpen, setSizeDropdownOpen] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const mobileCarouselRef = useRef<HTMLDivElement>(null);
+
 
   const [ctlScrollProgress, setCtlScrollProgress] = useState(0);
   const ctlCarouselRef = useRef<HTMLDivElement>(null);
@@ -178,14 +177,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
     }
     return 'top';
   };
-  const handleMobileScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const container = e.currentTarget;
-    const scrollLeft = container.scrollLeft;
-    const width = container.clientWidth;
-    if (width > 0) {
-      setCurrentSlide(Math.round(scrollLeft / width));
-    }
-  };
+
   const { t } = useTranslation();
   const { toggle, has, items } = useWishlist();
   const inWishlist = has(product.handle);
@@ -398,24 +390,21 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           
           {/* GALLERY COLUMN (Left side ~65% on desktop) */}
           <div className="tonet-gallery-column">
-            {/* Mobile Carousel (horizontal scroll snapping) */}
+            {/* Mobile Grid (2x2 grid for first 4 images, then vertical stack for others) */}
             <div className="tonet-mobile-gallery">
-              <div className="tonet-mobile-carousel" ref={mobileCarouselRef} onScroll={handleMobileScroll}>
-                {images.map((img, i) => (
-                  <div key={i} className="tonet-mobile-slide">
+              <div className={images.length === 1 ? "tonet-mobile-single" : "tonet-mobile-grid"}>
+                {images.slice(0, 4).map((img, i) => (
+                  <div key={i} className="tonet-mobile-grid-item">
                     <img src={img} alt={`${product.title} - ${i}`} className="tonet-pdp-img" />
                   </div>
                 ))}
               </div>
-              
-              {/* Carousel Dots */}
-              {images.length > 1 && (
-                <div className="tonet-mobile-dots">
-                  {images.map((_, i) => (
-                    <span
-                      key={i}
-                      className={`tonet-mobile-dot ${currentSlide === i ? 'active' : ''}`}
-                    />
+              {images.length > 4 && (
+                <div className="tonet-mobile-stack">
+                  {images.slice(4).map((img, i) => (
+                    <div key={i + 4} className="tonet-mobile-stack-item">
+                      <img src={img} alt={`${product.title} - ${i + 4}`} className="tonet-pdp-img" />
+                    </div>
                   ))}
                 </div>
               )}
@@ -910,59 +899,58 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           width: 100%;
         }
 
-        /* Mobile Swipe Gallery */
+        /* Mobile Grid/Stack Gallery */
         .tonet-mobile-gallery {
           display: block;
           width: 100%;
-          overflow: hidden;
         }
-        .tonet-mobile-carousel {
-          display: flex;
-          overflow-x: auto;
-          scroll-snap-type: x mandatory;
-          scrollbar-width: none;
-          -ms-overflow-style: none;
+        .tonet-mobile-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 2px;
+          background-color: #ffffff;
         }
-        .tonet-mobile-carousel::-webkit-scrollbar {
-          display: none;
-        }
-        .tonet-mobile-slide {
-          flex: 0 0 100%;
-          width: 100%;
-          scroll-snap-align: start;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background: #f6f6f6;
-          padding: 24px 20px;
-          box-sizing: border-box;
-          aspect-ratio: 3 / 4;
-        }
-        .tonet-mobile-slide img {
-          width: 100%;
-          max-width: 380px;
-          height: auto;
+        .tonet-mobile-single {
           display: block;
+          width: 100%;
+        }
+        .tonet-mobile-grid-item {
+          aspect-ratio: 3 / 4;
+          background-color: #f6f6f6;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          padding: 8px;
+          box-sizing: border-box;
+        }
+        .tonet-mobile-grid-item img {
+          width: 100%;
+          height: 100%;
           object-fit: contain;
           mix-blend-mode: multiply;
         }
-
-        .tonet-mobile-dots {
+        .tonet-mobile-stack {
           display: flex;
+          flex-direction: column;
+          gap: 2px;
+          margin-top: 2px;
+        }
+        .tonet-mobile-stack-item {
+          aspect-ratio: 3 / 4;
+          background-color: #f6f6f6;
+          display: flex;
+          align-items: center;
           justify-content: center;
-          gap: 8px;
-          margin-top: 8px;
-          margin-bottom: 24px;
+          overflow: hidden;
+          padding: 16px;
+          box-sizing: border-box;
         }
-        .tonet-mobile-dot {
-          width: 5px;
-          height: 5px;
-          border-radius: 50%;
-          background-color: #e0e0e0;
-          transition: background-color 0.3s;
-        }
-        .tonet-mobile-dot.active {
-          background-color: #000000;
+        .tonet-mobile-stack-item img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          mix-blend-mode: multiply;
         }
 
         /* Desktop Stacked Gallery (with extreme whitespace, no controls) */
@@ -1309,7 +1297,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
         .tonet-size-selector-modal {
           background: #ffffff;
-          border: 1px solid #000000;
+          border: none;
           width: 90%;
           max-width: 360px;
           padding: 32px;
@@ -1379,7 +1367,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           width: 100%;
         }
         .tonet-size-box-btn {
-          border: 1px solid transparent;
+          border: none;
           background: transparent;
           color: #000000;
           padding: 8px 16px;
@@ -1391,10 +1379,13 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           box-sizing: border-box;
         }
         .tonet-size-box-btn:hover {
-          border-color: #eaeaea;
+          color: #888888;
         }
         .tonet-size-box-btn.selected {
-          border: 1px solid #000000;
+          border: none;
+          text-decoration: underline;
+          text-underline-offset: 4px;
+          font-weight: 700;
         }
         .tonet-size-box-btn.sold-out {
           color: #cccccc;
