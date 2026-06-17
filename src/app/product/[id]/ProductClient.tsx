@@ -690,12 +690,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                 </div>
               )}
 
-              {/* Floating circular monogram badge at bottom right of the visible panels track */}
-              <div className="amiri-ctl-monogram-badge" onClick={() => router.push('/contact')} aria-label="Tonet Concierge">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M4 6h16M12 6v14" />
-                </svg>
-              </div>
+
             </div>
           </section>
         )}
@@ -717,13 +712,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         )}
       </div>
 
-      {/* FLOATING TONET CONCIERGE CHAT BADGE */}
-      <div className="tonet-concierge-badge" onClick={() => router.push('/contact')} aria-label="Tonet Concierge">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-          {/* Elegant T monogram */}
-          <path d="M4 6h16M12 6v14" />
-        </svg>
-      </div>
+
 
       {/* ══ SIZE SELECTOR OVERLAY MODAL ══ */}
       {sizeDropdownOpen && (
