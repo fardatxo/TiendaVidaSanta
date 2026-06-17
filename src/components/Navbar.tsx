@@ -107,17 +107,11 @@ export default function Navbar() {
     <>
       <header className={`acne-header ${isHome ? "transparent-home" : isProduct ? "transparent-pdp" : "solid"} ${!headerVisible ? "header-hidden" : ""}`} style={{top: `${navTop}px`}}>
         <div className="acne-header-inner">
-          {/* LEFT: Back button / Menu trigger + Search trigger */}
+          {/* LEFT: Menu trigger + Search trigger */}
           <div className="acne-nav-left">
-            {isProduct ? (
-              <button className="acne-right-icon" aria-label="Back" onClick={() => window.history.back()}>
-                <span style={{ fontSize: '18px', fontWeight: 300, color: 'inherit' }}>&lt;</span>
-              </button>
-            ) : (
-              <button className="acne-right-icon" aria-label="Menu" onClick={openMenu}>
-                <Menu size={18} strokeWidth={1} />
-              </button>
-            )}
+            <button className="acne-right-icon" aria-label="Menu" onClick={openMenu}>
+              <Menu size={18} strokeWidth={1} />
+            </button>
             <button className="acne-right-icon" aria-label="Search" onClick={openSearch}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8"/>
@@ -143,7 +137,7 @@ export default function Navbar() {
               </Link>
 
               {/* Wishlist icon (Bookmark ribbon style) */}
-              <Link href="/wishlist" className="acne-right-icon" aria-label="Wishlist">
+              <Link href="/wishlist" className="acne-right-icon acne-wishlist-icon" aria-label="Wishlist">
                 <div className="wishlist-icon-wrap">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
@@ -360,6 +354,7 @@ export default function Navbar() {
           .acne-logo-text { font-size: 26px; letter-spacing: 0; font-weight: 700; padding-right: 0; }
           .acne-mob-icon { width: 44px; height: 54px; }
           .acne-right-icon { width: 44px; height: 54px; }
+          .acne-wishlist-icon { display: none !important; }
           
           /* Active states */
           .acne-mob-icon:active,
