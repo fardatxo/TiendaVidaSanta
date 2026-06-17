@@ -392,10 +392,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   return (
     <>
       <div className="tonet-pdp-page">
-        {/* Collection/Season tag below header */}
-        <div className="tonet-pdp-season">
-          {product.tags?.find(t => t.toUpperCase() === t) || "HIGH SUMMER"}
-        </div>
+
 
         <div className="tonet-pdp-layout">
           
