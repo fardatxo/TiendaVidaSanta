@@ -1,1636 +1,1090 @@
 'use client';
 
-import { useState, useMemo, useEffect, useRef, useCallback, memo } from 'react';
-import { Plus, Check } from 'lucide-react';
-import type { CollectionDetail, Product, RecommendedProduct } from '@/lib/shopify';
-import { useCart } from '@/context/CartContext';
-import { useUI } from '@/context/UIContext';
-import { useTranslation } from '@/lib/i18n';
+import { useState, useMemo, useEffect } from 'react';
+import { Plus, Minus, X } from 'lucide-react';
+import type { CollectionDetail, Product } from '@/lib/shopify';
 import { useLocale } from '@/context/LocaleContext';
-import NotifyMeModal from '@/components/NotifyMeModal';
-import { useTranslatedText } from '@/hooks/useTranslatedText';
-import { useWishlist } from '@/context/WishlistContext';
 import Link from 'next/link';
 
-const YmalCarousel = memo(function YmalCarousel({ recommended }: { recommended: RecommendedProduct[]; toggle: (item: any) => void }) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const dragStart = useRef(0);
-  const scrollStart = useRef(0);
-  const isDragging = useRef(false);
-  const dragMoved = useRef(false);
+// Predefined set of ComfyUI fashion lifestyle images
+const LIFESTYLE_IMAGES = [
+  '/hero/ComfyUI-main_reference_00012_.png',
+  '/hero/ComfyUI-main_reference_00016_.png',
+  '/hero/ComfyUI-main_reference_00017_.png',
+  '/hero/ComfyUI-main_reference_00018_.png',
+  '/hero/ComfyUI-main_reference_00019_.png',
+  '/hero/ComfyUI-main_reference_00020_.png',
+  '/hero/ComfyUI-main_reference_00021_.png',
+  '/hero/ComfyUI-main_reference_00022_.png',
+  '/hero/ComfyUI-main_reference_00023_.png',
+  '/hero/ComfyUI-main_reference_00028_.png',
+  '/hero/ComfyUI-main_reference_00032_.png'
+];
 
-  function onPointerDown(e: React.PointerEvent) {
-    dragStart.current = e.clientX;
-    scrollStart.current = scrollRef.current?.scrollLeft ?? 0;
-    isDragging.current = true;
-    dragMoved.current = false;
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-  }
-  function onPointerMove(e: React.PointerEvent) {
-    if (!isDragging.current) return;
-    const dx = e.clientX - dragStart.current;
-    if (Math.abs(dx) > 5) {
-      dragMoved.current = true;
-      scrollRef.current?.classList.add('dragging');
-      if (scrollRef.current) scrollRef.current.scrollLeft = scrollStart.current - dx;
-    }
-  }
-  function onPointerUp() {
-    isDragging.current = false;
-    scrollRef.current?.classList.remove('dragging');
-  }
-  function onCarouselClick(e: React.MouseEvent) {
-    if (dragMoved.current) { e.preventDefault(); e.stopPropagation(); dragMoved.current = false; }
-  }
+interface GridItem {
+  key: string;
+  type: 'product' | 'lifestyle';
+  product?: Product;
+  imageUrl?: string;
+  colSpan: number; // 1 or 2
+  rowSpan: number; // 1 or 2
+}
 
-  return (
-    <section className="ymal-section">
-      <h2 className="ymal-title">WITHIN THE HOUSE</h2>
-      <div className="ymal-carousel-wrap">
-        <div
-          className="ymal-carousel"
-          ref={scrollRef}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerCancel={onPointerUp}
-          onClick={onCarouselClick}
-        >
-          <div style={{flexShrink: 0, width: 16, minWidth: 16}} />
-          {recommended.map((p) => (
-            <a key={p.handle} href={`/product/${p.handle}`} className="ymal-card">
-              <div className="ymal-img-wrap">
-                {p.imageUrl && <img src={p.imageUrl} alt={p.title} className="ymal-img" />}
-              </div>
-              <div className="ymal-meta">
-                <span className="ymal-name">{p.title}</span>
-                <span className="ymal-price">&euro;{Number(p.price).toFixed(0)}</span>
-              </div>
-            </a>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-});
+// Function to classify product for optical image scaling classes
+function getProductImageClass(title: string, tags: string[]): string {
+  const tLower = title.toLowerCase();
+  const tagsLower = tags.map(t => t.toLowerCase());
 
-function TranslatedDesc({ text }: { text?: string | null }) {
-  const translated = useTranslatedText(text);
-  const [expanded, setExpanded] = useState(false);
-  if (!translated) return null;
-  return (
-    <div className="col-desc-wrapper">
-      <div className={`col-desc${expanded ? ' expanded' : ''}`}>
-        <p>{translated}</p>
-        {!expanded && <div className="col-desc-blur" />}
-      </div>
-      <button className="col-desc-toggle" onClick={() => setExpanded(!expanded)}>
-        {expanded ? '— Show less' : '+ Show more'}
-      </button>
-    </div>
-  );
+  const isSneaker = tLower.includes('sneaker') || tLower.includes('shoes') || tLower.includes('clog') || tagsLower.includes('footwear') || tagsLower.includes('sneakers');
+  const isPants = tLower.includes('pants') || tLower.includes('shorts') || tLower.includes('trouser') || tagsLower.includes('bottoms') || tagsLower.includes('pants');
+  const isAccessory = tLower.includes('ball') || tLower.includes('sunglasses') || tLower.includes('bag') || tagsLower.includes('accessories');
+  
+  if (isSneaker) return 'amiri-product-img--sneaker';
+  if (isPants) return 'amiri-product-img--pants';
+  if (isAccessory) return 'amiri-product-img--accessory';
+  return 'amiri-product-img--top'; // Default
 }
 
 export default function CollectionClient({ collection }: { collection: CollectionDetail }) {
-  const [selectedIdx, setSelectedIdx] = useState(0);
-  const [adding, setAdding] = useState(false);
-  const [activeDrawer, setActiveDrawer] = useState<string | null>(null);
-  const [notifyOpen, setNotifyOpen] = useState(false);
-  const [currentImageIdx, setCurrentImageIdx] = useState(0);
-  const galleryRef = useRef<HTMLDivElement>(null);
-  const infoRef = useRef<HTMLDivElement>(null);
-  const [showMobileBar, setShowMobileBar] = useState(true);
-  const [recommended, setRecommended] = useState<RecommendedProduct[]>([]);
-
-  // Hide mobile fixed bar once real info panel scrolls into view
-  useEffect(() => {
-    if (!infoRef.current) return;
-    let observer: IntersectionObserver;
-    const timer = setTimeout(() => {
-      if (!infoRef.current) return;
-      observer = new IntersectionObserver(
-        ([entry]) => setShowMobileBar(!entry.isIntersecting),
-        { threshold: 0.15 }
-      );
-      observer.observe(infoRef.current);
-    }, 500);
-    return () => { clearTimeout(timer); observer?.disconnect(); };
-  }, []);
-
-  useEffect(() => {
-    const handle = collection.products[0]?.handle ?? '';
-    if (!handle) return;
-    import('@/lib/shopify').then(({ getRecommendedProducts }) => {
-      getRecommendedProducts(handle, 4)
-        .then(setRecommended)
-        .catch(() => {});
-    });
-  }, [collection.handle]);
-  const [selectedSize, setSelectedSize] = useState<string>('');
-  const { addToCart } = useCart();
-  const { openCart } = useUI();
-  const { t } = useTranslation();
   const { formatPrice } = useLocale();
-  const { toggle, has, items } = useWishlist();
-  const [ceremonyOpen, setCeremonyOpen] = useState(false);
 
-  const getHouseState = (handle: string) => {
-    const hash = handle.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-    if (hash % 3 === 0) return 'HOUSE_01 — PERMANENCE';
-    if (hash % 3 === 1) return 'HOUSE_02 — REPLICA';
-    return 'HOUSE_03 — INHERITANCE';
+  // Committed Filters State (Controls the Grid)
+  const [selectedSort, setSelectedSort] = useState<string>('featured');
+  const [selectedAvailability, setSelectedAvailability] = useState<string[]>([]);
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
+
+  // Temporary Filters State (Inside the Refine Drawer)
+  const [tempSort, setTempSort] = useState<string>('featured');
+  const [tempAvailability, setTempAvailability] = useState<string[]>([]);
+  const [tempColors, setTempColors] = useState<string[]>([]);
+  const [tempSizes, setTempSizes] = useState<string[]>([]);
+  const [tempMaterials, setTempMaterials] = useState<string[]>([]);
+
+  const [refineOpen, setRefineOpen] = useState(false);
+  const [activeFilterAccordion, setActiveFilterAccordion] = useState<string | null>(null);
+
+  // Dynamic filter options extraction
+  const filterOptions = useMemo(() => {
+    const colors = new Set<string>();
+    const sizes = new Set<string>();
+    const materials = new Set<string>();
+
+    const materialKeywords = ['cotton', 'fleece', 'denim', 'leather', 'wool', 'silk', 'nylon', 'polyester', 'linen', 'knit', 'cashmere', 'waffle'];
+
+    collection.products.forEach(p => {
+      p.variants.forEach(v => {
+        v.selectedOptions.forEach(opt => {
+          const nameLower = opt.name.toLowerCase();
+          if (nameLower === 'color' || nameLower === 'colour') {
+            colors.add(opt.value);
+          } else if (nameLower === 'size' || nameLower === 'talla') {
+            sizes.add(opt.value);
+          }
+        });
+      });
+
+      p.tags.forEach(t => {
+        const tLower = t.toLowerCase();
+        if (materialKeywords.includes(tLower)) {
+          materials.add(t);
+        }
+      });
+
+      materialKeywords.forEach(mat => {
+        if (p.description?.toLowerCase().includes(mat) || p.title.toLowerCase().includes(mat)) {
+          materials.add(mat.charAt(0).toUpperCase() + mat.slice(1));
+        }
+      });
+    });
+
+    return {
+      colors: Array.from(colors).sort(),
+      sizes: Array.from(sizes).sort(),
+      materials: Array.from(materials).sort()
+    };
+  }, [collection.products]);
+
+  // Open / Close Drawer Handling
+  const openRefine = () => {
+    setTempSort(selectedSort);
+    setTempAvailability(selectedAvailability);
+    setTempColors(selectedColors);
+    setTempSizes(selectedSizes);
+    setTempMaterials(selectedMaterials);
+    setRefineOpen(true);
   };
 
-  const getArchiveRef = (handle: string) => {
-    const hash = handle.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-    const num = String((hash % 9000) + 1000).padStart(4, '0');
-    return `ARC-26-${num}`;
+  const applyFilters = () => {
+    setSelectedSort(tempSort);
+    setSelectedAvailability(tempAvailability);
+    setSelectedColors(tempColors);
+    setSelectedSizes(tempSizes);
+    setSelectedMaterials(tempMaterials);
+    setRefineOpen(false);
   };
 
-  const selectedProduct: Product | undefined = collection.products[selectedIdx];
+  const clearFilters = () => {
+    setTempSort('featured');
+    setTempAvailability([]);
+    setTempColors([]);
+    setTempSizes([]);
+    setTempMaterials([]);
+  };
 
-  // Reset size + gallery position when switching products
-  useEffect(() => {
-    setSelectedSize('');
-    setCurrentImageIdx(0);
-    if (galleryRef.current) galleryRef.current.scrollLeft = 0;
-  }, [selectedIdx]);
-
-  const handleGalleryScroll = useCallback(() => {
-    const el = galleryRef.current;
-    if (!el) return;
-    const idx = Math.round(el.scrollLeft / el.offsetWidth);
-    setCurrentImageIdx(idx);
-  }, []);
-
-  const sizeOptionName = useMemo(() => {
-    if (!selectedProduct) return null;
-    for (const v of selectedProduct.variants)
-      for (const o of v.selectedOptions)
-        if (o.name.toLowerCase() === 'size') return o.name;
-    return null;
-  }, [selectedProduct]);
-
-  const sizeOptions = useMemo(() => {
-    if (!sizeOptionName || !selectedProduct) return [];
-    const seen = new Set<string>();
-    const result: string[] = [];
-    for (const v of selectedProduct.variants) {
-      const opt = v.selectedOptions.find(o => o.name === sizeOptionName);
-      if (opt && !seen.has(opt.value)) { seen.add(opt.value); result.push(opt.value); }
+  const toggleTempFilter = (list: string[], setList: (val: string[]) => void, item: string) => {
+    if (list.includes(item)) {
+      setList(list.filter(x => x !== item));
+    } else {
+      setList([...list, item]);
     }
-    return result;
-  }, [sizeOptionName, selectedProduct]);
+  };
 
-  const selectedVariant = useMemo(() => {
-    if (!selectedProduct) return undefined;
-    if (sizeOptionName && selectedSize) {
-      const match = selectedProduct.variants.find(v =>
-        v.selectedOptions.find(o => o.name === sizeOptionName)?.value === selectedSize
+  // committed filtering
+  const filteredAndSortedProducts = useMemo(() => {
+    let result = [...collection.products];
+
+    // 1. Availability
+    if (selectedAvailability.length > 0) {
+      result = result.filter(p => {
+        const inStock = p.variants.some(v => v.availableForSale);
+        if (selectedAvailability.includes('in-stock') && inStock) return true;
+        if (selectedAvailability.includes('out-of-stock') && !inStock) return true;
+        return false;
+      });
+    }
+
+    // 2. Color
+    if (selectedColors.length > 0) {
+      result = result.filter(p => 
+        p.variants.some(v => 
+          v.selectedOptions.some(opt => 
+            (opt.name.toLowerCase() === 'color' || opt.name.toLowerCase() === 'colour') && 
+            selectedColors.includes(opt.value)
+          )
+        )
       );
-      if (match) return match;
     }
-    return selectedProduct.variants.find(v => v.availableForSale) ?? selectedProduct.variants[0];
-  }, [selectedProduct, sizeOptionName, selectedSize]);
 
-  function isSizeAvailable(size: string): boolean {
-    if (!selectedProduct || !sizeOptionName) return false;
-    return selectedProduct.variants.find(v =>
-      v.selectedOptions.find(o => o.name === sizeOptionName)?.value === size
-    )?.availableForSale ?? false;
-  }
-
-  const STANDARD_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
-
-  const priceFormatted = selectedVariant
-    ? parseFloat(selectedVariant.price.amount).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-    : selectedProduct
-    ? new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(selectedProduct.price)
-    : '';
-
-  const currencyCode = selectedVariant?.price.currencyCode ?? selectedProduct?.currencyCode ?? 'EUR';
-
-  async function handleAddToBag() {
-    if (!selectedVariant?.id || adding) return;
-    setAdding(true);
-    try {
-      await addToCart(selectedVariant.id, 1);
-      openCart();
-    } finally {
-      setAdding(false);
+    // 3. Size
+    if (selectedSizes.length > 0) {
+      result = result.filter(p => 
+        p.variants.some(v => 
+          v.selectedOptions.some(opt => 
+            (opt.name.toLowerCase() === 'size' || opt.name.toLowerCase() === 'talla') && 
+            selectedSizes.includes(opt.value)
+          )
+        )
+      );
     }
-  }
 
-  const galleryImages: string[] = selectedProduct
-    ? (selectedProduct.images.length > 0 ? selectedProduct.images : [selectedProduct.imageUrl].filter(Boolean))
-    : [collection.imageUrl].filter(Boolean);
+    // 4. Material
+    if (selectedMaterials.length > 0) {
+      result = result.filter(p => {
+        const tagsLower = p.tags.map(t => t.toLowerCase());
+        const titleLower = p.title.toLowerCase();
+        const descLower = p.description?.toLowerCase() ?? '';
+        return selectedMaterials.some(mat => {
+          const matLower = mat.toLowerCase();
+          return tagsLower.includes(matLower) || titleLower.includes(matLower) || descLower.includes(matLower);
+        });
+      });
+    }
+
+    // 5. Sorting
+    if (selectedSort === 'price-asc') {
+      result.sort((a, b) => a.price - b.price);
+    } else if (selectedSort === 'price-desc') {
+      result.sort((a, b) => b.price - a.price);
+    }
+
+    return result;
+  }, [collection.products, selectedSort, selectedAvailability, selectedColors, selectedSizes, selectedMaterials]);
+
+  // temp count inside drawer
+  const tempFilteredCount = useMemo(() => {
+    let result = [...collection.products];
+
+    if (tempAvailability.length > 0) {
+      result = result.filter(p => {
+        const inStock = p.variants.some(v => v.availableForSale);
+        if (tempAvailability.includes('in-stock') && inStock) return true;
+        if (tempAvailability.includes('out-of-stock') && !inStock) return true;
+        return false;
+      });
+    }
+
+    if (tempColors.length > 0) {
+      result = result.filter(p => 
+        p.variants.some(v => 
+          v.selectedOptions.some(opt => 
+            (opt.name.toLowerCase() === 'color' || opt.name.toLowerCase() === 'colour') && 
+            tempColors.includes(opt.value)
+          )
+        )
+      );
+    }
+
+    if (tempSizes.length > 0) {
+      result = result.filter(p => 
+        p.variants.some(v => 
+          v.selectedOptions.some(opt => 
+            (opt.name.toLowerCase() === 'size' || opt.name.toLowerCase() === 'talla') && 
+            tempSizes.includes(opt.value)
+          )
+        )
+      );
+    }
+
+    if (tempMaterials.length > 0) {
+      result = result.filter(p => {
+        const tagsLower = p.tags.map(t => t.toLowerCase());
+        const titleLower = p.title.toLowerCase();
+        const descLower = p.description?.toLowerCase() ?? '';
+        return tempMaterials.some(mat => {
+          const matLower = mat.toLowerCase();
+          return tagsLower.includes(matLower) || titleLower.includes(matLower) || descLower.includes(matLower);
+        });
+      });
+    }
+
+    return result.length;
+  }, [collection.products, tempAvailability, tempColors, tempSizes, tempMaterials]);
+
+  // Dynamic layout generator (Interweaving lifestyle images into the grid)
+  const gridItems = useMemo(() => {
+    const items: GridItem[] = [];
+    let productIdx = 0;
+    let lifestyleIdx = 0;
+
+    const totalProducts = filteredAndSortedProducts.length;
+    if (totalProducts === 0) return [];
+
+    // Simple grid layout if very few products
+    if (totalProducts <= 3) {
+      filteredAndSortedProducts.forEach((p) => {
+        items.push({
+          key: `prod-${p.id}`,
+          type: 'product',
+          product: p,
+          colSpan: 1,
+          rowSpan: 1
+        });
+      });
+      items.push({
+        key: 'lifestyle-end',
+        type: 'lifestyle',
+        imageUrl: LIFESTYLE_IMAGES[0],
+        colSpan: 1,
+        rowSpan: 1
+      });
+      return items;
+    }
+
+    // High fidelity modular pattern
+    const pattern = [
+      { type: 'product', colSpan: 1, rowSpan: 1 },
+      { type: 'product', colSpan: 1, rowSpan: 1 },
+      { type: 'lifestyle', colSpan: 2, rowSpan: 2 }, // large lifestyle cover
+      { type: 'product', colSpan: 1, rowSpan: 1 },
+      { type: 'product', colSpan: 1, rowSpan: 1 },
+      { type: 'product', colSpan: 1, rowSpan: 1 },
+      { type: 'product', colSpan: 1, rowSpan: 1 },
+      { type: 'lifestyle', colSpan: 2, rowSpan: 1 }, // wide lifestyle cover
+      { type: 'product', colSpan: 1, rowSpan: 1 },
+      { type: 'product', colSpan: 1, rowSpan: 1 },
+      { type: 'product', colSpan: 1, rowSpan: 1 },
+      { type: 'product', colSpan: 1, rowSpan: 1 },
+      { type: 'product', colSpan: 2, rowSpan: 2 }, // spotlight product cell
+      { type: 'lifestyle', colSpan: 1, rowSpan: 1 }, // small lifestyle cell
+      { type: 'product', colSpan: 1, rowSpan: 1 },
+      { type: 'product', colSpan: 1, rowSpan: 1 },
+      { type: 'product', colSpan: 1, rowSpan: 1 },
+      { type: 'product', colSpan: 1, rowSpan: 1 },
+      { type: 'lifestyle', colSpan: 2, rowSpan: 2 } // large lifestyle cover
+    ];
+
+    let patternIdx = 0;
+    while (productIdx < totalProducts) {
+      const pRule = pattern[patternIdx % pattern.length];
+      
+      if (pRule.type === 'product') {
+        const p = filteredAndSortedProducts[productIdx++];
+        items.push({
+          key: `prod-${p.id}-${productIdx}`,
+          type: 'product',
+          product: p,
+          colSpan: pRule.colSpan,
+          rowSpan: pRule.rowSpan
+        });
+      } else {
+        const img = LIFESTYLE_IMAGES[lifestyleIdx % LIFESTYLE_IMAGES.length];
+        lifestyleIdx++;
+        items.push({
+          key: `lifestyle-${lifestyleIdx}`,
+          type: 'lifestyle',
+          imageUrl: img,
+          colSpan: pRule.colSpan,
+          rowSpan: pRule.rowSpan
+        });
+      }
+      patternIdx++;
+    }
+
+    // Grid balancing row completion (to fill a 4-column row layout cleanly)
+    if (items.length % 4 !== 0) {
+      const remainder = 4 - (items.length % 4);
+      for (let i = 0; i < remainder; i++) {
+        const img = LIFESTYLE_IMAGES[lifestyleIdx % LIFESTYLE_IMAGES.length];
+        lifestyleIdx++;
+        items.push({
+          key: `lifestyle-fill-${lifestyleIdx}`,
+          type: 'lifestyle',
+          imageUrl: img,
+          colSpan: 1,
+          rowSpan: 1
+        });
+      }
+    }
+
+    return items;
+  }, [filteredAndSortedProducts]);
+
+  const toggleAccordion = (name: string) => {
+    setActiveFilterAccordion(activeFilterAccordion === name ? null : name);
+  };
 
   return (
     <>
-      <div className="col-layout">
-
-        {/* ── LEFT: vertical gallery, each image = full viewport ── */}
-        <div className="col-gallery">
-          {/* On mobile only the first image shows here; on desktop all images */}
-          {galleryImages.map((url, i) => (
-            <div key={`${selectedIdx}-${i}`} className={`col-gallery-slide${i > 0 ? ' col-rest-slide' : ''}`}>
-              <img
-                src={url}
-                alt={`${selectedProduct?.title ?? collection.title} ${i + 1}`}
-                className="col-main-img"
-              />
-            </div>
-          ))}
-          {/* Description block below gallery images */}
-          {(collection.description || selectedProduct?.description) && (
-            <div className="col-gallery-desc">
-              <TranslatedDesc text={collection.description || selectedProduct?.description} />
-            </div>
-          )}
+      <div className="amiri-collection-container">
+        
+        {/* TOP BAR: Title & Refine Trigger */}
+        <div className="amiri-collection-top">
+          <h1 className="amiri-collection-title">
+            {collection.title}
+          </h1>
+          <button 
+            type="button" 
+            className="amiri-refine-trigger"
+            onClick={openRefine}
+          >
+            REFINE
+          </button>
         </div>
 
-        {/* ── RIGHT: Suitsupply-style info panel ── */}
-        <div className="col-info" ref={infoRef}>
-
-          {/* Title + Price */}
-          <div className="col-header">
-            <h1 className="col-title">{selectedProduct?.title ?? collection.title}</h1>
-            {selectedProduct && (
-              <span className="col-price">&euro;{priceFormatted}</span>
-            )}
-          </div>
-
-          {/* Subtitle */}
-          {selectedProduct && (
-            <p className="col-subtitle">{selectedProduct.title}</p>
-          )}
-
-          {/* Product thumbnails */}
-          <div className="col-thumbs-wrap">
-            <div className="col-thumbs" ref={galleryRef}>
-              {collection.products.length > 0 ? (
-                collection.products.map((product, idx) => (
-                  <button
-                    key={product.handle}
-                    className={`col-thumb${selectedIdx === idx ? ' active' : ''}`}
-                    onClick={() => setSelectedIdx(idx)}
-                    title={product.title}
-                  >
-                    {product.imageUrl && (
-                      <img src={product.imageUrl} alt={product.title} />
-                    )}
-                  </button>
-                ))
-              ) : (
-                <p className="col-no-products">No products in this collection.</p>
-              )}
-            </div>
-            {collection.products.length > 5 && (
-              <button
-                className="col-thumbs-arrow"
-                onClick={() => { if (galleryRef.current) galleryRef.current.scrollBy({ left: 140, behavior: 'smooth' }); }}
-                aria-label="More variants"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
-              </button>
-            )}
-          </div>
-
-          {/* Action row: bookmark + customize + select size */}
-          {collection.products.length > 0 && (
-            <div className="col-actions">
-              <button
-                className="col-bookmark"
-                aria-label="Add to wishlist"
-                onClick={() => {
-                  if (selectedProduct) {
-                    const isBookmarked = has(selectedProduct.handle);
-                    toggle({
-                      handle: selectedProduct.handle,
-                      title: selectedProduct.title,
-                      imageUrl: selectedProduct.imageUrl,
-                      price: selectedProduct.price,
-                      currencyCode: selectedProduct.currencyCode,
-                      collectionTitle: collection.title
-                    });
-                    if (!isBookmarked) {
-                      setCeremonyOpen(true);
-                    }
-                  }
-                }}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill={selectedProduct && has(selectedProduct.handle) ? '#111' : 'none'} stroke="#111" strokeWidth="1.5">
-                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-                </svg>
-              </button>
-              <button className="col-customize-btn">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4m-7.07-3.93l2.83-2.83m8.48-8.48l2.83-2.83M2 12h4m12 0h4m-3.93 7.07l-2.83-2.83M6.76 6.76L3.93 3.93"/></svg>
-                <span>Personalizar</span>
-              </button>
-              <button
-                className="col-cta-btn"
-                onClick={handleAddToBag}
-                disabled={adding || !selectedVariant?.availableForSale}
-              >
-                {adding
-                  ? t('common.adding')
-                  : !selectedVariant?.availableForSale
-                  ? t('common.soldOut')
-                  : (sizeOptions.length > 0 && !selectedSize)
-                  ? t('common.selectSize')
-                  : t('common.addToBag')}
-              </button>
-            </div>
-          )}
-
-          {/* Size selector */}
-          {sizeOptions.length > 0 && (
-            <div className="col-size-grid">
-              {STANDARD_SIZES.filter(s => sizeOptions.includes(s)).map((size) => {
-                const available = isSizeAvailable(size);
-                return (
-                  <button
-                    key={size}
-                    className={`col-size-btn${selectedSize === size ? ' active' : ''}${!available ? ' sold-out' : ''}`}
-                    onClick={() => available ? setSelectedSize(size) : undefined}
-                  >
-                    {size}
-                  </button>
-                );
+        {/* MAIN MODULAR GRID */}
+        <div className="amiri-grid-wrapper">
+          {gridItems.length > 0 ? (
+            <div className="amiri-modular-grid">
+              {gridItems.map((item) => {
+                if (item.type === 'product' && item.product) {
+                  const p = item.product;
+                  const isLarge = item.colSpan === 2 && item.rowSpan === 2;
+                  const imageClass = getProductImageClass(p.title, p.tags);
+                  
+                  return (
+                    <Link
+                      href={`/product/${p.handle}`}
+                      key={item.key}
+                      className={`amiri-grid-item amiri-grid-item--product ${
+                        isLarge ? 'amiri-grid-item--span-2 amiri-grid-item--row-2' : ''
+                      }`}
+                    >
+                      <span className="amiri-product-tag">TOURNAMENT</span>
+                      <div className="amiri-product-img-wrap">
+                        {p.imageUrl && (
+                          <img
+                            src={p.imageUrl}
+                            alt={p.title}
+                            className={`amiri-product-img ${imageClass}`}
+                          />
+                        )}
+                      </div>
+                      <div className="amiri-product-info">
+                        <span className="amiri-product-name">{p.title}</span>
+                        <span className="amiri-product-price">
+                          {formatPrice(p.price, p.currencyCode)}
+                        </span>
+                      </div>
+                    </Link>
+                  );
+                } else {
+                  const isLarge = item.colSpan === 2 && item.rowSpan === 2;
+                  const isWide = item.colSpan === 2 && item.rowSpan === 1;
+                  
+                  return (
+                    <div
+                      key={item.key}
+                      className={`amiri-grid-item amiri-grid-item--lifestyle ${
+                        isLarge ? 'amiri-grid-item--span-2 amiri-grid-item--row-2' : ''
+                      } ${isWide ? 'amiri-grid-item--span-2 amiri-grid-item--wide' : ''}`}
+                    >
+                      {item.imageUrl && (
+                        <img
+                          src={item.imageUrl}
+                          alt="Collection Lifestyle"
+                          className="amiri-lifestyle-img"
+                        />
+                      )}
+                    </div>
+                  );
+                }
               })}
             </div>
+          ) : (
+            <div className="amiri-empty-grid">
+              <span>NO PRODUCTS FOUND MATCHING THE ACTIVE FILTERS</span>
+            </div>
           )}
-
-          {/* Delivery line */}
-          <div className="col-delivery">
-            <Check size={13} strokeWidth={1.5} color="#111" />
-            <span>{t('common.freeDeliveryShort')}</span>
-          </div>
-
-          {/* Accordion sections */}
-          <div className="col-accordions">
-            <div className="col-accordion-item">
-              <button className="col-accordion-header" onClick={() => setActiveDrawer(activeDrawer === 'sizefit' ? null : 'sizefit')}>
-                <span>{t('common.sizeAndFit')}</span>
-                <span className={`col-accordion-icon${activeDrawer === 'sizefit' ? ' open' : ''}`}><Plus size={12} strokeWidth={1.4} /></span>
-              </button>
-              {activeDrawer === 'sizefit' && (
-                <div className="col-accordion-body">
-                  {sizeOptions.length > 0 && (
-                    <div className="col-inline-sizes">
-                      {STANDARD_SIZES.filter(s => sizeOptions.includes(s)).map((size) => {
-                        const available = isSizeAvailable(size);
-                        return (
-                          <button
-                            key={size}
-                            className={`col-inline-size${selectedSize === size ? ' active' : ''}${!available ? ' sold-out' : ''}`}
-                            onClick={() => available ? setSelectedSize(size) : undefined}
-                          >
-                            {size}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                  <p className="col-accordion-text">{t('common.deliveryEstimate')}</p>
-                </div>
-              )}
-            </div>
-
-            <div className="col-accordion-item">
-              <button className="col-accordion-header" onClick={() => setActiveDrawer(activeDrawer === 'details' ? null : 'details')}>
-                <span>{t('common.detailsAndCare')}</span>
-                <span className={`col-accordion-icon${activeDrawer === 'details' ? ' open' : ''}`}><Plus size={12} strokeWidth={1.4} /></span>
-              </button>
-              {activeDrawer === 'details' && (
-                <div className="col-accordion-body">
-                  <TranslatedDesc text={selectedProduct?.description || collection.description} />
-                </div>
-              )}
-            </div>
-
-            <div className="col-accordion-item">
-              <button className="col-accordion-header" onClick={() => setActiveDrawer(activeDrawer === 'delivery' ? null : 'delivery')}>
-                <span>{t('common.deliveryAndReturns')}</span>
-                <span className={`col-accordion-icon${activeDrawer === 'delivery' ? ' open' : ''}`}><Plus size={12} strokeWidth={1.4} /></span>
-              </button>
-              {activeDrawer === 'delivery' && (
-                <div className="col-accordion-body">
-                  <p className="col-accordion-text">
-                    <strong>{t('common.drawerDeliveryLabel')}</strong><br />
-                    {t('common.drawerDeliveryBody')}
-                  </p>
-                  <p className="col-accordion-text" style={{ marginTop: 12 }}>
-                    <strong>{t('common.drawerReturnsLabel')}</strong><br />
-                    {t('common.drawerReturnsBody')}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
         </div>
-
-        {/* ── Mobile only: remaining gallery images after info panel ── */}
-        {galleryImages.length > 1 && (
-          <div className="col-gallery-mobile-rest">
-            {galleryImages.slice(1).map((url, i) => (
-              <div key={`rest-${selectedIdx}-${i}`} className="col-gallery-slide">
-                <img
-                  src={url}
-                  alt={`${selectedProduct?.title ?? collection.title} ${i + 2}`}
-                  className="col-main-img"
-                />
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
-      <NotifyMeModal
-        isOpen={notifyOpen}
-        onClose={() => setNotifyOpen(false)}
-        sizes={sizeOptions}
-        preselectedSize={selectedSize}
-        productTitle={selectedProduct?.title}
+      {/* FLOATING MONOGRAM BADGE */}
+      <div className="amiri-monogram-badge">
+        <span>T</span>
+      </div>
+
+      {/* REFINE DRAWER OVERLAY */}
+      <div 
+        className={`amiri-refine-overlay ${refineOpen ? 'open' : ''}`}
+        onClick={applyFilters}
       />
 
-      {/* ── YOU MAY ALSO LIKE — Suitsupply carousel ── */}
-      {recommended.length > 0 && (
-        <YmalCarousel recommended={recommended} toggle={toggle} />
-      )}
-
-      {/* Mobile fixed info bar — visible until real info scrolls into view */}
-      <div className={`col-mobile-fixed-bar ${showMobileBar ? '' : 'hidden'}`}>
-        <div className="col-mfb-info">
-          <div className="col-mfb-row">
-            <span className="col-mfb-title">{selectedProduct?.title ?? collection.title}</span>
-            {selectedProduct && <span className="col-mfb-price">&euro;{priceFormatted}</span>}
-          </div>
-          {selectedProduct && <span className="col-mfb-subtitle">{selectedProduct.title}</span>}
+      {/* REFINE DRAWER */}
+      <div className={`amiri-refine-drawer ${refineOpen ? 'open' : ''}`}>
+        <div className="amiri-refine-header">
+          <h2>REFINE</h2>
+          <button 
+            type="button" 
+            className="amiri-refine-close" 
+            onClick={applyFilters}
+          >
+            <X size={16} strokeWidth={1.5} />
+          </button>
         </div>
-        <div className="col-mfb-actions">
-          <button
-            className="col-mfb-bookmark"
-            aria-label="Add to wishlist"
-            onClick={() => {
-              if (selectedProduct) {
-                const isBookmarked = has(selectedProduct.handle);
-                toggle({
-                  handle: selectedProduct.handle,
-                  title: selectedProduct.title,
-                  imageUrl: selectedProduct.imageUrl,
-                  price: selectedProduct.price,
-                  currencyCode: selectedProduct.currencyCode,
-                  collectionTitle: collection.title
-                });
-                if (!isBookmarked) {
-                  setCeremonyOpen(true);
-                }
-              }
-            }}
+
+        <div className="amiri-refine-body">
+          {/* SORT BY ACCORDION */}
+          <div className="amiri-refine-section">
+            <button 
+              type="button"
+              className="amiri-refine-section-header"
+              onClick={() => toggleAccordion('sort')}
+            >
+              <span>SORT BY</span>
+              {activeFilterAccordion === 'sort' ? <Minus size={11} strokeWidth={1.5} /> : <Plus size={11} strokeWidth={1.5} />}
+            </button>
+            {activeFilterAccordion === 'sort' && (
+              <div className="amiri-refine-section-content">
+                <button
+                  type="button"
+                  className={`amiri-refine-option ${tempSort === 'featured' ? 'active' : ''}`}
+                  onClick={() => setTempSort('featured')}
+                >
+                  <span className="amiri-refine-option-check" />
+                  <span>FEATURED</span>
+                </button>
+                <button
+                  type="button"
+                  className={`amiri-refine-option ${tempSort === 'price-asc' ? 'active' : ''}`}
+                  onClick={() => setTempSort('price-asc')}
+                >
+                  <span className="amiri-refine-option-check" />
+                  <span>PRICE: LOW TO HIGH</span>
+                </button>
+                <button
+                  type="button"
+                  className={`amiri-refine-option ${tempSort === 'price-desc' ? 'active' : ''}`}
+                  onClick={() => setTempSort('price-desc')}
+                >
+                  <span className="amiri-refine-option-check" />
+                  <span>PRICE: HIGH TO LOW</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* AVAILABILITY ACCORDION */}
+          <div className="amiri-refine-section">
+            <button 
+              type="button"
+              className="amiri-refine-section-header"
+              onClick={() => toggleAccordion('availability')}
+            >
+              <span>AVAILABILITY</span>
+              {activeFilterAccordion === 'availability' ? <Minus size={11} strokeWidth={1.5} /> : <Plus size={11} strokeWidth={1.5} />}
+            </button>
+            {activeFilterAccordion === 'availability' && (
+              <div className="amiri-refine-section-content">
+                <button
+                  type="button"
+                  className={`amiri-refine-option ${tempAvailability.includes('in-stock') ? 'active' : ''}`}
+                  onClick={() => toggleTempFilter(tempAvailability, setTempAvailability, 'in-stock')}
+                >
+                  <span className="amiri-refine-option-check" />
+                  <span>IN STOCK</span>
+                </button>
+                <button
+                  type="button"
+                  className={`amiri-refine-option ${tempAvailability.includes('out-of-stock') ? 'active' : ''}`}
+                  onClick={() => toggleTempFilter(tempAvailability, setTempAvailability, 'out-of-stock')}
+                >
+                  <span className="amiri-refine-option-check" />
+                  <span>OUT OF STOCK</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* COLOR ACCORDION */}
+          {filterOptions.colors.length > 0 && (
+            <div className="amiri-refine-section">
+              <button 
+                type="button"
+                className="amiri-refine-section-header"
+                onClick={() => toggleAccordion('color')}
+              >
+                <span>COLOR</span>
+                {activeFilterAccordion === 'color' ? <Minus size={11} strokeWidth={1.5} /> : <Plus size={11} strokeWidth={1.5} />}
+              </button>
+              {activeFilterAccordion === 'color' && (
+                <div className="amiri-refine-section-content">
+                  {filterOptions.colors.map(col => (
+                    <button
+                      key={col}
+                      type="button"
+                      className={`amiri-refine-option ${tempColors.includes(col) ? 'active' : ''}`}
+                      onClick={() => toggleTempFilter(tempColors, setTempColors, col)}
+                    >
+                      <span className="amiri-refine-option-check" />
+                      <span>{col}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* SIZE ACCORDION */}
+          {filterOptions.sizes.length > 0 && (
+            <div className="amiri-refine-section">
+              <button 
+                type="button"
+                className="amiri-refine-section-header"
+                onClick={() => toggleAccordion('size')}
+              >
+                <span>SIZE</span>
+                {activeFilterAccordion === 'size' ? <Minus size={11} strokeWidth={1.5} /> : <Plus size={11} strokeWidth={1.5} />}
+              </button>
+              {activeFilterAccordion === 'size' && (
+                <div className="amiri-refine-section-content">
+                  {filterOptions.sizes.map(sz => (
+                    <button
+                      key={sz}
+                      type="button"
+                      className={`amiri-refine-option ${tempSizes.includes(sz) ? 'active' : ''}`}
+                      onClick={() => toggleTempFilter(tempSizes, setTempSizes, sz)}
+                    >
+                      <span className="amiri-refine-option-check" />
+                      <span>{sz}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* MATERIAL ACCORDION */}
+          {filterOptions.materials.length > 0 && (
+            <div className="amiri-refine-section">
+              <button 
+                type="button"
+                className="amiri-refine-section-header"
+                onClick={() => toggleAccordion('material')}
+              >
+                <span>MATERIAL</span>
+                {activeFilterAccordion === 'material' ? <Minus size={11} strokeWidth={1.5} /> : <Plus size={11} strokeWidth={1.5} />}
+              </button>
+              {activeFilterAccordion === 'material' && (
+                <div className="amiri-refine-section-content">
+                  {filterOptions.materials.map(mat => (
+                    <button
+                      key={mat}
+                      type="button"
+                      className={`amiri-refine-option ${tempMaterials.includes(mat) ? 'active' : ''}`}
+                      onClick={() => toggleTempFilter(tempMaterials, setTempMaterials, mat)}
+                    >
+                      <span className="amiri-refine-option-check" />
+                      <span>{mat}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* REFINE DRAWER FOOTER */}
+        <div className="amiri-refine-footer">
+          <button 
+            type="button" 
+            className="amiri-refine-btn-clear"
+            onClick={clearFilters}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill={selectedProduct && has(selectedProduct.handle) ? '#111' : 'none'} stroke="#111" strokeWidth="1.5">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-            </svg>
+            CLEAR ALL
           </button>
-          <button className="col-mfb-customize">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4m-7.07-3.93l2.83-2.83m8.48-8.48l2.83-2.83M2 12h4m12 0h4m-3.93 7.07l-2.83-2.83M6.76 6.76L3.93 3.93"/></svg>
-            <span>Personalizar</span>
-          </button>
-          <button
-            className="col-mfb-cta"
-            onClick={handleAddToBag}
-            disabled={adding || !selectedVariant?.availableForSale}
+          <button 
+            type="button" 
+            className="amiri-refine-btn-view"
+            onClick={applyFilters}
           >
-            {adding
-              ? t('common.adding')
-              : !selectedVariant?.availableForSale
-              ? t('common.soldOut')
-              : (sizeOptions.length > 0 && !selectedSize)
-              ? t('common.selectSize')
-              : t('common.addToBag')}
+            VIEW ({tempFilteredCount})
           </button>
         </div>
       </div>
 
-      {/* ══ CINEMATIC ARCHIVAL CEREMONY MODAL ══ */}
-      {ceremonyOpen && selectedProduct && (
-        <div className="ac-overlay" onClick={() => setCeremonyOpen(false)}>
-          <div className="ac-modal" onClick={e => e.stopPropagation()}>
-            <button className="ac-close" onClick={() => setCeremonyOpen(false)} aria-label="Close Ceremony">
-              <svg width="10" height="10" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1">
-                <line x1="1" y1="1" x2="13" y2="13" />
-                <line x1="13" y1="1" x2="1" y2="13" />
-              </svg>
-            </button>
-
-            <div className="ac-header">
-              <span className="ac-supra">ARCHIVE RECORD</span>
-              <h2 className="ac-title">Archive Entry Created</h2>
-              <p className="ac-desc">
-                This garment has been preserved within your private archive and will remain accessible while availability permits.
-              </p>
-            </div>
-
-            <div className="ac-split">
-              <div className="ac-image-panel">
-                {selectedProduct.imageUrl && (
-                  <img src={selectedProduct.imageUrl} alt={selectedProduct.title} className="ac-garment-img" />
-                )}
-              </div>
-
-              <div className="ac-details-panel">
-                <div className="ac-tech-grid">
-                  <div className="ac-tech-item">
-                    <span className="ac-tech-label">Garment Name</span>
-                    <span className="ac-tech-value ac-tech-value--name">{selectedProduct.title.toUpperCase()}</span>
-                  </div>
-
-                  <div className="ac-tech-item">
-                    <span className="ac-tech-label">Collection</span>
-                    <span className="ac-tech-value">{getHouseState(selectedProduct.handle)}</span>
-                  </div>
-
-                  <div className="ac-tech-item">
-                    <span className="ac-tech-label">Archive Reference</span>
-                    <span className="ac-tech-value ac-tech-value--ref">{getArchiveRef(selectedProduct.handle)}</span>
-                  </div>
-
-                  <div className="ac-tech-item">
-                    <span className="ac-tech-label">Date Preserved</span>
-                    <span className="ac-tech-value">
-                      {new Date().toLocaleDateString('en-GB', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                      }).toUpperCase()}
-                    </span>
-                  </div>
-
-                  <div className="ac-tech-item">
-                    <span className="ac-tech-label">Archive Position</span>
-                    <span className="ac-tech-value">
-                      Position {items.findIndex(i => i.handle === selectedProduct.handle) + 1 > 0 ? items.findIndex(i => i.handle === selectedProduct.handle) + 1 : items.length + 1} of {Math.max(items.length, items.findIndex(i => i.handle === selectedProduct.handle) + 1)}
-                    </span>
-                  </div>
-
-                  <div className="ac-tech-item">
-                    <span className="ac-tech-label">Collection Status</span>
-                    <span className="ac-tech-value">
-                      {selectedProduct.variants.some(v => v.availableForSale) ? 'ACTIVE COLLECTION' : 'PERMANENT ARCHIVE'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="ac-divider" />
-
-                <div className="ac-avail-section">
-                  <span className="ac-section-label">Archive Availability</span>
-                  <p className="ac-avail-desc">
-                    This garment remains available for acquisition while inventory permits.
-                  </p>
-
-                  <div className="ac-avail-status-block">
-                    <div className="ac-status-row">
-                      <span className="ac-status-label">Availability State</span>
-                      <span className={`ac-status-value ${!selectedProduct.variants.some(v => v.availableForSale) ? 'ac-status-value--closed' : ''}`}>
-                        {selectedProduct.variants.some(v => v.availableForSale) ? 'AVAILABLE' : 'PERMANENTLY ARCHIVED'}
-                      </span>
-                    </div>
-
-                    <div className="ac-status-row">
-                      <span className="ac-status-label">Estimated Window</span>
-                      <span className="ac-status-value">
-                        {selectedProduct.variants.some(v => v.availableForSale) ? 'APPROXIMATELY 12 DAYS REMAINING' : 'CLOSED'}
-                      </span>
-                    </div>
-
-                    {selectedProduct.variants.some(v => v.availableForSale) && (
-                      <div className="ac-timeline-wrap">
-                        <span className="ac-timeline-label">Preservation Window Timeline</span>
-                        <div className="ac-timeline">
-                          {[...Array(14)].map((_, i) => (
-                            <div key={i} className={`ac-timeline-tick ${i < 12 ? 'active' : ''}`} />
-                          ))}
-                        </div>
-                        <div className="ac-timeline-footer">
-                          <span>Today</span>
-                          <span>12 June 2026</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="ac-divider" />
-
-                <div className="ac-notes-section">
-                  <span className="ac-section-label">House Notes</span>
-                  <p className="ac-notes-text">
-                    Archived garments remain accessible for future consideration. Availability is not guaranteed and may change as pieces enter permanent archive status.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="ac-actions">
-              <Link href="/archive" className="ac-btn-primary">
-                View Archive
-              </Link>
-              <button className="ac-btn-secondary" onClick={() => setCeremonyOpen(false)}>
-                Continue Through The House
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       <style>{`
-        /* ══════════════════════════════════════
-           CINEMATIC ARCHIVAL CEREMONY MODAL
-        ══════════════════════════════════════ */
-
-        .ac-overlay {
-          position: fixed;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(12, 12, 12, 0.96);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 10000;
-          opacity: 0;
-          animation: ac-fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        /* AMIRI LUXURY EDITORIAL PLP STYLE REPLICA */
+        .amiri-collection-container {
+          padding-top: 56px;
+          padding-bottom: 120px;
+          background-color: #ffffff;
         }
 
-        .ac-modal {
-          background: #111111;
-          border: 1px solid rgba(243, 240, 234, 0.08);
-          width: 100%;
-          max-width: 820px;
-          padding: 48px;
-          position: relative;
-          color: rgba(255, 255, 255, 0.85);
-          box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+        /* TOP AREA */
+        .amiri-collection-top {
           display: flex;
           flex-direction: column;
-          gap: 32px;
+          align-items: center;
+          position: relative;
+          padding: 36px 40px 60px;
           box-sizing: border-box;
-          opacity: 0;
-          transform: translateY(20px);
-          animation: ac-slide-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
         }
-
-        .ac-close {
+        .amiri-collection-title {
+          font-family: var(--font-brand), var(--font-serif), serif;
+          font-size: clamp(24px, 3.5vw, 36px);
+          font-weight: 300;
+          color: #000000;
+          text-align: center;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          margin: 0;
+          line-height: 1.2;
+        }
+        .amiri-refine-trigger {
           position: absolute;
-          top: 28px;
-          right: 28px;
+          right: 40px;
+          bottom: 60px;
           background: none;
           border: none;
-          color: rgba(255, 255, 255, 0.3);
-          cursor: pointer;
-          padding: 8px;
-          transition: color 0.4s;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .ac-close:hover {
-          color: #ffffff;
-        }
-
-        .ac-header {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          border-bottom: 1px solid rgba(243, 240, 234, 0.05);
-          padding-bottom: 24px;
-        }
-
-        .ac-supra {
-          font-size: 7px;
-          font-weight: 300;
-          letter-spacing: 0.4em;
-          color: rgba(255, 255, 255, 0.35);
-          text-transform: uppercase;
-        }
-
-        .ac-title {
-          font-family: var(--font-brand);
-          font-size: clamp(20px, 3.5vw, 26px);
-          font-weight: 300;
-          letter-spacing: 0.12em;
-          color: rgba(255, 255, 255, 0.85);
-          margin: 0;
-        }
-
-        .ac-desc {
-          font-size: 10px;
-          font-weight: 300;
-          letter-spacing: 0.06em;
-          line-height: 1.6;
-          color: rgba(255, 255, 255, 0.4);
-          margin: 0;
-          max-width: 600px;
-        }
-
-        .ac-split {
-          display: grid;
-          grid-template-columns: 220px 1fr;
-          gap: 48px;
-          align-items: start;
-        }
-
-        .ac-image-panel {
-          aspect-ratio: 3 / 4;
-          background: rgba(255, 255, 255, 0.015);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-          border: 1px solid rgba(243, 240, 234, 0.04);
-          opacity: 0;
-          transform: scale(0.97);
-          animation: ac-img-fade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;
-        }
-
-        .ac-garment-img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-          filter: grayscale(0.15);
-          transition: filter 0.5s;
-        }
-        .ac-garment-img:hover {
-          filter: grayscale(0);
-        }
-
-        .ac-details-panel {
-          display: flex;
-          flex-direction: column;
-          gap: 24px;
-        }
-
-        .ac-tech-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 16px 24px;
-        }
-
-        .ac-tech-item {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-        }
-
-        .ac-tech-label {
-          font-size: 7px;
-          font-weight: 300;
-          text-transform: uppercase;
-          letter-spacing: 0.25em;
-          color: rgba(255, 255, 255, 0.3);
-        }
-
-        .ac-tech-value {
-          font-size: 10px;
-          font-weight: 300;
-          letter-spacing: 0.05em;
-          color: rgba(255, 255, 255, 0.65);
-        }
-        .ac-tech-value--name {
-          font-family: var(--font-brand);
-          letter-spacing: 0.08em;
-          color: rgba(255, 255, 255, 0.8);
-        }
-        .ac-tech-value--ref {
-          font-family: monospace;
-          letter-spacing: 0.1em;
-          color: rgba(255, 255, 255, 0.5);
-        }
-
-        .ac-divider {
-          height: 1px;
-          background: rgba(243, 240, 234, 0.05);
-        }
-
-        .ac-section-label {
-          font-size: 7px;
-          font-weight: 300;
-          text-transform: uppercase;
-          letter-spacing: 0.25em;
-          color: rgba(255, 255, 255, 0.35);
-          display: block;
-          margin-bottom: 8px;
-        }
-
-        .ac-avail-section {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .ac-avail-desc {
-          font-size: 9px;
-          font-weight: 300;
-          letter-spacing: 0.06em;
-          line-height: 1.5;
-          color: rgba(255, 255, 255, 0.35);
-          margin: 0;
-        }
-
-        .ac-avail-status-block {
-          background: rgba(255, 255, 255, 0.01);
-          border: 1px solid rgba(243, 240, 234, 0.03);
-          padding: 16px;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          margin-top: 8px;
-        }
-
-        .ac-status-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          border-bottom: 1px solid rgba(243, 240, 234, 0.03);
-          padding-bottom: 8px;
-        }
-        .ac-status-row:last-of-type {
-          border-bottom: none;
-          padding-bottom: 0;
-        }
-
-        .ac-status-label {
-          font-size: 7px;
+          color: #000000;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 11px;
           font-weight: 300;
           text-transform: uppercase;
           letter-spacing: 0.15em;
-          color: rgba(255, 255, 255, 0.3);
-        }
-
-        .ac-status-value {
-          font-size: 8px;
-          font-weight: 300;
-          text-transform: uppercase;
-          letter-spacing: 0.15em;
-          color: rgba(255, 255, 255, 0.7);
-        }
-        .ac-status-value--closed {
-          color: #db4437;
-          opacity: 0.8;
-        }
-
-        .ac-timeline-wrap {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-          margin-top: 4px;
-        }
-
-        .ac-timeline-label {
-          font-size: 7px;
-          font-weight: 300;
-          text-transform: uppercase;
-          letter-spacing: 0.15em;
-          color: rgba(255, 255, 255, 0.25);
-        }
-
-        .ac-timeline {
-          display: flex;
-          gap: 3px;
-          width: 100%;
-          margin: 4px 0;
-        }
-
-        .ac-timeline-tick {
-          flex: 1;
-          height: 3px;
-          background: rgba(255, 255, 255, 0.05);
-        }
-        .ac-timeline-tick.active {
-          background: rgba(255, 255, 255, 0.25);
-        }
-
-        .ac-timeline-footer {
-          display: flex;
-          justify-content: space-between;
-          font-size: 6px;
-          font-weight: 300;
-          letter-spacing: 0.1em;
-          color: rgba(255, 255, 255, 0.2);
-          text-transform: uppercase;
-        }
-
-        .ac-notes-section {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .ac-notes-text {
-          font-size: 9px;
-          font-weight: 300;
-          letter-spacing: 0.06em;
-          line-height: 1.6;
-          color: rgba(255, 255, 255, 0.3);
-          margin: 0;
-        }
-
-        .ac-actions {
-          display: flex;
-          gap: 16px;
-          border-top: 1px solid rgba(243, 240, 234, 0.05);
-          padding-top: 24px;
-          margin-top: 12px;
-        }
-
-        .ac-btn-primary {
-          flex: 1;
-          background: transparent;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          text-align: center;
-          text-decoration: none;
-          padding: 14px;
-          font-size: 9px;
-          font-weight: 300;
-          text-transform: uppercase;
-          letter-spacing: 0.3em;
-          color: rgba(255, 255, 255, 0.85);
           cursor: pointer;
-          transition: border-color 0.4s, color 0.4s, background 0.4s;
+          padding: 0;
+          transition: opacity 0.2s ease;
         }
-        .ac-btn-primary:hover {
-          border-color: rgba(255, 255, 255, 0.6);
-          color: #ffffff;
-          background: rgba(255, 255, 255, 0.02);
-        }
-
-        .ac-btn-secondary {
-          flex: 1.2;
-          background: transparent;
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          padding: 14px;
-          font-size: 9px;
-          font-weight: 300;
-          text-transform: uppercase;
-          letter-spacing: 0.3em;
-          color: rgba(255, 255, 255, 0.45);
-          cursor: pointer;
-          transition: border-color 0.4s, color 0.4s;
-        }
-        .ac-btn-secondary:hover {
-          border-color: rgba(255, 255, 255, 0.2);
-          color: rgba(255, 255, 255, 0.85);
-        }
-
-        /* ── ANIMATIONS ── */
-        @keyframes ac-fade-in {
-          to {
-            opacity: 1;
-          }
-        }
-
-        @keyframes ac-slide-up {
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes ac-img-fade {
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
+        .amiri-refine-trigger:hover {
+          opacity: 0.6;
         }
 
         @media (max-width: 767px) {
-          .ac-modal {
-            padding: 24px;
-            gap: 20px;
-            overflow-y: auto;
-            max-height: 90vh;
-            margin: 16px;
+          .amiri-collection-top {
+            padding: 24px 16px 40px;
           }
-          .ac-split {
-            grid-template-columns: 1fr;
-            gap: 24px;
-          }
-          .ac-image-panel {
-            max-width: 140px;
-            margin: 0 auto;
-          }
-          .ac-actions {
-            flex-direction: column;
-            gap: 10px;
+          .amiri-refine-trigger {
+            position: static;
+            margin-top: 24px;
           }
         }
 
-        /* ══════════════════════════════════════
-           SUITSUPPLY-STYLE COLLECTION/PRODUCT
-        ══════════════════════════════════════ */
-        .col-layout {
+        /* GRID SYSTEM */
+        .amiri-grid-wrapper {
+          padding: 0 40px;
+          box-sizing: border-box;
+          width: 100%;
+        }
+        @media (max-width: 767px) {
+          .amiri-grid-wrapper {
+            padding: 0 16px;
+          }
+        }
+
+        .amiri-modular-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 2px;
+          background-color: rgba(0, 0, 0, 0.04); /* hairline dividers */
+          box-sizing: border-box;
+          border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+        @media (max-width: 1023px) {
+          .amiri-modular-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+        @media (max-width: 767px) {
+          .amiri-modular-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1px;
+          }
+        }
+
+        .amiri-empty-grid {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 120px 24px;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 11px;
+          letter-spacing: 0.15em;
+          color: #888888;
+        }
+
+        /* GRID ITEMS */
+        .amiri-grid-item {
+          background-color: #f6f6f6;
+          position: relative;
+          box-sizing: border-box;
+          overflow: hidden;
           display: flex;
           flex-direction: column;
-          font-family: var(--font-primary);
-          color: #111;
-          margin-top: -48px;
+          justify-content: space-between;
+          text-decoration: none;
+          color: inherit;
+          aspect-ratio: 3 / 4;
         }
 
-        /* ── GALLERY ── */
-        .col-gallery {
-          position: relative;
-          background: #e8e4df;
-          line-height: 0;
+        .amiri-grid-item--span-2 {
+          grid-column: span 2;
         }
-        .col-gallery-slide {
-          width: 100%;
-          height: 100vh;
+        .amiri-grid-item--row-2 {
+          grid-row: span 2;
+        }
+        .amiri-grid-item--wide {
+          aspect-ratio: 3 / 2;
+        }
+
+        @media (max-width: 767px) {
+          .amiri-grid-item--span-2 {
+            grid-column: span 2;
+          }
+          .amiri-grid-item--row-2 {
+            grid-row: span 2;
+          }
+        }
+
+        /* PRODUCT CELLS INTERIOR */
+        .amiri-product-tag {
+          position: absolute;
+          top: 20px;
+          left: 20px;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 8.5px;
+          font-weight: 300;
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
+          color: #888888;
+          z-index: 2;
+        }
+
+        .amiri-product-img-wrap {
+          flex: 1;
           display: flex;
           align-items: center;
           justify-content: center;
-          overflow: hidden;
-          background: #e8e4df;
-        }
-        .col-gallery-slide .col-main-img {
+          padding: 0;
+          box-sizing: border-box;
           width: 100%;
-          height: 100% !important;
-          max-width: none;
-          object-fit: contain;
+          height: 100%;
+          position: relative;
+          isolation: isolate;
+          background-color: #f6f6f6;
+        }
+
+        .amiri-product-img {
+          width: 100%;
+          height: 100%;
+          display: block;
+          object-fit: cover;
+          transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+          mix-blend-mode: multiply;
+        }
+
+        .amiri-grid-item--product:hover .amiri-product-img {
+          transform: scale(1.03);
+        }
+
+        /* Optical Scaling classes - Overridden for full fill */
+        .amiri-product-img--top,
+        .amiri-product-img--pants,
+        .amiri-product-img--sneaker,
+        .amiri-product-img--accessory {
+          width: 100%;
+          height: 100%;
+          max-width: 100%;
+          max-height: 100%;
+        }
+
+        .amiri-product-info {
+          padding: 20px 24px;
+          background-color: #f6f6f6;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          box-sizing: border-box;
+          z-index: 2;
+          width: 100%;
+          align-items: flex-start;
+          text-align: left;
+        }
+
+        .amiri-product-name {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 9.5px;
+          font-weight: 300;
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+          color: #000000;
+          margin: 0;
+          line-height: 1.3;
+          width: 100%;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .amiri-product-price {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 9px;
+          font-weight: 300;
+          color: #555555;
+          letter-spacing: 0.08em;
+          margin: 0;
+        }
+
+        /* LIFESTYLE CELLS INTERIOR */
+        .amiri-lifestyle-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
           display: block;
         }
-        .col-gallery-desc {
-          padding: 40px 24px 60px;
-          background: #fff;
-        }
-        .col-desc-wrapper { margin: 0; }
-        .col-desc {
-          position: relative;
-          font-size: 14px;
-          font-weight: 400;
-          line-height: 1.7;
-          color: #444;
-          overflow: hidden;
-          max-height: calc(1.7em * 6);
-        }
-        .col-desc.expanded { max-height: none; }
-        .col-desc p { margin: 0; }
-        .col-desc-blur {
-          position: absolute;
-          bottom: 0; left: 0; right: 0;
-          height: 2em;
-          background: linear-gradient(to bottom, rgba(255,255,255,0), #fff);
-          pointer-events: none;
-        }
-        .col-desc-toggle {
-          background: none; border: none; padding: 6px 0 0; margin: 0;
-          font: inherit; font-size: 12px; color: #111; cursor: pointer;
-          text-decoration: underline; text-underline-offset: 2px;
-        }
 
-        /* ── INFO PANEL ── */
-        .col-info {
-          padding: 24px 20px 140px 20px;
-          color: #111 !important;
-          background: #fff;
-        }
-        .col-info h1,
-        .col-info h2,
-        .col-info h3,
-        .col-info span,
-        .col-info p {
-          color: inherit;
-        }
-
-        /* Header: title + price */
-        .col-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          gap: 20px;
-          margin-bottom: 6px;
-        }
-        .col-title {
-          font-size: 13px;
-          font-weight: 500;
-          line-height: 1.3;
-          margin: 0;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          color: #111 !important;
-        }
-        .col-price {
-          font-size: 13px;
-          font-weight: 500;
-          white-space: nowrap;
-          letter-spacing: 0.06em;
-          color: #111;
-        }
-
-        /* Subtitle */
-        .col-subtitle {
-          font-size: 10px;
-          font-weight: 400;
-          color: #888;
-          margin: 0 0 20px 0;
-          line-height: 1.6;
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
-        }
-
-        /* Thumbnails — Suitsupply style: square, grey bg, rounded */
-        .col-thumbs-wrap {
-          position: relative;
-          margin-bottom: 20px;
-        }
-        .col-thumbs {
-          display: flex;
-          gap: 8px;
-          overflow-x: auto;
-          scrollbar-width: none;
-          max-width: 100%;
-          padding-right: 32px;
-        }
-        .col-thumbs::-webkit-scrollbar { display: none; }
-        .col-thumb {
-          width: 60px;
-          height: 60px;
-          padding: 4px;
-          border: 2px solid transparent;
-          border-radius: 8px;
-          cursor: pointer;
-          background: #f0efed;
-          flex-shrink: 0;
-          box-sizing: border-box;
-          overflow: hidden;
-          transition: border-color 0.15s, opacity 0.15s;
-        }
-        .col-thumb.active {
-          border-color: #111;
-        }
-        .col-thumb:hover:not(.active) { opacity: 0.75; }
-        .col-thumb img {
-          width: 100%; height: 100%;
-          object-fit: contain; display: block;
-          border-radius: 4px;
-        }
-        .col-thumbs-arrow {
-          position: absolute;
-          right: 0;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 28px;
-          height: 28px;
-          background: #fff;
-          border: 1px solid #ddd;
+        /* FLOATING MONOGRAM BADGE */
+        .amiri-monogram-badge {
+          position: fixed;
+          bottom: 24px;
+          right: 24px;
+          width: 44px;
+          height: 44px;
+          background-color: #000000;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          color: #ffffff;
+          font-family: var(--font-brand);
+          font-size: 18px;
+          z-index: 999;
           cursor: pointer;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.10);
-          z-index: 2;
+          transition: transform 0.3s ease;
         }
-        .col-thumbs-arrow:hover { background: #f5f5f5; }
-        .col-no-products {
-          font-size: 12px; color: #888;
-          margin-bottom: 16px;
+        .amiri-monogram-badge:hover {
+          transform: scale(1.05);
         }
 
-        /* Action row */
-        .col-actions {
-          display: flex;
-          gap: 8px;
-          margin-bottom: 16px;
-          height: 44px;
-          align-items: stretch;
+        /* REFINE DRAWER OVERLAY */
+        .amiri-refine-overlay {
+          position: fixed;
+          inset: 0;
+          background-color: rgba(0, 0, 0, 0.15);
+          z-index: 10000;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .col-bookmark {
-          width: 44px;
-          height: 44px;
-          border: 1px solid #d0d0d0;
-          background: #fff;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          flex-shrink: 0;
-          border-radius: 6px;
-          transition: background 0.15s;
-        }
-        .col-bookmark:hover { background: #f5f5f5; }
-        .col-customize-btn {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 6px;
-          height: 44px;
-          padding: 0 16px;
-          border: 1px solid #d0d0d0;
-          background: #fff;
-          border-radius: 6px;
-          font-family: inherit;
-          font-size: 11px;
-          font-weight: 500;
-          color: #111;
-          cursor: pointer;
-          white-space: nowrap;
-          transition: border-color 0.15s;
-        }
-        .col-customize-btn:hover { border-color: #111; }
-        .col-cta-btn {
-          flex: 1;
-          height: 44px;
-          background: #111;
-          color: #fff;
-          border: none;
-          border-radius: 6px;
-          font-family: inherit;
-          font-size: 11px;
-          font-weight: 500;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          cursor: pointer;
-          transition: background 0.15s;
-        }
-        .col-cta-btn:hover:not(:disabled) { background: #333; }
-        .col-cta-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* Size grid */
-        .col-size-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-          border: 1px solid #e0e0e0;
-          margin-bottom: 16px;
-          background: #fff;
-        }
-        .col-size-btn {
-          padding: 12px 8px;
-          font-family: inherit;
-          font-size: 12px;
-          font-weight: 400;
-          text-align: center;
-          border: none;
-          border-right: 1px solid #e0e0e0;
-          border-bottom: 1px solid #e0e0e0;
-          background: #fff;
-          cursor: pointer;
-          color: #111;
-          transition: background 0.12s;
-        }
-        .col-size-btn:hover:not(.sold-out):not(.active) { background: #f5f5f5; }
-        .col-size-btn.active { background: #111; color: #fff; }
-        .col-size-btn.sold-out { color: #ccc; cursor: not-allowed; text-decoration: line-through; }
-
-        /* Delivery line */
-        .col-delivery {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          padding: 14px 0;
-          font-size: 10px;
-          font-weight: 500;
-          color: #444;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          border-bottom: 1px solid #e8e8e8;
+        .amiri-refine-overlay.open {
+          opacity: 1;
+          pointer-events: all;
         }
 
-        /* Accordion sections */
-        .col-accordions { margin-top: 0; }
-        .col-accordion-item {
-          border-bottom: 1px solid #e8e8e8;
-        }
-        .col-accordion-header {
+        /* REFINE DRAWER */
+        .amiri-refine-drawer {
+          position: fixed;
+          top: 0;
+          left: 0;
+          bottom: 0;
           width: 100%;
+          max-width: 360px;
+          background-color: #ffffff;
+          z-index: 10001;
+          transform: translateX(-100%);
+          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          display: flex;
+          flex-direction: column;
+          box-shadow: 10px 0 30px rgba(0, 0, 0, 0.02);
+        }
+        .amiri-refine-drawer.open {
+          transform: translateX(0);
+        }
+
+        .amiri-refine-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 16px 0;
-          background: none;
-          border: none;
-          font-family: inherit;
-          font-size: 11px;
-          font-weight: 500;
-          color: #111;
-          cursor: pointer;
-          text-align: left;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
+          padding: 24px 32px;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.04);
         }
-        .col-accordion-header:hover { opacity: 0.7; }
-        .col-accordion-icon {
-          font-size: 18px;
-          font-weight: 300;
-          color: #111;
-          transition: transform 0.2s;
-          line-height: 1;
-        }
-        .col-accordion-icon.open { transform: rotate(45deg); }
-        .col-accordion-body { padding: 0 0 16px; }
-        .col-accordion-text {
-          font-size: 13px;
+        .amiri-refine-header h2 {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 12px;
           font-weight: 400;
-          line-height: 1.7;
-          color: #555;
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
+          color: #000000;
           margin: 0;
         }
-
-        /* Inline size buttons */
-        .col-inline-sizes {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 6px;
-          margin-bottom: 12px;
-        }
-        .col-inline-size {
-          padding: 8px 14px;
-          font-family: inherit;
-          font-size: 11px;
-          font-weight: 500;
-          border: 1px solid #d0d0d0;
-          background: #fff;
+        .amiri-refine-close {
+          background: none;
+          border: none;
+          color: #000000;
           cursor: pointer;
-          color: #111;
-          border-radius: 0;
-          transition: all 0.12s;
+          padding: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: opacity 0.2s ease;
         }
-        .col-inline-size:hover:not(.sold-out):not(.active) { border-color: #111; }
-        .col-inline-size.active { background: #111; color: #fff; border-color: #111; }
-        .col-inline-size.sold-out { color: #ccc; border-color: #eee; cursor: not-allowed; text-decoration: line-through; }
+        .amiri-refine-close:hover {
+          opacity: 0.6;
+        }
 
-        /* ── MOBILE FIXED INFO BAR ── */
-        .col-mobile-fixed-bar {
+        .amiri-refine-body {
+          flex: 1;
+          overflow-y: auto;
+          padding: 16px 32px;
+          scrollbar-width: none;
+        }
+        .amiri-refine-body::-webkit-scrollbar {
           display: none;
         }
 
-        @media (max-width: 767px) {
-          .col-mobile-fixed-bar {
-            display: block;
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            z-index: 200;
-            background: #fff;
-            padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px)) 16px;
-            box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
-            transition: transform 0.3s ease, opacity 0.3s ease;
-          }
-          .col-mobile-fixed-bar.hidden {
-            transform: translateY(100%);
-            opacity: 0;
-            pointer-events: none;
-          }
-          .col-mfb-info {
-            margin-bottom: 12px;
-          }
-          .col-mfb-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            gap: 12px;
-          }
-          .col-mfb-title {
-            font-size: 15px;
-            font-weight: 600;
-            line-height: 1.3;
-            color: #111;
-          }
-          .col-mfb-price {
-            font-size: 15px;
-            font-weight: 600;
-            color: #111;
-            white-space: nowrap;
-          }
-          .col-mfb-subtitle {
-            font-size: 12px;
-            font-weight: 400;
-            color: #666;
-            display: block;
-            margin-top: 2px;
-          }
-          .col-mfb-actions {
-            display: flex;
-            gap: 8px;
-            height: 42px;
-            align-items: stretch;
-          }
-          .col-mfb-bookmark {
-            width: 42px;
-            height: 42px;
-            border: 1px solid #d0d0d0 !important;
-            border-radius: 6px !important;
-            background: #fff !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            flex-shrink: 0;
-            padding: 0 !important;
-            letter-spacing: 0 !important;
-            transform: none !important;
-          }
-          .col-mfb-customize {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            height: 42px;
-            padding: 0 14px !important;
-            border: 1px solid #d0d0d0 !important;
-            background: #fff !important;
-            border-radius: 6px !important;
-            font-family: inherit;
-            font-size: 11px;
-            font-weight: 500;
-            color: #111 !important;
-            cursor: pointer;
-            white-space: nowrap;
-            letter-spacing: 0 !important;
-            transform: none !important;
-          }
-          .col-mfb-cta {
-            flex: 1;
-            height: 42px;
-            background: #111 !important;
-            color: #fff !important;
-            border: none !important;
-            border-radius: 6px !important;
-            font-family: inherit;
-            font-size: 11px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.08em !important;
-            cursor: pointer;
-            padding: 0 12px !important;
-            transform: none !important;
-          }
-          .col-mfb-cta:disabled { opacity: 0.5; cursor: not-allowed; }
-          .col-mfb-cta:active { transform: none !important; }
-
-          /* Gallery: only first image visible on mobile */
-          .col-gallery-slide {
-            height: 125vh;
-          }
-          .col-rest-slide {
-            display: none;
-          }
-          .col-gallery-desc {
-            display: none;
-          }
-          .col-gallery-mobile-rest {
-            display: block;
-            background: #e8e4df;
-            line-height: 0;
-            font-size: 0;
-          }
-          .col-gallery-mobile-rest .col-gallery-slide {
-            display: block;
-            height: auto;
-            overflow: visible;
-          }
-          .col-gallery-mobile-rest .col-main-img {
-            width: 100%;
-            height: auto !important;
-            object-fit: cover;
-          }
-          .col-info {
-            padding: 24px 16px 40px 16px;
-          }
+        .amiri-refine-section {
+          border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+          padding: 18px 0;
+        }
+        .amiri-refine-section-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+          background: none;
+          border: none;
+          padding: 8px 0;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10.5px;
+          font-weight: 300;
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+          color: #000000;
+          cursor: pointer;
+          text-align: left;
+        }
+        .amiri-refine-section-content {
+          padding: 12px 0 8px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
         }
 
-        /* ══════════════════════════════════════
-           DESKTOP: side-by-side layout
-           Gallery = 5/8 (62.5%), Info = 3/8
-        ══════════════════════════════════════ */
-        @media (min-width: 768px) {
-          .col-layout {
-            flex-direction: row;
-            min-height: 100vh;
-          }
-
-          .col-gallery {
-            width: 62.5%;
-            flex-shrink: 0;
-          }
-          .col-gallery-slide {
-            height: 100vh;
-          }
-          .col-rest-slide {
-            display: flex;
-          }
-          .col-gallery-desc {
-            min-height: 50vh;
-            display: flex;
-            align-items: center;
-            padding: 60px 48px;
-          }
-          .col-gallery-mobile-rest {
-            display: none !important;
-          }
-
-          .col-info {
-            width: 37.5%;
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            overflow-y: auto;
-            padding: 100px 40px 80px 40px;
-            scrollbar-width: none;
-            box-sizing: border-box;
-          }
-          .col-info::-webkit-scrollbar { display: none; }
-
-          .col-mobile-fixed-bar { display: none !important; }
+        .amiri-refine-option {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          background: none;
+          border: none;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10px;
+          font-weight: 300;
+          color: #555555;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          cursor: pointer;
+          padding: 2px 0;
+          text-align: left;
+          transition: color 0.2s ease;
+        }
+        .amiri-refine-option:hover {
+          color: #000000;
+        }
+        .amiri-refine-option.active {
+          color: #000000;
+          font-weight: 400;
+        }
+        .amiri-refine-option-check {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background-color: #000000;
+          opacity: 0;
+          flex-shrink: 0;
+        }
+        .amiri-refine-option.active .amiri-refine-option-check {
+          opacity: 1;
         }
 
-        @media (min-width: 1200px) {
-          .col-info {
-            padding: 100px 48px 80px 48px;
-          }
+        .amiri-refine-footer {
+          padding: 24px 32px;
+          border-top: 1px solid rgba(0, 0, 0, 0.04);
+          display: grid;
+          grid-template-columns: 1fr 1.2fr;
+          gap: 12px;
+          background-color: #ffffff;
         }
-
-        /* ── YOU MAY ALSO LIKE ── */
-        .ymal-section {
-          padding: 60px 0 80px;
-          overflow: hidden;
-        }
-        .ymal-title {
-          font-size: 14px;
-          font-weight: 500;
-          color: #111;
-          margin: 0 0 28px;
+        .amiri-refine-btn-clear {
+          background-color: #ffffff;
+          color: #000000;
+          border: 1px solid #000000;
+          border-radius: 0;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10px;
+          font-weight: 300;
           text-transform: uppercase;
           letter-spacing: 0.1em;
+          padding: 12px;
+          cursor: pointer;
           text-align: center;
+          transition: opacity 0.2s ease;
         }
-        .ymal-carousel-wrap { overflow: hidden; }
-        .ymal-carousel {
-          display: flex;
-          gap: 0;
-          overflow-x: auto;
-          scroll-snap-type: x mandatory;
-          -webkit-overflow-scrolling: touch;
-          cursor: grab;
-          user-select: none;
-          scroll-padding-left: 16px;
-          scrollbar-width: none;
-        }
-        .ymal-carousel:active { cursor: grabbing; }
-        .ymal-carousel.dragging { cursor: grabbing; }
-        .ymal-carousel.dragging * { pointer-events: none; user-select: none; }
-        .ymal-carousel::-webkit-scrollbar { display: none; }
-        .ymal-card {
-          flex: 0 0 calc(25% - 18px);
-          min-width: calc(25% - 18px);
-          scroll-snap-align: start;
-          text-decoration: none;
-          color: inherit;
-          display: flex;
-          flex-direction: column;
-        }
-        .ymal-img-wrap {
-          position: relative;
-          width: 100%;
-          aspect-ratio: 3 / 4;
-          background: #f5f5f5;
-          overflow: hidden;
-        }
-        .ymal-img {
-          width: 100%; height: 100%;
-          object-fit: contain; display: block;
-        }
-        .ymal-meta {
-          padding-top: 10px;
-          padding-left: 18px;
-          padding-right: 12px;
-          padding-bottom: 16px;
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-        }
-        .ymal-name {
-          font-size: 13px;
-          font-weight: 500;
-          color: #111;
-          line-height: 1.3;
+        .amiri-refine-btn-view {
+          background-color: #000000;
+          color: #ffffff;
+          border: none;
+          border-radius: 0;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10px;
+          font-weight: 300;
           text-transform: uppercase;
-          letter-spacing: 0.03em;
+          letter-spacing: 0.1em;
+          padding: 12px;
+          cursor: pointer;
+          text-align: center;
+          transition: opacity 0.2s ease;
         }
-        .ymal-price {
-          font-size: 13px;
-          font-weight: 400;
-          color: #111;
-          letter-spacing: 0.04em;
+        .amiri-refine-btn-clear:hover,
+        .amiri-refine-btn-view:hover {
+          opacity: 0.8;
         }
 
         @media (max-width: 767px) {
-          .ymal-section { padding: 40px 0 60px; }
-          .ymal-title { font-size: 14px; }
-          .ymal-card {
-            flex: 0 0 83.333vw;
-            min-width: 83.333vw;
+          .amiri-refine-drawer {
+            max-width: 100%;
           }
         }
       `}</style>

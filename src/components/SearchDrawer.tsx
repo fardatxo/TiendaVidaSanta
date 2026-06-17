@@ -1,14 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Search, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUI } from "@/context/UIContext";
-import { getProducts, Product } from "@/lib/shopify";
+import { useLocale } from "@/context/LocaleContext";
+import { getProducts } from "@/lib/shopify";
 
 export default function SearchDrawer() {
   const { isSearchOpen, closeSearch } = useUI();
+  const { formatPrice } = useLocale();
   const router = useRouter();
   const drawerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -18,22 +19,32 @@ export default function SearchDrawer() {
   // Fallback recommended products for "You Might Like"
   const fallbackSuggestions = [
     {
-      handle: 'camiseta-espejada',
-      title: 'tonet core logo tee',
-      price: 350.00,
+      handle: 'essential-heavyweight-shorts',
+      title: 'essential heavyweight shorts',
+      price: 320.00,
+      currencyCode: 'EUR',
       imageUrl: '/hero/ComfyUI-main_reference_00012_.png'
     },
     {
-      handle: 'sweater-rombos',
-      title: 'mx1 classic denim jeans',
-      price: 1090.00,
+      handle: 'heavyweight-raglan-zip-hoodie',
+      title: 'heavyweight raglan zip hoodie',
+      price: 790.00,
+      currencyCode: 'EUR',
       imageUrl: '/hero/ComfyUI-main_reference_00028_.png'
     },
     {
-      handle: 'bolso-heirloom',
-      title: 'ma-94 court sneaker',
-      price: 790.00,
+      handle: 'unisex-sunfade-waffle-boxy-tee',
+      title: 'unisex sunfade waffle boxy tee',
+      price: 350.00,
+      currencyCode: 'EUR',
       imageUrl: '/hero/ComfyUI-main_reference_00020_.png'
+    },
+    {
+      handle: 'core-cargo-pants',
+      title: 'core cargo pants',
+      price: 650.00,
+      currencyCode: 'EUR',
+      imageUrl: '/hero/ComfyUI-main_reference_00012_.png'
     }
   ];
 
@@ -43,7 +54,7 @@ export default function SearchDrawer() {
     getProducts()
       .then((prods) => {
         if (prods && prods.length > 0) {
-          setSuggestedProducts(prods.slice(0, 3));
+          setSuggestedProducts(prods.slice(0, 4));
         } else {
           setSuggestedProducts(fallbackSuggestions);
         }
@@ -94,26 +105,27 @@ export default function SearchDrawer() {
     router.push(`/search?q=${encodeURIComponent(term)}`);
   };
 
-  if (!isSearchOpen) return null;
-
   return (
     <>
-      <div className="sd-backdrop open" aria-hidden="true" />
+      {/* DRAWER BACKDROP */}
+      <div 
+        className={`sd-backdrop ${isSearchOpen ? "open" : ""}`} 
+        onClick={closeSearch}
+        aria-hidden="true" 
+      />
       
-      <div className="sd-overlay open" ref={drawerRef} role="dialog" aria-modal="true">
+      {/* SIDE PANEL OVERLAY */}
+      <div 
+        className={`sd-overlay ${isSearchOpen ? "open" : ""}`} 
+        ref={drawerRef} 
+        role="dialog" 
+        aria-modal="true"
+      >
         <div className="sd-container">
           
-          {/* Top Bar with Close Button */}
-          <div className="sd-topbar">
-            <span className="sd-topbar-title">Search</span>
-            <button className="sd-close-btn" onClick={closeSearch} aria-label="Close search">
-              <X size={20} strokeWidth={1} />
-            </button>
-          </div>
-
-          {/* Search Input field */}
-          <form className="sd-search-form" onSubmit={handleSearchSubmit}>
-            <div className="sd-input-wrapper">
+          {/* Top Row with Rectangular Input and Close Button */}
+          <div className="sd-input-row">
+            <form className="sd-search-form" onSubmit={handleSearchSubmit}>
               <input
                 ref={inputRef}
                 type="text"
@@ -122,77 +134,75 @@ export default function SearchDrawer() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <button type="submit" className="sd-search-submit-btn" aria-label="Submit search">
-                <Search size={18} strokeWidth={1.2} />
-              </button>
-            </div>
-          </form>
+            </form>
+            <button className="sd-close-btn" onClick={closeSearch} aria-label="Close search">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1L10 10M10 1L1 10" stroke="black" strokeWidth="1" strokeLinecap="square"/>
+              </svg>
+            </button>
+          </div>
 
-          {/* Search content grid */}
-          <div className="sd-grid">
+          {/* Search Content Stack */}
+          <div className="sd-content-stack">
             
-            {/* Left Column: Popular Searches */}
-            <div className="sd-col-popular">
+            {/* Popular Searches */}
+            <div className="sd-section-popular">
               <h4 className="sd-section-title">Popular Searches</h4>
               <ul className="sd-popular-list">
                 <li>
-                  <button onClick={() => handlePopularSearch("skel top")}>
-                    skel top
+                  <button type="button" onClick={() => handlePopularSearch("shorts")}>
+                    shorts
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => handlePopularSearch("ma-1")}>
-                    ma-1
+                  <button type="button" onClick={() => handlePopularSearch("hoodie")}>
+                    hoodie
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => handlePopularSearch("mx1")}>
-                    mx1
+                  <button type="button" onClick={() => handlePopularSearch("tee")}>
+                    tee
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => handlePopularSearch("ma-94")}>
-                    ma-94
+                  <button type="button" onClick={() => handlePopularSearch("pants")}>
+                    pants
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => handlePopularSearch("stars")}>
-                    stars
-                  </button>
-                </li>
-                <li>
-                  <button onClick={() => handlePopularSearch("core logo")}>
-                    core logo
-                  </button>
-                </li>
-                <li>
-                  <button onClick={() => handlePopularSearch("denim")}>
-                    denim
+                  <button type="button" onClick={() => handlePopularSearch("fleece")}>
+                    fleece
                   </button>
                 </li>
               </ul>
             </div>
 
-            {/* Right Column: You Might Like */}
-            <div className="sd-col-suggestions">
+            {/* You Might Like */}
+            <div className="sd-section-suggestions">
               <h4 className="sd-section-title">You Might Like</h4>
               <div className="sd-suggestions-grid">
                 {suggestedProducts.map((p) => {
                   const image = p.imageUrl || p.images?.[0];
-                  const priceStr = typeof p.price === 'number' ? `€${p.price.toFixed(2)}` : p.price;
+                  const priceStr = formatPrice(p.price, p.currencyCode ?? 'EUR');
                   return (
                     <Link
                       href={`/product/${p.handle}`}
                       key={p.handle}
-                      className="sd-product-card"
+                      className="sd-suggested-item"
                       onClick={closeSearch}
                     >
-                      <div className="sd-product-img-wrap">
-                        {image && <img src={image} alt={p.title} className="sd-product-img" />}
+                      <div className="sd-suggested-img-wrap">
+                        {image && (
+                          <img 
+                            src={image} 
+                            alt={p.title} 
+                            className="sd-suggested-img" 
+                          />
+                        )}
                       </div>
-                      <div className="sd-product-info">
-                        <span className="sd-product-name">{p.title.toLowerCase()}</span>
-                        <span className="sd-product-price">{priceStr}</span>
+                      <div className="sd-suggested-info">
+                        <span className="sd-suggested-name">{p.title}</span>
+                        <span className="sd-suggested-price">{priceStr}</span>
                       </div>
                     </Link>
                   );
@@ -203,6 +213,11 @@ export default function SearchDrawer() {
           </div>
 
         </div>
+
+        {/* Floating Monogram Bottom Right */}
+        <div className="sd-monogram-badge">
+          <span>T</span>
+        </div>
       </div>
 
       <style>{`
@@ -210,55 +225,78 @@ export default function SearchDrawer() {
         .sd-backdrop {
           position: fixed;
           inset: 0;
-          background: rgba(0, 0, 0, 0.4);
-          backdrop-filter: blur(4px);
-          -webkit-backdrop-filter: blur(4px);
-          z-index: 1000;
+          background: rgba(0, 0, 0, 0.05);
+          z-index: 10000;
           opacity: 0;
-          transition: opacity 0.5s ease;
+          pointer-events: none;
+          transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .sd-backdrop.open {
           opacity: 1;
+          pointer-events: all;
         }
 
-        /* OVERLAY CONTAINER */
+        /* OVERLAY CONTAINER (SIDE PANEL SLIDING FROM RIGHT) */
         .sd-overlay {
           position: fixed;
-          top: 0; left: 0; right: 0;
+          top: 0; 
+          right: 0; 
+          bottom: 0;
           width: 100%;
+          max-width: 420px;
           background: #ffffff;
           color: #000000;
-          z-index: 1001;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+          z-index: 10001;
+          border-left: 1px solid rgba(0, 0, 0, 0.08);
+          box-shadow: none;
           font-family: var(--font-primary), sans-serif;
-          transform: translateY(-100%);
-          transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+          transform: translateX(100%);
+          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
           overflow-y: auto;
-          max-height: 90vh;
-          border-bottom: 1px solid #eaeaea;
+          display: flex;
+          flex-direction: column;
         }
         .sd-overlay.open {
-          transform: translateY(0);
+          transform: translateX(0);
         }
 
         .sd-container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 24px 40px 60px;
+          padding: 20px 24px 60px;
+          display: flex;
+          flex-direction: column;
+          box-sizing: border-box;
+          width: 100%;
+          min-height: 100%;
         }
 
-        /* TOPBAR */
-        .sd-topbar {
+        /* INPUT ROW */
+        .sd-input-row {
           display: flex;
-          justify-content: space-between;
           align-items: center;
+          width: 100%;
           margin-bottom: 24px;
         }
-        .sd-topbar-title {
+        .sd-search-form {
+          flex: 1;
+          margin: 0;
+        }
+        .sd-search-input {
+          width: 100%;
+          height: 36px;
+          border: 1px solid #000000;
+          border-radius: 0;
+          background: transparent;
+          outline: none;
+          font-family: inherit;
           font-size: 10px;
-          font-weight: 400;
+          font-weight: 300;
+          letter-spacing: 0.15em;
+          padding: 0 12px;
           text-transform: uppercase;
-          letter-spacing: 0.2em;
+          color: #000000;
+          box-sizing: border-box;
+        }
+        .sd-search-input::placeholder {
           color: rgba(0, 0, 0, 0.4);
         }
         .sd-close-btn {
@@ -267,6 +305,7 @@ export default function SearchDrawer() {
           cursor: pointer;
           color: #000000;
           padding: 8px;
+          margin-left: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -276,177 +315,166 @@ export default function SearchDrawer() {
           opacity: 0.6;
         }
 
-        /* INPUT ROW */
-        .sd-search-form {
-          margin-bottom: 48px;
-        }
-        .sd-input-wrapper {
+        /* CONTENT STACK */
+        .sd-content-stack {
           display: flex;
-          align-items: center;
-          border-bottom: 1px solid #000000;
-          padding-bottom: 8px;
-        }
-        .sd-search-input {
-          flex: 1;
-          background: transparent;
-          border: none;
-          outline: none;
-          font-family: inherit;
-          font-size: 24px;
-          font-weight: 300;
-          letter-spacing: 0.05em;
-          color: #000000;
-          text-transform: uppercase;
-        }
-        .sd-search-input::placeholder {
-          color: rgba(0, 0, 0, 0.15);
-        }
-        .sd-search-submit-btn {
-          background: none;
-          border: none;
-          cursor: pointer;
-          color: #000000;
-          padding: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: opacity 0.3s ease;
-        }
-        .sd-search-submit-btn:hover {
-          opacity: 0.6;
-        }
-
-        /* CONTENT GRID */
-        .sd-grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 48px;
-        }
-        @media (min-width: 768px) {
-          .sd-grid {
-            grid-template-columns: 35% 65%;
-            gap: 60px;
-          }
+          flex-direction: column;
         }
 
         .sd-section-title {
-          font-size: 10px;
-          font-weight: 500;
+          font-size: 9px;
+          font-weight: 400;
           text-transform: uppercase;
           letter-spacing: 0.15em;
-          color: rgba(0, 0, 0, 0.4);
-          margin: 0 0 20px;
-          border-bottom: 1px solid #eaeaea;
-          padding-bottom: 8px;
+          color: #000000;
+          margin: 0 0 12px;
+          display: block;
         }
 
-        /* POPULAR LIST */
+        /* POPULAR SEARCHES */
+        .sd-section-popular {
+          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+          padding-bottom: 24px;
+          margin-bottom: 24px;
+        }
         .sd-popular-list {
           list-style: none;
           padding: 0;
           margin: 0;
           display: flex;
           flex-direction: column;
-          gap: 12px;
+        }
+        .sd-popular-list li {
+          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+        .sd-popular-list li:last-child {
+          border-bottom: none;
         }
         .sd-popular-list button {
+          width: 100%;
           background: none;
           border: none;
-          padding: 0;
+          padding: 10px 0;
           text-align: left;
           font-family: inherit;
-          font-size: 11px;
+          font-size: 9px;
           font-weight: 300;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
           color: #000000;
           cursor: pointer;
-          transition: opacity 0.3s ease;
+          transition: opacity 0.2s ease;
         }
         .sd-popular-list button:hover {
           opacity: 0.6;
         }
 
-        /* SUGGESTIONS PRODUCTS */
+        /* YOU MIGHT LIKE SUGGESTIONS GRID */
+        .sd-section-suggestions {
+          margin-bottom: 40px;
+          overflow: hidden;
+        }
         .sd-suggestions-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 20px;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px 8px;
+          overflow: hidden;
         }
-        .sd-product-card {
+        .sd-suggested-item {
           display: flex;
           flex-direction: column;
           text-decoration: none;
           color: #000000;
+          transition: opacity 0.2s ease;
         }
-        .sd-product-img-wrap {
-          aspect-ratio: 3 / 4;
-          background-color: #fcfcfc;
-          overflow: hidden;
-          margin-bottom: 12px;
-        }
-        .sd-product-img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
-          transition: opacity 0.5s ease;
-        }
-        .sd-product-card:hover .sd-product-img {
-          opacity: 0.85;
-        }
-        .sd-product-info {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-        }
-        .sd-product-name {
-          font-size: 9px;
-          font-weight: 400;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          line-height: 1.4;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-        .sd-product-price {
-          font-size: 9px;
-          font-weight: 300;
-          color: rgba(0, 0, 0, 0.55);
+        .sd-suggested-item:hover {
+          opacity: 0.7;
         }
 
-        /* MOBILE STYLING */
+        .sd-suggested-img-wrap {
+          width: 100%;
+          aspect-ratio: 16 / 19;
+          background-color: #f6f6f6;
+          margin-bottom: 4px;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          padding: 8px;
+          box-sizing: border-box;
+          border-radius: 0;
+        }
+        .sd-suggested-img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          display: block;
+          mix-blend-mode: multiply;
+        }
+        .sd-suggested-info {
+          display: flex;
+          flex-direction: column;
+          gap: 1px;
+          margin-top: 2px;
+        }
+        .sd-suggested-name {
+          font-size: 7.5px;
+          font-weight: 300;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          line-height: 1.2;
+          color: #000000;
+        }
+        .sd-suggested-price {
+          font-size: 7px;
+          font-weight: 300;
+          color: #777777;
+          letter-spacing: 0.04em;
+        }
+
+        /* FLOATING MONOGRAM BADGE */
+        .sd-monogram-badge {
+          position: absolute;
+          bottom: 24px;
+          right: 24px;
+          width: 44px;
+          height: 44px;
+          background-color: #000000;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          color: #ffffff;
+          font-family: var(--font-brand);
+          font-size: 18px;
+          z-index: 10;
+          cursor: pointer;
+          transition: transform 0.3s ease;
+        }
+        .sd-monogram-badge:hover {
+          transform: scale(1.05);
+        }
+
+        /* MOBILE RESPONSIVE Adjustments */
         @media (max-width: 767px) {
           .sd-overlay {
-            max-height: 100vh;
-            height: 100vh;
-            border-bottom: none;
+            max-width: 100%;
+            border-left: none;
           }
           .sd-container {
-            padding: 16px 20px 80px;
-          }
-          .sd-search-form {
-            margin-bottom: 32px;
-          }
-          .sd-search-input {
-            font-size: 18px;
-          }
-          .sd-grid {
-            gap: 36px;
+            padding: 20px 16px 60px;
           }
           .sd-suggestions-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 12px 8px;
           }
-          .sd-suggestions-grid .sd-product-card:last-child {
-            display: none; /* Hide third product card on mobile to balance columns */
-          }
-          
-          /* Active states */
-          .sd-popular-list button:active,
-          .sd-product-card:active {
-            opacity: 0.5;
+          .sd-monogram-badge {
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
           }
         }
       `}</style>

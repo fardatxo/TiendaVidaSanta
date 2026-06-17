@@ -10,7 +10,7 @@ import { useTranslation } from "@/lib/i18n";
 import { useWishlist } from "@/context/WishlistContext";
 
 export default function Navbar() {
-  const { openCart, openSearch, openMenu, closeMenu } = useUI();
+  const { openCart, openSearch, openMenu, closeMenu, isSearchOpen } = useUI();
   const { cartCount } = useCart();
   const { items: wishlistItems } = useWishlist();
   const { t } = useTranslation();
@@ -105,7 +105,10 @@ export default function Navbar() {
 
   return (
     <>
-      <header className={`acne-header ${isHome ? "transparent-home" : isProduct ? "transparent-pdp" : "solid"} ${!headerVisible ? "header-hidden" : ""}`} style={{top: `${navTop}px`}}>
+      <header 
+        className={`acne-header ${isHome ? "transparent-home" : isProduct ? "transparent-pdp" : "solid"} ${!headerVisible ? "header-hidden" : ""} ${isSearchOpen ? "search-active" : ""}`} 
+        style={{top: `${navTop}px`}}
+      >
         <div className="acne-header-inner">
           {/* LEFT: Menu trigger + Search trigger */}
           <div className="acne-nav-left">
@@ -180,6 +183,25 @@ export default function Navbar() {
           border-bottom: 1px solid transparent;
         }
         .acne-header.header-hidden { transform: translateY(-100%); }
+
+        @media (min-width: 768px) {
+          .acne-header.search-active {
+            background-color: transparent !important;
+            border-bottom-color: transparent !important;
+            pointer-events: none;
+          }
+          .acne-header.search-active .acne-nav-left,
+          .acne-header.search-active .acne-logo,
+          .acne-header.search-active .acne-nav-right {
+            opacity: 0;
+            pointer-events: none;
+          }
+          .acne-nav-left,
+          .acne-logo,
+          .acne-nav-right {
+            transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+          }
+        }
 
         /* ══ ALL STATES: black text ══ */
         .acne-header .acne-nav-links a,

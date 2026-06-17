@@ -60,6 +60,7 @@ export default function RecommendedCard({ product }: Props) {
           border-radius: 0;
           overflow: hidden;
           transition: transform 0.3s ease, box-shadow 0.3s ease;
+          isolation: isolate;
         }
         .tonet-house-carousel__image {
           width: 100%;
