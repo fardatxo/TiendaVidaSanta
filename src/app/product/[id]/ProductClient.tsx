@@ -248,6 +248,17 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
     })?.value ?? ''
   );
   const [selectedSize, setSelectedSize] = useState<string>('');
+
+  const [selectedOptionsState, setSelectedOptionsState] = useState<Record<string, string>>(() => {
+    const initial: Record<string, string> = {};
+    if (product.variants[0]) {
+      for (const o of product.variants[0].selectedOptions) {
+        initial[o.name] = o.value;
+      }
+    }
+    return initial;
+  });
+
   const { openCart } = useUI();
   const { addToCart } = useCart();
 
@@ -264,6 +275,12 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
     for (const v of product.variants)
       for (const o of v.selectedOptions)
         if (o.name.toLowerCase() === 'size') return o.name;
+    // Fallback: match any variant option that is NOT 'color' or 'colour'
+    for (const v of product.variants)
+      for (const o of v.selectedOptions) {
+        const n = o.name.toLowerCase();
+        if (n !== 'color' && n !== 'colour') return o.name;
+      }
     if (product.handle === 'e-gift-card') {
       const first = product.variants[0]?.selectedOptions[0];
       return first?.name ?? null;
@@ -307,10 +324,23 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   const hasSizes = sizeOptions.length > 0;
   const needsSizeSelection = hasSizes && !selectedSize;
 
+  function findVariantByOptions(optionsMap: Record<string, string>): ShopifyVariant | undefined {
+    return product.variants.find(v => 
+      v.selectedOptions.every(o => {
+        const val = optionsMap[o.name];
+        return !val || val === o.value;
+      })
+    );
+  }
+
   function handleSizeSelectInDrawer(sizeValue: string) {
     setSelectedSize(sizeValue);
-    const next = findVariant(selectedColor, sizeValue);
-    if (next) setSelectedVariant(next);
+    if (sizeOptionName) {
+      const updated = { ...selectedOptionsState, [sizeOptionName]: sizeValue };
+      setSelectedOptionsState(updated);
+      const next = findVariantByOptions(updated);
+      if (next) setSelectedVariant(next);
+    }
   }
 
   async function handleAddToBag() {
@@ -329,18 +359,16 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   }
 
   function findVariant(color: string, size: string): ShopifyVariant | undefined {
-    return product.variants.find(v => {
-      const c = colorOptionName ? v.selectedOptions.find(o => o.name === colorOptionName)?.value : undefined;
-      const s = sizeOptionName ? v.selectedOptions.find(o => o.name === sizeOptionName)?.value : undefined;
-      if (colorOptionName && sizeOptionName) return c === color && s === size;
-      if (colorOptionName) return c === color;
-      if (sizeOptionName) return s === size;
-      return false;
-    });
+    const opts: Record<string, string> = {};
+    if (colorOptionName) opts[colorOptionName] = color;
+    if (sizeOptionName) opts[sizeOptionName] = size;
+    return findVariantByOptions(opts);
   }
 
   function isSizeAvailable(size: string): boolean {
-    const v = findVariant(selectedColor, size);
+    if (!sizeOptionName) return false;
+    const targetOptions = { ...selectedOptionsState, [sizeOptionName]: size };
+    const v = findVariantByOptions(targetOptions);
     return v?.availableForSale ?? false;
   }
 
@@ -383,8 +411,12 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
   function handleColorChange(colorValue: string) {
     setSelectedColor(colorValue);
-    const next = findVariant(colorValue, selectedSize);
-    if (next) setSelectedVariant(next);
+    if (colorOptionName) {
+      const updated = { ...selectedOptionsState, [colorOptionName]: colorValue };
+      setSelectedOptionsState(updated);
+      const next = findVariantByOptions(updated);
+      if (next) setSelectedVariant(next);
+    }
   }
 
   function toggleAccordion(key: string) {
@@ -469,15 +501,26 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                 </div>
               </div>
 
-              {/* SELECT SIZE Button */}
+              {/* SELECT SIZE / ADD TO BAG Button */}
               <div className="tonet-size-selector-wrap">
-                <button 
-                  type="button"
-                  className="tonet-select-size-btn"
-                  onClick={() => setSizeDropdownOpen(true)}
-                >
-                  <span>{selectedSize ? `SIZE: ${selectedSize.toUpperCase()}` : 'SELECT SIZE'} ▾</span>
-                </button>
+                {hasSizes ? (
+                  <button 
+                    type="button"
+                    className="tonet-select-size-btn"
+                    onClick={() => setSizeDropdownOpen(true)}
+                  >
+                    <span>{selectedSize ? `SIZE: ${selectedSize.toUpperCase()}` : 'SELECT SIZE'} ▾</span>
+                  </button>
+                ) : (
+                  <button 
+                    type="button"
+                    className="tonet-select-size-btn"
+                    onClick={handleAddToBag}
+                    disabled={adding}
+                  >
+                    <span>{adding ? 'ADDING...' : 'ADD TO BAG'}</span>
+                  </button>
+                )}
               </div>
 
               {/* Short Description (uppercase, compact) */}
