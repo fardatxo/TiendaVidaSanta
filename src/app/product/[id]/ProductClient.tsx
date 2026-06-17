@@ -151,6 +151,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   const [ceremonyOpen, setCeremonyOpen] = useState(false);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [sizeDropdownOpen, setSizeDropdownOpen] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const mobileCarouselRef = useRef<HTMLDivElement>(null);
 
 
   const [ctlScrollProgress, setCtlScrollProgress] = useState(0);
@@ -176,6 +178,14 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
       return 'accessory';
     }
     return 'top';
+  };
+  const handleMobileScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const container = e.currentTarget;
+    const scrollLeft = container.scrollLeft;
+    const width = container.clientWidth;
+    if (width > 0) {
+      setCurrentSlide(Math.round(scrollLeft / width));
+    }
   };
 
   const { t } = useTranslation();
@@ -390,21 +400,24 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           
           {/* GALLERY COLUMN (Left side ~65% on desktop) */}
           <div className="tonet-gallery-column">
-            {/* Mobile Grid (2x2 grid for first 4 images, then vertical stack for others) */}
+            {/* Mobile Carousel (horizontal scroll snapping) */}
             <div className="tonet-mobile-gallery">
-              <div className={images.length === 1 ? "tonet-mobile-single" : "tonet-mobile-grid"}>
-                {images.slice(0, 4).map((img, i) => (
-                  <div key={i} className="tonet-mobile-grid-item">
+              <div className="tonet-mobile-carousel" ref={mobileCarouselRef} onScroll={handleMobileScroll}>
+                {images.map((img, i) => (
+                  <div key={i} className="tonet-mobile-slide">
                     <img src={img} alt={`${product.title} - ${i}`} className="tonet-pdp-img" />
                   </div>
                 ))}
               </div>
-              {images.length > 4 && (
-                <div className="tonet-mobile-stack">
-                  {images.slice(4).map((img, i) => (
-                    <div key={i + 4} className="tonet-mobile-stack-item">
-                      <img src={img} alt={`${product.title} - ${i + 4}`} className="tonet-pdp-img" />
-                    </div>
+              
+              {/* Carousel Dots */}
+              {images.length > 1 && (
+                <div className="tonet-mobile-dots">
+                  {images.map((_, i) => (
+                    <span
+                      key={i}
+                      className={`tonet-mobile-dot ${currentSlide === i ? 'active' : ''}`}
+                    />
                   ))}
                 </div>
               )}
@@ -534,6 +547,26 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                     </div>
                   )}
                 </div>
+              </div>
+
+              {/* Additional Mobile-only 2x2 grid below accordions */}
+              <div className="tonet-mobile-extra-grid">
+                <div className={images.length === 1 ? "tonet-mobile-single" : "tonet-mobile-grid"}>
+                  {images.slice(0, 4).map((img, i) => (
+                    <div key={i} className="tonet-mobile-grid-item">
+                      <img src={img} alt={`${product.title} - ${i}`} className="tonet-pdp-img" />
+                    </div>
+                  ))}
+                </div>
+                {images.length > 4 && (
+                  <div className="tonet-mobile-stack">
+                    {images.slice(4).map((img, i) => (
+                      <div key={i + 4} className="tonet-mobile-stack-item">
+                        <img src={img} alt={`${product.title} - ${i + 4}`} className="tonet-pdp-img" />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
             </div>
@@ -899,10 +932,73 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           width: 100%;
         }
 
-        /* Mobile Grid/Stack Gallery */
+        /* Mobile Swipe Gallery */
         .tonet-mobile-gallery {
           display: block;
           width: 100%;
+          overflow: hidden;
+        }
+        .tonet-mobile-carousel {
+          display: flex;
+          overflow-x: auto;
+          scroll-snap-type: x mandatory;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        .tonet-mobile-carousel::-webkit-scrollbar {
+          display: none;
+        }
+        .tonet-mobile-slide {
+          flex: 0 0 100%;
+          width: 100%;
+          scroll-snap-align: start;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: #f6f6f6;
+          padding: 24px 20px;
+          box-sizing: border-box;
+          aspect-ratio: 3 / 4;
+        }
+        .tonet-mobile-slide img {
+          width: 100%;
+          max-width: 380px;
+          height: auto;
+          display: block;
+          object-fit: contain;
+          mix-blend-mode: multiply;
+        }
+
+        .tonet-mobile-dots {
+          display: flex;
+          justify-content: center;
+          gap: 8px;
+          margin-top: 8px;
+          margin-bottom: 24px;
+        }
+        .tonet-mobile-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background-color: #e0e0e0;
+          transition: background-color 0.3s;
+        }
+        .tonet-mobile-dot.active {
+          background-color: #000000;
+        }
+
+        /* Mobile Extra Grid (below accordions) */
+        .tonet-mobile-extra-grid {
+          display: block;
+          width: 100%;
+          margin-top: 32px;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        @media (min-width: 1024px) {
+          .tonet-mobile-extra-grid {
+            display: none !important;
+          }
         }
         .tonet-mobile-grid {
           display: grid;
