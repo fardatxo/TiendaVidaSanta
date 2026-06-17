@@ -202,8 +202,8 @@ export default async function Home() {
 
       <style>{`
         .tn-home-page {
-          background: #000000;
-          color: #ffffff;
+          background: #ffffff;
+          color: #000000;
         }
 
         /* ══ HERO SECTION ══ */
@@ -270,20 +270,20 @@ export default async function Home() {
 
         /* ══ OVERSIZED SECTIONS (ARCHIVE, WORLD & ART) ══ */
         .tn-archive {
-          background: #0b0b0b;
+          background: #ffffff;
           padding: 120px 0;
           margin-bottom: 180px;
         }
         .tn-world {
-          background: #000000;
+          background: #ffffff;
           padding: 120px 0;
           margin-bottom: 180px;
         }
         .tn-art-culture {
-          background: #000000;
+          background: #ffffff;
           padding: 120px 0;
           margin-bottom: 180px;
-          border-top: 1px solid rgba(255, 255, 255, 0.03);
+          border-top: 1px solid rgba(0, 0, 0, 0.05);
         }
         .tn-archive-inner, .tn-world-inner, .tn-art-culture-inner {
           max-width: 1400px;
@@ -301,15 +301,14 @@ export default async function Home() {
           max-width: 1300px;
           aspect-ratio: 16 / 9;
           overflow: hidden;
-          background: #080808;
-          border: 1px solid rgba(255, 255, 255, 0.04);
+          background: #f5f5f5;
+          border: 1px solid rgba(0, 0, 0, 0.06);
         }
         .tn-archive-img, .tn-world-img, .tn-art-culture-img {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          opacity: 0.75;
-          filter: grayscale(0.2) brightness(0.85);
+          opacity: 1;
           transition: transform 2.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .tn-archive-img-wrap:hover .tn-archive-img,
@@ -320,7 +319,7 @@ export default async function Home() {
         .tn-archive-img-overlay, .tn-world-img-overlay, .tn-art-culture-img-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(to bottom, transparent 60%, rgba(0, 0, 0, 0.75) 100%);
+          background: linear-gradient(to bottom, transparent 70%, rgba(255, 255, 255, 0.3) 100%);
           z-index: 2;
           pointer-events: none;
         }
@@ -338,7 +337,7 @@ export default async function Home() {
           font-size: 13px;
           font-weight: 300;
           letter-spacing: 0.08em;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(0, 0, 0, 0.45);
           text-transform: uppercase;
           margin-bottom: 16px;
         }
@@ -347,7 +346,7 @@ export default async function Home() {
           font-size: clamp(32px, 4vw, 48px);
           font-weight: 400;
           letter-spacing: 0.05em;
-          color: #ffffff;
+          color: #000000;
           margin: 0 0 24px;
           text-transform: uppercase;
         }
@@ -355,7 +354,7 @@ export default async function Home() {
           font-family: var(--font-primary);
           font-size: 15px;
           font-weight: 300;
-          color: #cfcfcf;
+          color: #333333;
           line-height: 1.6;
           margin: 0 0 40px;
           max-width: 580px;
@@ -367,7 +366,7 @@ export default async function Home() {
           font-size: 12px;
           font-weight: 500;
           letter-spacing: 0.12em;
-          color: #ffffff;
+          color: #000000;
           text-transform: uppercase;
           text-decoration: none;
           position: relative;
@@ -378,19 +377,19 @@ export default async function Home() {
           position: absolute;
           bottom: 0; left: 0;
           width: 100%; height: 1px;
-          background: rgba(255, 255, 255, 0.25);
+          background: rgba(0, 0, 0, 0.2);
           transition: background 0.4s;
         }
         .tn-discover-link:hover::after {
-          background: #ffffff;
+          background: #000000;
         }
 
         /* ══ EDITORIAL JOURNAL ══ */
         .tn-journal {
-          background: #0b0b0b;
+          background: #ffffff;
           padding: 120px 0;
           margin-bottom: 180px;
-          border-top: 1px solid rgba(255, 255, 255, 0.03);
+          border-top: 1px solid rgba(0, 0, 0, 0.05);
         }
         .tn-journal-inner {
           max-width: 1400px;
@@ -406,7 +405,7 @@ export default async function Home() {
           font-size: 13px;
           font-weight: 300;
           letter-spacing: 0.08em;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(0, 0, 0, 0.45);
           text-transform: uppercase;
           display: block;
           margin-bottom: 16px;
@@ -416,7 +415,7 @@ export default async function Home() {
           font-size: clamp(32px, 4vw, 48px);
           font-weight: 400;
           letter-spacing: 0.05em;
-          color: #ffffff;
+          color: #000000;
           margin: 0;
           text-transform: uppercase;
         }
@@ -439,16 +438,16 @@ export default async function Home() {
         .tn-journal-img-wrap {
           aspect-ratio: 3 / 4;
           overflow: hidden;
-          background: #080808;
-          border: 1px solid rgba(255, 255, 255, 0.04);
+          background: #f5f5f5;
+          border: 1px solid rgba(0, 0, 0, 0.06);
           margin-bottom: 24px;
         }
         .tn-journal-img-wrap-small {
           aspect-ratio: 4 / 5;
           width: 80%;
           overflow: hidden;
-          background: #080808;
-          border: 1px solid rgba(255, 255, 255, 0.04);
+          background: #f5f5f5;
+          border: 1px solid rgba(0, 0, 0, 0.06);
           margin-bottom: 24px;
           align-self: flex-end;
         }
@@ -456,15 +455,14 @@ export default async function Home() {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          opacity: 0.75;
-          filter: grayscale(0.2) brightness(0.85);
+          opacity: 1;
         }
         .tn-journal-caption {
           font-family: var(--font-primary);
           font-size: 11px;
           font-weight: 300;
           letter-spacing: 0.05em;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(0, 0, 0, 0.45);
           text-transform: uppercase;
           margin-top: 12px;
           display: block;
@@ -479,7 +477,7 @@ export default async function Home() {
           font-weight: 400;
           letter-spacing: 0.04em;
           line-height: 1.45;
-          color: rgba(255, 255, 255, 0.85);
+          color: #1a1a1a;
           margin: 0;
         }
         .tn-journal-cta-wrap {
@@ -492,9 +490,9 @@ export default async function Home() {
 
         /* ══ NEWSLETTER VIP ══ */
         .tn-newsletter {
-          background: #0b0b0b;
+          background: #ffffff;
           padding: 160px 0;
-          border-top: 1px solid rgba(255, 255, 255, 0.03);
+          border-top: 1px solid rgba(0, 0, 0, 0.05);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -509,7 +507,7 @@ export default async function Home() {
           font-size: 13px;
           font-weight: 300;
           letter-spacing: 0.08em;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(0, 0, 0, 0.45);
           text-transform: uppercase;
           display: block;
           margin-bottom: 24px;
@@ -519,7 +517,7 @@ export default async function Home() {
           font-size: clamp(32px, 4vw, 48px);
           font-weight: 400;
           letter-spacing: 0.05em;
-          color: #ffffff;
+          color: #000000;
           margin: 0 0 24px;
           text-transform: uppercase;
         }
@@ -527,7 +525,7 @@ export default async function Home() {
           font-family: var(--font-primary);
           font-size: 15px;
           font-weight: 300;
-          color: #cfcfcf;
+          color: #333333;
           line-height: 1.6;
           margin: 0 0 52px;
         }
@@ -544,9 +542,9 @@ export default async function Home() {
         .tn-newsletter-input {
           background: transparent;
           border: none;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.2);
           outline: none;
-          color: #ffffff;
+          color: #000000;
           font-family: var(--font-primary);
           font-size: 13px;
           font-weight: 300;
@@ -557,15 +555,15 @@ export default async function Home() {
           transition: border-color 0.4s;
         }
         .tn-newsletter-input:focus {
-          border-color: #ffffff;
+          border-color: #000000;
         }
         .tn-newsletter-input::placeholder {
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.3);
         }
         .tn-newsletter-btn {
-          background: #ffffff;
-          color: #000000;
-          border: 1px solid #ffffff;
+          background: #000000;
+          color: #ffffff;
+          border: 1px solid #000000;
           padding: 18px 0;
           font-family: var(--font-primary);
           font-size: 12px;
@@ -577,8 +575,8 @@ export default async function Home() {
         }
         .tn-newsletter-btn:hover {
           background: transparent;
-          color: #ffffff;
-          border-color: rgba(255, 255, 255, 0.3);
+          color: #000000;
+          border-color: rgba(0, 0, 0, 0.3);
         }
 
         /* ══ RESPONSIVE ══ */

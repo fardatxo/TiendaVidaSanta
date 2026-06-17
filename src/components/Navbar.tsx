@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Menu, ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useUI } from "@/context/UIContext";
 import { useCart } from "@/context/CartContext";
 import { useTranslation } from "@/lib/i18n";
@@ -13,6 +13,7 @@ export default function Navbar() {
   const { cartCount } = useCart();
   const { t } = useTranslation();
   const pathname = usePathname();
+  const router = useRouter();
 
   const isHome = pathname === "/";
   const isProduct = pathname.startsWith("/product/");
@@ -39,9 +40,6 @@ export default function Navbar() {
   const [subnavOpen, setSubnavOpen] = useState(false);
   const currentCollection = collections.find(c => c.handle === currentCollectionHandle);
 
-  // Pages with fullbleed gallery (transparent header overlay)
-  const isFullbleed = isProduct || isCollection;
-
   const [hasBanner, setHasBanner] = useState(true);
 
   useEffect(() => {
@@ -60,7 +58,6 @@ export default function Navbar() {
 
   // Smart header: hide on scroll down, show solid on scroll up
   const [headerVisible, setHeaderVisible] = useState(true);
-  const [scrolledPast, setScrolledPast] = useState(false);
   const [navTop, setNavTop] = useState(BANNER_H);
 
   useEffect(() => {
@@ -69,89 +66,86 @@ export default function Navbar() {
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
 
-  // Track if scrolled past the first viewport (video hero)
-  const [pastVideo, setPastVideo] = useState(false);
-  const [overDark, setOverDark] = useState(false);
-
   const handleScroll = useCallback(() => {
     if (ticking.current) return;
     ticking.current = true;
     requestAnimationFrame(() => {
       const y = window.scrollY;
-      setScrolledPast(y > 80);
-      setPastVideo(y > window.innerHeight * 0.5);
       setHeaderVisible(true);
       setNavTop(Math.max(0, BANNER_H - y));
       lastScrollY.current = y;
       ticking.current = false;
     });
-  }, []);
+  }, [BANNER_H]);
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
-  // IntersectionObserver for dark sections — fires on viewport entry, not scroll position
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        let anyDark = false;
-        entries.forEach(entry => {
-          if (entry.isIntersecting) anyDark = true;
-        });
-        setOverDark(anyDark);
-      },
-      { threshold: 0.5 }
-    );
-    const sections = document.querySelectorAll('.dark-section');
-    sections.forEach(s => observer.observe(s));
-    return () => observer.disconnect();
-  }, [pathname]);
-
-  // Body padding
+  // Body padding: always pad body to accommodate the header height (44px) + banner
   useEffect(() => {
     const body = document.body;
-    if (isFullbleed || isHome) {
-      body.style.paddingTop = "0px";
-    } else {
-      const pad = 48 + BANNER_H;
-      body.style.paddingTop = `${pad}px`;
-    }
+    const headerHeight = 44;
+    const pad = headerHeight + BANNER_H;
+    body.style.paddingTop = `${pad}px`;
     return () => { body.style.paddingTop = "48px"; };
-  }, [isFullbleed, isHome, BANNER_H]);
-
-  // Determine header style class
-  // Home: always transparent. Other pages: solid when scrolled up past threshold.
-  const solid = !isHome && (!isFullbleed || scrolledPast);
+  }, [BANNER_H]);
 
   return (
     <>
-      <header className={`acne-header ${solid ? "solid" : "transparent"} ${isHome && !pastVideo ? "home-top" : ""} ${isHome && pastVideo ? "home-dark" : ""} ${isCollection && !scrolledPast ? "fullbleed-top" : ""} ${!headerVisible ? "header-hidden" : ""} ${overDark ? "over-dark" : ""}`} style={{top: `${navTop}px`}}>
+      <header className={`acne-header solid ${!headerVisible ? "header-hidden" : ""}`} style={{top: `${navTop}px`}}>
         <div className="acne-header-inner">
-          {/* LEFT: Hamburger+Search (mobile) + Nav links (desktop) */}
+          {/* LEFT: Back button (on mobile product page) / Menu trigger (on other mobile pages) + Nav links (desktop) */}
           <div className="acne-nav-left">
-            <button className="acne-mob-icon acne-mobile-only" aria-label="Menu" onClick={openMenu}>
-              <Menu size={18} strokeWidth={1} />
-            </button>
+            {isProduct ? (
+              <button className="acne-mob-icon acne-mobile-only" aria-label="Back" onClick={() => window.history.back()}>
+                <span style={{ fontSize: '18px', fontWeight: 300, color: 'inherit' }}>&lt;</span>
+              </button>
+            ) : (
+              <button className="acne-mob-icon acne-mobile-only" aria-label="Menu" onClick={openMenu}>
+                <Menu size={18} strokeWidth={1} />
+              </button>
+            )}
             <nav className="acne-nav-links acne-desktop-only">
-              <Link href="/collection" onClick={closeMenu}>The Collection</Link>
-              <Link href="/about" onClick={closeMenu}>The House</Link>
+              <Link href="/collection" onClick={closeMenu}>women</Link>
+              <Link href="/collection" onClick={closeMenu}>men</Link>
+              <button className="acne-search-text-btn" onClick={openMenuWithSearch}>buscar</button>
             </nav>
           </div>
 
           <Link href="/" className="acne-logo">
-            <span className="acne-logo-text">TONET</span>
+            <span className="acne-logo-text">tonet</span>
           </Link>
 
-          {/* RIGHT: Nav links (desktop) + Search (desktop) + Account, Wishlist, Cart */}
+          {/* RIGHT: Desktop links (Info, Account) + Mobile/Desktop search/bag icons */}
           <div className="acne-nav-right">
             <div className="acne-right-icons">
-              <button className="acne-right-icon" aria-label="Search" onClick={openMenuWithSearch}>
+              {/* Help icon (desktop only) */}
+              <Link href="/about" className="acne-right-icon acne-desktop-only" aria-label="Help">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="16" x2="12" y2="12"/>
+                  <line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+              </Link>
+              
+              {/* Account icon (desktop only) */}
+              <Link href="/account" className="acne-right-icon acne-desktop-only" aria-label="Account">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </Link>
+
+              {/* Search icon (mobile only) */}
+              <button className="acne-right-icon acne-mobile-only" aria-label="Search" onClick={openMenuWithSearch}>
                 <svg width="18" height="18" viewBox="-1 -1 19 19" fill="none" stroke="currentColor" strokeWidth="0.7">
                   <path d="M16.604 15.868l-5.173-5.173c0.975-1.137 1.569-2.611 1.569-4.223 0-3.584-2.916-6.5-6.5-6.5-1.736 0-3.369 0.676-4.598 1.903-1.227 1.228-1.903 2.861-1.902 4.597 0 3.584 2.916 6.5 6.5 6.5 1.612 0 3.087-0.594 4.224-1.569l5.173 5.173 0.707-0.708zM6.5 11.972c-3.032 0-5.5-2.467-5.5-5.5-0.001-1.47 0.571-2.851 1.61-3.889 1.038-1.039 2.42-1.611 3.89-1.611 3.032 0 5.5 2.467 5.5 5.5 0 3.032-2.468 5.5-5.5 5.5z" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </button>
+
+              {/* Cart icon (both) */}
               <button className="acne-right-icon" onClick={openCart} aria-label="Open bag">
                 <div className="cart-icon-wrap">
                   <svg width="18" height="18" viewBox="3 2 18 20" fill="none" stroke="currentColor" strokeWidth="1" strokeLinejoin="round">
@@ -163,40 +157,6 @@ export default function Navbar() {
             </div>
           </div>
         </div>
-
-        {/* ── SECONDARY STICKY NAV – hidden when transparent header is active ── */}
-        {false && isCollection && (
-          <div className="acne-subnav">
-            <div className="acne-subnav-inner">
-              <Link href="/" className="back-link">
-                <ArrowLeft size={16} strokeWidth={1.4} />
-                <span>{t('nav.gallery')}</span>
-              </Link>
-              <div className="subnav-right">
-                {currentCollection && (
-                  <span className="subnav-current">{currentCollection?.title}</span>
-                )}
-                <button className="subnav-toggle" onClick={() => setSubnavOpen(!subnavOpen)} aria-label="All collections">
-                  {subnavOpen ? <ChevronUp size={14} strokeWidth={1.4} /> : <ChevronDown size={14} strokeWidth={1.4} />}
-                </button>
-              </div>
-              {subnavOpen && (
-                <div className="subnav-dropdown">
-                  {collections.map(c => (
-                    <Link
-                      key={c.handle}
-                      href={`/collection/${c.handle}`}
-                      className={`subnav-drop-item${currentCollectionHandle === c.handle ? ' active' : ''}`}
-                      onClick={() => setSubnavOpen(false)}
-                    >
-                      {c.title}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </header>
 
       <style>{`
@@ -206,42 +166,27 @@ export default function Navbar() {
           top: 0;
           left: 0; right: 0;
           z-index: 500;
-          background: transparent;
-          border-bottom: 1px solid transparent;
-          transition:
-            background-color 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-            border-color 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-            transform 0.45s ease;
+          background: #ffffff;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+          transition: transform 0.45s ease;
         }
         .acne-header.header-hidden { transform: translateY(-100%); }
 
-        /* ══ ALL STATES: white text ══ */
+        /* ══ ALL STATES: black text ══ */
         .acne-header .acne-nav-links a,
+        .acne-header .acne-search-text-btn,
         .acne-header .acne-mob-icon,
         .acne-header .acne-right-icon,
-        .acne-header .acne-logo-text { color: rgba(255,255,255,0.82); }
-        .acne-header svg { stroke: rgba(255,255,255,0.82); }
-
-        /* ══ SCROLL STATES ══ */
-        .acne-header.home-dark {
-          background: rgba(4,4,4,0.5);
-          backdrop-filter: blur(14px);
-          -webkit-backdrop-filter: blur(14px);
-          border-bottom-color: rgba(255,255,255,0.04);
-        }
-        .acne-header.solid {
-          background: rgba(4,4,4,0.9);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border-bottom-color: rgba(255,255,255,0.05);
-        }
+        .acne-header .acne-logo-text { color: rgba(0, 0, 0, 0.85); }
+        .acne-header svg { stroke: rgba(0, 0, 0, 0.85); }
+        .acne-header .cart-badge { background: rgba(0, 0, 0, 0.65); }
 
         /* ══ LAYOUT ══ */
         .acne-header-inner {
           display: grid;
           grid-template-columns: 1fr auto 1fr;
           align-items: center;
-          height: 56px;
+          height: 44px;
           padding: 0 40px;
         }
 
@@ -254,13 +199,13 @@ export default function Navbar() {
           justify-content: center;
         }
         .acne-logo-text {
-          font-family: var(--font-brand), var(--font-serif), serif;
-          font-size: 26px;
-          font-weight: 400;
-          letter-spacing: normal;
+          font-family: var(--font-primary), 'Helvetica Neue', Arial, sans-serif;
+          font-size: 25px;
+          font-weight: 700;
+          letter-spacing: -0.03em;
           padding-right: 0;
-          color: rgba(255,255,255,0.82);
-          text-transform: uppercase;
+          color: rgba(0, 0, 0, 0.85);
+          text-transform: lowercase;
           line-height: 1;
           transition: opacity 0.6s;
         }
@@ -274,19 +219,26 @@ export default function Navbar() {
           justify-content: flex-start;
         }
         .acne-nav-links { display: flex; align-items: center; gap: 36px; }
-        .acne-nav-links a {
+        .acne-nav-links a,
+        .acne-search-text-btn {
           font-family: var(--font-primary);
-          font-size: 9px;
+          font-size: 10px;
           font-weight: 300;
-          text-transform: uppercase;
+          text-transform: lowercase;
           text-decoration: none;
-          color: rgba(255,255,255,0.82);
-          letter-spacing: 0.38em;
+          color: rgba(0, 0, 0, 0.85);
+          letter-spacing: 0.08em;
           line-height: 1;
           white-space: nowrap;
           transition: opacity 0.6s;
+          background: none;
+          border: none;
+          outline: none;
+          cursor: pointer;
+          padding: 0;
         }
-        .acne-nav-links a:hover { opacity: 0.32; }
+        .acne-nav-links a:hover,
+        .acne-search-text-btn:hover { opacity: 0.32; }
         .acne-mobile-only { display: flex; }
         .acne-desktop-only { display: none; }
 
@@ -300,16 +252,16 @@ export default function Navbar() {
         .acne-right-icons { display: flex; align-items: center; gap: 2px; }
         .acne-right-icon {
           display: flex; align-items: center; justify-content: center;
-          width: 40px; height: 40px;
+          width: 40px; height: 44px;
           background: none; border: none;
           cursor: pointer;
-          color: rgba(255,255,255,0.82);
+          color: rgba(0, 0, 0, 0.85);
           text-decoration: none;
           padding: 0;
           transition: opacity 0.6s;
         }
         .acne-right-icon:hover { opacity: 0.32; }
-        .acne-right-icon svg { stroke: rgba(255,255,255,0.82); }
+        .acne-right-icon svg { stroke: rgba(0, 0, 0, 0.85); }
 
         /* ══ CART ══ */
         .cart-icon-wrap {
@@ -318,22 +270,14 @@ export default function Navbar() {
           align-items: center;
           justify-content: center;
         }
-        .cart-badge {
-          position: absolute;
-          top: 6px; right: 6px;
-          width: 4px; height: 4px;
-          border-radius: 50%;
-          background: rgba(255,255,255,0.65);
-          pointer-events: none;
-        }
 
         /* ══ MOB ICON ══ */
         .acne-mob-icon {
           display: flex; align-items: center; justify-content: center;
-          width: 40px; height: 40px;
+          width: 40px; height: 44px;
           background: none; border: none;
           cursor: pointer;
-          color: rgba(255,255,255,0.82);
+          color: rgba(0, 0, 0, 0.85);
           padding: 0;
           transition: opacity 0.6s;
         }
@@ -349,11 +293,10 @@ export default function Navbar() {
 
         /* ══ MOBILE ══ */
         @media (max-width: 767px) {
-          .acne-header-inner { padding: 0 20px; height: 52px; }
-          .acne-logo-text { font-size: 20px; letter-spacing: normal; padding-right: 0; }
-          .acne-mob-icon { width: 32px; height: 52px; }
-          .acne-right-icon { width: 32px; height: 52px; }
-          .acne-right-icon:first-child { display: none; }
+          .acne-header-inner { padding: 0 20px; height: 40px; }
+          .acne-logo-text { font-size: 22px; letter-spacing: -0.03em; font-weight: 700; padding-right: 0; }
+          .acne-mob-icon { width: 32px; height: 40px; }
+          .acne-right-icon { width: 32px; height: 40px; }
         }
       `}</style>
     </>

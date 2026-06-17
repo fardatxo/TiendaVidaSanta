@@ -31,10 +31,10 @@ export default function Footer() {
 
         <style>{`
           .ft-home {
-            background: #000000;
-            color: #ffffff;
+            background: #ffffff;
+            color: #000000;
             font-family: var(--font-primary);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
             padding: 120px 80px 60px;
           }
           .ft-home-inner {
@@ -54,7 +54,7 @@ export default function Footer() {
             font-weight: 300;
             letter-spacing: normal;
             padding-left: 0px;
-            color: #ffffff;
+            color: #000000;
             text-transform: uppercase;
           }
           .ft-home-links {
@@ -69,12 +69,12 @@ export default function Footer() {
             font-size: 11px;
             font-weight: 300;
             letter-spacing: 0.35em;
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(0, 0, 0, 0.5);
             text-decoration: none;
             transition: color 0.4s;
           }
           .ft-home-link:hover {
-            color: #ffffff;
+            color: #000000;
             opacity: 1 !important;
           }
           .ft-home-bottom {
@@ -85,7 +85,7 @@ export default function Footer() {
             font-family: var(--font-brand) !important;
             font-size: 16px;
             font-weight: 300;
-            color: #ffffff !important;
+            color: #000000 !important;
             letter-spacing: normal;
             text-transform: uppercase;
           }
