@@ -56,8 +56,8 @@ export default function RecommendedCard({ product }: Props) {
           position: relative;
           width: 100%;
           aspect-ratio: 3 / 4;
-          background: #f7f7f7;
-          border-radius: 4px;
+          background: #f6f6f6;
+          border-radius: 0;
           overflow: hidden;
           transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
@@ -66,8 +66,9 @@ export default function RecommendedCard({ product }: Props) {
           height: 100%;
           object-fit: contain;
           display: block;
-          border-radius: 4px;
+          border-radius: 0;
           transition: opacity 300ms ease-in-out;
+          mix-blend-mode: multiply;
         }
         .tonet-house-carousel__image--secondary {
           position: absolute;
