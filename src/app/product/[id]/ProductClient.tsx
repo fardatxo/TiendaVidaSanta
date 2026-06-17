@@ -965,8 +965,14 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           min-height: 100vh;
           font-family: var(--font-primary), sans-serif;
           font-variant-numeric: lining-nums tabular-nums;
-          padding-top: 100px;
+          padding-top: 0px;
           position: relative;
+        }
+
+        @media (min-width: 1024px) {
+          .tonet-pdp-page {
+            padding-top: 100px;
+          }
         }
 
         /* Small collection label top-left */

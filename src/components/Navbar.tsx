@@ -65,7 +65,7 @@ export default function Navbar() {
 
   useEffect(() => {
     setNavTop(BANNER_H);
-    setIsAtTop(window.scrollY < 50);
+    setIsAtTop(window.scrollY < 10);
   }, [BANNER_H]);
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
@@ -77,7 +77,7 @@ export default function Navbar() {
       const y = window.scrollY;
       setHeaderVisible(true);
       setNavTop(Math.max(0, BANNER_H - y));
-      setIsAtTop(y < 50);
+      setIsAtTop(y < 10);
       lastScrollY.current = y;
       ticking.current = false;
     });
@@ -106,7 +106,7 @@ export default function Navbar() {
   return (
     <>
       <header 
-        className={`acne-header ${isHome ? "transparent-home" : isProduct ? "transparent-pdp" : "solid"} ${!headerVisible ? "header-hidden" : ""} ${isSearchOpen ? "search-active" : ""}`} 
+        className={`acne-header ${isHome ? "transparent-home" : isProduct ? (isAtTop ? "transparent-pdp" : "solid") : "solid"} ${!headerVisible ? "header-hidden" : ""} ${isSearchOpen ? "search-active" : ""}`} 
         style={{top: `${navTop}px`}}
       >
         <div className="acne-header-inner">
