@@ -158,7 +158,7 @@ export default function Navbar() {
             </span>
             <span 
               className="acne-logo-text acne-logo-mobile"
-              style={{ fontFamily: currentFont.family, fontWeight: currentFont.weight }}
+              style={{ fontFamily: "'Coolvetica Condensed', sans-serif", fontWeight: 'normal' }}
             >
               TONET
             </span>
@@ -415,7 +415,7 @@ export default function Navbar() {
         /* ══ MOBILE ══ */
         @media (max-width: 767px) {
           .acne-header-inner { padding: 0 16px; height: 54px; }
-          .acne-logo-text { font-size: 18px; letter-spacing: 0.03em; font-weight: normal; padding-right: 0; }
+          .acne-logo-text { font-size: 24px; letter-spacing: 0.03em; font-weight: normal; padding-right: 0; }
           .acne-mob-icon { width: 44px; height: 54px; }
           .acne-right-icon { width: 44px; height: 54px; }
           .acne-wishlist-icon { display: none !important; }
