@@ -356,8 +356,8 @@ export default async function Home() {
 
         /* ── THE WORLD OF TONET ── */
         .am-world-tonet-section {
-          padding: 100px 48px;
-          min-height: 100vh;
+          padding: 80px 48px;
+          height: 100vh;
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
@@ -381,7 +381,7 @@ export default async function Home() {
           grid-template-columns: repeat(3, 1fr);
           gap: 24px;
           width: 100%;
-          max-width: 1300px;
+          max-width: 1200px;
           margin: 0 auto;
         }
         .am-world-tonet-col {
@@ -392,7 +392,7 @@ export default async function Home() {
         }
         .am-world-tonet-media {
           width: 100%;
-          aspect-ratio: 4 / 5;
+          aspect-ratio: 1 / 1;
           overflow: hidden;
           background: #fcfcfc;
           transition: filter 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -507,9 +507,14 @@ export default async function Home() {
           }
           .am-world-tonet-section {
             padding: 80px 0;
-            height: auto;
-            scroll-snap-align: none;
-            scroll-snap-stop: none;
+            height: 100vh;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
           }
           .am-world-tonet-title {
             margin-bottom: 40px;
@@ -521,19 +526,22 @@ export default async function Home() {
             overflow-x: auto;
             scroll-snap-type: x mandatory;
             gap: 16px;
-            padding: 0 20px;
+            padding: 0 40px;
             scrollbar-width: none;
+            width: 100%;
+            box-sizing: border-box;
           }
           .am-world-tonet-grid::-webkit-scrollbar {
             display: none;
           }
           .am-world-tonet-col {
-            flex: 0 0 80%;
-            scroll-snap-align: start;
+            flex: 0 0 75%;
+            scroll-snap-align: center;
             height: auto;
           }
           .am-world-tonet-media {
             filter: blur(4px) brightness(0.6);
+            aspect-ratio: 1 / 1;
           }
           .am-world-tonet-overlay {
             background-color: rgba(0, 0, 0, 0.25);
