@@ -74,7 +74,7 @@ export default function CartDrawer() {
         {/* ── HEADER ── */}
         <div className="cd-header">
           <div className="cd-header-spacer" />
-          <span className="cd-title">Shopping Bag</span>
+          <span className="cd-title">SHOPPING BAG</span>
           <button className="cd-close" onClick={closeCart} aria-label="Close">
             <X size={18} strokeWidth={1.4} />
           </button>
@@ -118,7 +118,7 @@ export default function CartDrawer() {
         {items.length > 0 && (
           <div className="cd-footer">
             <div className="cd-subtotal-row">
-              <span className="cd-subtotal-label">Total</span>
+              <span className="cd-subtotal-label">Subtotal</span>
               <span className="cd-subtotal-price">{totalFormatted}</span>
             </div>
             <div className="cd-cta-group">
@@ -128,10 +128,7 @@ export default function CartDrawer() {
                   if (cart.checkoutUrl) window.location.href = cart.checkoutUrl;
                 }}
               >
-                Continue to Checkout
-              </button>
-              <button className="cd-favorites-btn">
-                Archive
+                Checkout
               </button>
             </div>
           </div>
@@ -157,7 +154,7 @@ export default function CartDrawer() {
         .cd-drawer {
           position: fixed;
           top: 0; right: 0; bottom: 0;
-          width: min(100vw, 400px);
+          width: min(100vw, 480px); /* 10% wider (440px -> 480px) */
           background: #ffffff;
           border-left: 1px solid #eaeaea;
           z-index: 1001;
@@ -176,17 +173,17 @@ export default function CartDrawer() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 20px 24px;
-          border-bottom: 1px solid #eaeaea;
+          padding: 24px 24px;
+          border-bottom: none; /* No separator line */
           flex-shrink: 0;
         }
         .cd-header-spacer { width: 28px; }
         .cd-title {
-          font-size: 10px;
+          font-size: 11px;
           font-weight: 500;
-          letter-spacing: 0.15em;
+          letter-spacing: 0.18em;
           text-transform: uppercase;
-          color: rgba(0, 0, 0, 0.4);
+          color: #000000; /* Darker/black text */
         }
         .cd-close {
           background: none; border: none;
@@ -250,25 +247,29 @@ export default function CartDrawer() {
         .cd-item {
           display: flex;
           flex-direction: row;
-          padding: 20px 24px;
+          padding: 11px 24px;
           gap: 16px;
-          border-bottom: 1px solid #eaeaea;
+          border-bottom: none; /* No separator lines between products */
         }
         .cd-item-img {
-          width: 35%;
+          width: 60%; /* 60% of the cart width */
           flex-shrink: 0;
-          background: #fcfcfc;
+          background: #f4f4f4; /* Gray background */
           aspect-ratio: 3 / 4;
           display: flex;
           align-items: center;
           justify-content: center;
           overflow: hidden;
+          padding: 12px; /* Less zoomed in */
+          box-sizing: border-box;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); /* Subtle shadow effect */
         }
         .cd-item-img img {
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: contain;
           display: block;
+          mix-blend-mode: multiply;
         }
         .cd-item-info {
           flex: 1;
@@ -330,7 +331,7 @@ export default function CartDrawer() {
         /* ══ FOOTER ══ */
         .cd-footer {
           flex-shrink: 0;
-          border-top: 1px solid #eaeaea;
+          border-top: none; /* No top border line */
           padding: 20px 24px 28px;
           display: flex;
           flex-direction: column;
@@ -343,10 +344,10 @@ export default function CartDrawer() {
         }
         .cd-subtotal-label {
           font-size: 9px;
-          font-weight: 400;
+          font-weight: 500;
           letter-spacing: 0.15em;
           text-transform: uppercase;
-          color: rgba(0, 0, 0, 0.4);
+          color: #000000; /* Darker subtotal label */
         }
         .cd-subtotal-price {
           font-size: 11px;
@@ -376,22 +377,6 @@ export default function CartDrawer() {
           transition: opacity 0.3s;
         }
         .cd-checkout-btn:hover { opacity: 0.85; }
-        .cd-favorites-btn {
-          width: 100%;
-          padding: 14px 8px;
-          font-size: 10px;
-          font-family: inherit;
-          font-weight: 300;
-          text-transform: uppercase;
-          letter-spacing: 0.15em;
-          cursor: pointer;
-          border-radius: 0;
-          background: transparent;
-          color: rgba(0, 0, 0, 0.6);
-          border: 1px solid rgba(0, 0, 0, 0.1);
-          transition: color 0.3s, border-color 0.3s;
-        }
-        .cd-favorites-btn:hover { border-color: rgba(0, 0, 0, 0.3); color: #000000; }
 
         /* ══ MOBILE ══ */
         @media (max-width: 767px) {
@@ -403,8 +388,7 @@ export default function CartDrawer() {
           
           /* Active touch feedbacks */
           .cd-qty-btn:active,
-          .cd-checkout-btn:active,
-          .cd-favorites-btn:active {
+          .cd-checkout-btn:active {
             opacity: 0.6;
           }
         }

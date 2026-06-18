@@ -21,19 +21,19 @@ export default function Footer() {
 
         {/* Left: Newsletter + Socials */}
         <div className="ft-left">
-          <p className="ft-nl-label">boletín de noticias</p>
+          <p className="ft-nl-label">newsletter</p>
           <div className="ft-nl">
             <div className="ft-nl-row">
               <input
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="dirección de correo electrónico"
+                placeholder="email address"
                 className="ft-nl-input"
               />
               <button className="ft-nl-btn" aria-label="Submit">→</button>
             </div>
-            <p className="ft-nl-sub">suscríbete para recibir novedades, lanzamientos y más.</p>
+            <p className="ft-nl-sub">subscribe to receive updates, launches and more.</p>
           </div>
           <div className="ft-socials-text">
             <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">instagram</a>
