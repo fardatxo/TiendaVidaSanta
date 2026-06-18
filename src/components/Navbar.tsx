@@ -151,10 +151,16 @@ export default function Navbar() {
           {/* CENTER: Logo */}
           <Link href="/" className="acne-logo">
             <span 
-              className="acne-logo-text"
+              className="acne-logo-text acne-logo-desktop"
               style={{ fontFamily: currentFont.family, fontWeight: currentFont.weight }}
             >
               TONET TORRENTINNI
+            </span>
+            <span 
+              className="acne-logo-text acne-logo-mobile"
+              style={{ fontFamily: currentFont.family, fontWeight: currentFont.weight }}
+            >
+              TONET
             </span>
           </Link>
 
@@ -310,6 +316,12 @@ export default function Navbar() {
           transition: opacity 0.3s ease;
         }
         .acne-logo:hover .acne-logo-text { opacity: 0.6; }
+        .acne-logo-desktop {
+          display: inline-block;
+        }
+        .acne-logo-mobile {
+          display: none;
+        }
 
         /* ══ LEFT NAV ══ */
         .acne-nav-left {
@@ -407,6 +419,12 @@ export default function Navbar() {
           .acne-mob-icon { width: 44px; height: 54px; }
           .acne-right-icon { width: 44px; height: 54px; }
           .acne-wishlist-icon { display: none !important; }
+          .acne-logo-desktop {
+            display: none;
+          }
+          .acne-logo-mobile {
+            display: inline-block;
+          }
           
           /* Active states */
           .acne-mob-icon:active,
