@@ -9,6 +9,17 @@ import { useCart } from "@/context/CartContext";
 import { useTranslation } from "@/lib/i18n";
 import { useWishlist } from "@/context/WishlistContext";
 
+const logoFonts = [
+  { family: "'Coolvetica Condensed', sans-serif", weight: "normal" },
+  { family: "'Saint Carell', sans-serif", weight: "normal" },
+  { family: "'Against', sans-serif", weight: "normal" },
+  { family: "'Twilight New Moon', sans-serif", weight: "normal" },
+  { family: "'A Star Demo', sans-serif", weight: "normal" },
+  { family: "'Creato Display', sans-serif", weight: "bold" },
+  { family: "var(--font-jost), sans-serif", weight: "500" },
+  { family: "var(--font-cormorant), serif", weight: "300" }
+];
+
 export default function Navbar() {
   const { openCart, openSearch, openMenu, closeMenu, isSearchOpen, openAccount } = useUI();
   const { cartCount } = useCart();
@@ -16,6 +27,24 @@ export default function Navbar() {
   const { t } = useTranslation();
   const pathname = usePathname();
   const router = useRouter();
+
+  const [currentFont, setCurrentFont] = useState(logoFonts[0]);
+
+  useEffect(() => {
+    const randomFont = logoFonts[Math.floor(Math.random() * logoFonts.length)];
+    setCurrentFont(randomFont);
+  }, [pathname]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        const randomFont = logoFonts[Math.floor(Math.random() * logoFonts.length)];
+        setCurrentFont(randomFont);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
 
   const isHome = pathname === "/";
   const isProduct = pathname.startsWith("/product/");
@@ -125,7 +154,12 @@ export default function Navbar() {
 
           {/* CENTER: Logo */}
           <Link href="/" className="acne-logo">
-            <span className="acne-logo-text">TONET TORRENTINNI</span>
+            <span 
+              className="acne-logo-text"
+              style={{ fontFamily: currentFont.family, fontWeight: currentFont.weight }}
+            >
+              TONET TORRENTINNI
+            </span>
           </Link>
 
           {/* RIGHT: Account, Bookmark, Bag */}
