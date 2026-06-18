@@ -11,11 +11,13 @@ import { LocaleProvider } from "@/context/LocaleContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { AuthProvider } from "@/context/AuthContext";
 import CartDrawer from "@/components/CartDrawer";
+import AccountDrawer from "@/components/AccountDrawer";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import MenuDrawer from "@/components/MenuDrawer";
 import SearchDrawer from "@/components/SearchDrawer";
 import CookieBanner from "@/components/CookieBanner";
 import TransitionProvider from "@/components/TransitionProvider";
+import LocaleSelectorModal from "@/components/LocaleSelectorModal";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -55,8 +57,10 @@ export default function RootLayout({
                 <AnnouncementBar />
                 <Navbar />
                 <CartDrawer />
+                <AccountDrawer />
                 <MenuDrawer />
                 <SearchDrawer />
+                <LocaleSelectorModal />
                 <main>{children}</main>
                 <Footer />
                 <CookieBanner />

@@ -5,6 +5,8 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUI } from "@/context/UIContext";
+import { useLocale } from "@/context/LocaleContext";
+import { getRegionLabel, getLanguageLabel, REGIONS } from "@/lib/i18n/regions";
 
 interface CollectionNav {
   handle: string;
@@ -14,7 +16,12 @@ interface CollectionNav {
 
 export default function MenuDrawer() {
   const { isMenuOpen, closeMenu, menuSearchMode, clearMenuSearchMode } = useUI();
+  const { region, language, openSelector } = useLocale();
+  const regionLabel = getRegionLabel(region, language);
+  const languageLabel = getLanguageLabel(language, language);
+  const currency = REGIONS[region]?.currency || 'EUR';
   const router = useRouter();
+
   const drawerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [collections, setCollections] = useState<CollectionNav[]>([]);
@@ -185,8 +192,8 @@ export default function MenuDrawer() {
             <Link href="/stores" className="md-archive-link" onClick={closeMenu}>Stores</Link>
           </div>
 
-          <div className="md-locale">
-            españa / es / eur
+          <div className="md-locale" onClick={() => { closeMenu(); openSelector(); }}>
+            {`${regionLabel} / ${languageLabel} / ${currency}`.toLowerCase()}
           </div>
         </div>
 
@@ -396,6 +403,11 @@ export default function MenuDrawer() {
           letter-spacing: 0.15em;
           text-transform: lowercase;
           color: rgba(0, 0, 0, 0.4);
+          cursor: pointer;
+          transition: color 0.3s;
+        }
+        .md-locale:hover {
+          color: #000000;
         }
 
         /* ══ RIGHT COLUMN ══ */

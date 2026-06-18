@@ -16,6 +16,10 @@ interface UIContextType {
   menuSearchMode: boolean;
   openMenuWithSearch: () => void;
   clearMenuSearchMode: () => void;
+  isAccountOpen: boolean;
+  openAccount: () => void;
+  closeAccount: () => void;
+  toggleAccount: () => void;
 }
 
 const UIContext = createContext<UIContextType | undefined>(undefined);
@@ -24,23 +28,59 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
 
-  const openCart = () => setIsCartOpen(true);
+  const openCart = () => {
+    setIsCartOpen(true);
+    setIsAccountOpen(false);
+    setIsSearchOpen(false);
+    setIsMenuOpen(false);
+  };
   const closeCart = () => setIsCartOpen(false);
   const toggleCart = () => setIsCartOpen((prev) => !prev);
 
-  const openSearch = () => setIsSearchOpen(true);
+  const openSearch = () => {
+    setIsSearchOpen(true);
+    setIsAccountOpen(false);
+    setIsCartOpen(false);
+    setIsMenuOpen(false);
+  };
   const closeSearch = () => setIsSearchOpen(false);
 
   const [menuSearchMode, setMenuSearchMode] = useState(false);
 
-  const openMenu = () => setIsMenuOpen(true);
+  const openMenu = () => {
+    setIsMenuOpen(true);
+    setIsAccountOpen(false);
+    setIsCartOpen(false);
+    setIsSearchOpen(false);
+  };
   const closeMenu = () => { setIsMenuOpen(false); setMenuSearchMode(false); };
-  const openMenuWithSearch = () => { setMenuSearchMode(true); setIsMenuOpen(true); };
+  const openMenuWithSearch = () => {
+    setMenuSearchMode(true);
+    setIsMenuOpen(true);
+    setIsAccountOpen(false);
+    setIsCartOpen(false);
+    setIsSearchOpen(false);
+  };
   const clearMenuSearchMode = () => setMenuSearchMode(false);
 
+  const openAccount = () => {
+    setIsAccountOpen(true);
+    setIsCartOpen(false);
+    setIsSearchOpen(false);
+    setIsMenuOpen(false);
+  };
+  const closeAccount = () => setIsAccountOpen(false);
+  const toggleAccount = () => setIsAccountOpen((prev) => !prev);
+
   return (
-    <UIContext.Provider value={{ isCartOpen, openCart, closeCart, toggleCart, isSearchOpen, openSearch, closeSearch, isMenuOpen, openMenu, closeMenu, menuSearchMode, openMenuWithSearch, clearMenuSearchMode }}>
+    <UIContext.Provider value={{ 
+      isCartOpen, openCart, closeCart, toggleCart, 
+      isSearchOpen, openSearch, closeSearch, 
+      isMenuOpen, openMenu, closeMenu, menuSearchMode, openMenuWithSearch, clearMenuSearchMode,
+      isAccountOpen, openAccount, closeAccount, toggleAccount
+    }}>
       {children}
     </UIContext.Provider>
   );

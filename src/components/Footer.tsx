@@ -3,11 +3,18 @@
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { useLocale } from "@/context/LocaleContext";
+import { getRegionLabel, getLanguageLabel, REGIONS } from "@/lib/i18n/regions";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
   const pathname = usePathname();
   const [expandedCol, setExpandedCol] = useState<string | null>(null);
+
+  const { region, language, openSelector } = useLocale();
+  const regionLabel = getRegionLabel(region, language);
+  const languageLabel = getLanguageLabel(language, language);
+  const currency = REGIONS[region]?.currency || 'EUR';
 
   const toggleCol = (colName: string) => {
     setExpandedCol(prev => prev === colName ? null : colName);
@@ -87,7 +94,9 @@ export default function Footer() {
       {/* ── BOTTOM ── */}
       <div className="ft-bottom">
         <span className="ft-copy">© 2026 tonet</span>
-        <span className="ft-locale">spain / en / eur</span>
+        <span className="ft-locale" onClick={openSelector}>
+          {`${regionLabel} / ${languageLabel} / ${currency}`.toLowerCase()}
+        </span>
       </div>
 
       <style>{`

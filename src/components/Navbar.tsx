@@ -10,7 +10,7 @@ import { useTranslation } from "@/lib/i18n";
 import { useWishlist } from "@/context/WishlistContext";
 
 export default function Navbar() {
-  const { openCart, openSearch, openMenu, closeMenu, isSearchOpen } = useUI();
+  const { openCart, openSearch, openMenu, closeMenu, isSearchOpen, openAccount } = useUI();
   const { cartCount } = useCart();
   const { items: wishlistItems } = useWishlist();
   const { t } = useTranslation();
@@ -132,12 +132,12 @@ export default function Navbar() {
           <div className="acne-nav-right">
             <div className="acne-right-icons">
               {/* Account icon */}
-              <Link href="/account" className="acne-right-icon" aria-label="Account">
+              <button onClick={openAccount} className="acne-right-icon" aria-label="Account">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                   <circle cx="12" cy="7" r="4"/>
                 </svg>
-              </Link>
+              </button>
 
               {/* Wishlist icon (Bookmark ribbon style) */}
               <Link href="/wishlist" className="acne-right-icon acne-wishlist-icon" aria-label="Wishlist">

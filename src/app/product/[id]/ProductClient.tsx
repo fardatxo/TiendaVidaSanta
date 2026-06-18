@@ -141,7 +141,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
     product.variants[0] ?? { id: '', title: '', availableForSale: true, price: { amount: String(product.price), currencyCode: product.currencyCode }, selectedOptions: [] }
   );
   const [adding, setAdding] = useState(false);
-  const [expandedAccordion, setExpandedAccordion] = useState<string | null>('desc');
+  const [expandedAccordion, setExpandedAccordion] = useState<string | null>(null);
   const [availModal, setAvailModal] = useState(false);
   const [availSizes, setAvailSizes] = useState<string[]>([]);
   const [availEmail, setAvailEmail] = useState('');
@@ -609,24 +609,15 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                 </div>
               </div>
 
-              {/* Additional Mobile-only 2x2 grid below accordions */}
+              {/* Additional Mobile-only grid below accordions */}
               <div className="tonet-mobile-extra-grid">
                 <div className={images.length === 1 ? "tonet-mobile-single" : "tonet-mobile-grid"}>
-                  {images.slice(0, 4).map((img, i) => (
+                  {images.map((img, i) => (
                     <div key={i} className="tonet-mobile-grid-item">
                       <img src={img} alt={`${product.title} - ${i}`} className="tonet-pdp-img" />
                     </div>
                   ))}
                 </div>
-                {images.length > 4 && (
-                  <div className="tonet-mobile-stack">
-                    {images.slice(4).map((img, i) => (
-                      <div key={i + 4} className="tonet-mobile-stack-item">
-                        <img src={img} alt={`${product.title} - ${i + 4}`} className="tonet-pdp-img" />
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
 
             </div>
@@ -697,15 +688,41 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
         {/* RELATED CAROUSEL (YOU MIGHT ALSO LIKE) */}
         {recommended.length > 0 && (
-          <section className="tonet-related-carousel">
-            <h2 className="tonet-carousel-title">YOU MIGHT ALSO LIKE</h2>
-            <div className="tonet-carousel-wrap">
-              <div className="tonet-carousel-track">
-                {recommended.slice(0, 8).map((p) => (
-                  <div className="tonet-carousel-item" key={p.handle}>
-                    <RecommendedCard product={p} />
-                  </div>
-                ))}
+          <section className="amiri-ctl-section">
+            <div className="amiri-ctl-header">
+              <span className="amiri-ctl-logo">TONET</span>
+              <h2 className="amiri-ctl-title">YOU MIGHT ALSO LIKE</h2>
+            </div>
+            
+            <div className="amiri-ctl-carousel-wrapper">
+              <div className="amiri-ctl-carousel">
+                {recommended.slice(0, 8).map((p) => {
+                  const pType = getProductType(p);
+                  const symbol = p.currencyCode === 'USD' ? '$' : '€';
+                  const formattedPrice = Number.isInteger(p.price)
+                    ? `${symbol}${p.price} ${p.currencyCode}`
+                    : `${symbol}${p.price.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${p.currencyCode}`;
+                  
+                  return (
+                    <div className="amiri-ctl-item" key={p.handle}>
+                      <Link href={`/product/${p.handle}`} className="amiri-ctl-card">
+                        <div className="amiri-ctl-image-panel">
+                          {p.imageUrl && (
+                            <img 
+                              src={p.imageUrl} 
+                              alt={p.title} 
+                              className={`amiri-ctl-image amiri-ctl-image--${pType}`}
+                            />
+                          )}
+                        </div>
+                        <div className="amiri-ctl-meta">
+                          <span className="amiri-ctl-name">{p.title.toUpperCase()}</span>
+                          <span className="amiri-ctl-price">{formattedPrice}</span>
+                        </div>
+                      </Link>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </section>
@@ -1015,6 +1032,11 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .tonet-gallery-column {
           width: 100%;
         }
+        @media (min-width: 1024px) {
+          .tonet-gallery-column {
+            background-color: #f6f6f6;
+          }
+        }
 
         /* Mobile Swipe Gallery */
         .tonet-mobile-gallery {
@@ -1168,7 +1190,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
         @media (min-width: 1024px) {
           .tonet-info-column {
-            padding: 40px 0 120px 64px;
+            padding: 0 0 120px 64px;
           }
         }
         .tonet-info-sticky {
@@ -1182,7 +1204,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         @media (min-width: 1024px) {
           .tonet-info-sticky {
             position: sticky;
-            top: 130px;
+            top: 50vh;
+            transform: translateY(-50%);
             align-items: center;
             text-align: center;
             max-width: 460px;
@@ -1811,12 +1834,12 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .amiri-ctl-carousel-wrapper {
           position: relative;
           width: 100%;
-          padding: 0 40px;
+          padding: 0;
           box-sizing: border-box;
         }
         @media (min-width: 1024px) {
           .amiri-ctl-carousel-wrapper {
-            padding: 0 64px;
+            padding: 0;
           }
         }
 
@@ -1828,14 +1851,23 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           scroll-snap-type: x mandatory;
           gap: 0;
           width: 100%;
+          padding-left: 40px;
+          padding-right: 40px;
+          box-sizing: border-box;
+        }
+        @media (min-width: 1024px) {
+          .amiri-ctl-carousel {
+            padding-left: 64px;
+            padding-right: 64px;
+          }
         }
         .amiri-ctl-carousel::-webkit-scrollbar {
           display: none;
         }
 
         .amiri-ctl-item {
-          flex: 0 0 75%;
-          width: 75%;
+          flex: 0 0 86%;
+          width: 86%;
           scroll-snap-align: center;
           box-sizing: border-box;
         }
@@ -1844,10 +1876,10 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
         @media (min-width: 1024px) {
           .amiri-ctl-item {
-            flex: 0 0 22%;
-            width: 22%;
-            min-width: 280px;
-            max-width: 330px;
+            flex: 0 0 25%;
+            width: 25%;
+            min-width: 322px;
+            max-width: 380px;
             scroll-snap-align: start;
           }
         }
@@ -1862,22 +1894,24 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
         .amiri-ctl-image-panel {
           width: 100%;
-          aspect-ratio: 4 / 5;
+          aspect-ratio: 3 / 4;
           background-color: #f6f6f6;
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 24px;
+          padding: 4px;
           box-sizing: border-box;
         }
         @media (min-width: 1024px) {
           .amiri-ctl-image-panel {
-            padding: 32px;
+            padding: 8px;
           }
         }
 
         .amiri-ctl-image {
           display: block;
+          width: 100%;
+          height: 100%;
           object-fit: contain;
           mix-blend-mode: multiply;
           transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1911,12 +1945,12 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           display: flex;
           flex-direction: column;
           gap: 4px;
-          text-align: left;
-          padding-left: 8px;
+          text-align: center;
+          align-items: center;
         }
         @media (min-width: 1024px) {
           .amiri-ctl-meta {
-            padding-left: 12px;
+            padding-top: 16px;
           }
         }
 

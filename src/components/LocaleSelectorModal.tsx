@@ -7,232 +7,293 @@ import {
   getRegionLabel,
   getLanguageLabel,
   getAvailableLanguages,
-  REGIONS,
-  detectSuggestedLocale,
 } from '@/lib/i18n/regions';
 import type { RegionCode, LanguageCode } from '@/lib/i18n/regions';
-import { useTranslation } from '@/lib/i18n';
 
 export default function LocaleSelectorModal() {
   const { selectorOpen, hasPreference, setLocale, closeSelector, region, language } = useLocale();
-  const { t } = useTranslation();
 
   const [selectedRegion, setSelectedRegion] = useState<RegionCode>(region);
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>(language);
-  const [rememberChoice, setRememberChoice] = useState(false);
 
   useEffect(() => {
     if (selectorOpen) {
-      if (hasPreference) {
-        setSelectedRegion(region);
-        setSelectedLanguage(language);
-      } else {
-        const suggested = detectSuggestedLocale();
-        setSelectedRegion(suggested.region);
-        setSelectedLanguage(suggested.language);
-      }
+      setSelectedRegion(region);
+      setSelectedLanguage(language);
     }
-  }, [selectorOpen, hasPreference, region, language]);
-
-  const availableLanguages = getAvailableLanguages(selectedRegion);
-
-  function handleRegionChange(code: RegionCode) {
-    setSelectedRegion(code);
-    if (!availableLanguages.includes(selectedLanguage) || !getAvailableLanguages(code).includes(selectedLanguage)) {
-      setSelectedLanguage(REGIONS[code].defaultLanguage);
-    }
-  }
-
-  function handleContinue() {
-    setLocale({ region: selectedRegion, language: selectedLanguage, remember: rememberChoice });
-  }
+  }, [selectorOpen, region, language]);
 
   if (!selectorOpen) return null;
 
+  const availableLanguages = getAvailableLanguages(selectedRegion);
   const isBlocking = !hasPreference;
-  const displayLang = hasPreference ? language : selectedLanguage;
+
+  function handleRegionSelect(code: RegionCode) {
+    setSelectedRegion(code);
+    const langs = getAvailableLanguages(code);
+    if (!langs.includes(selectedLanguage)) {
+      setSelectedLanguage(langs[0]);
+    }
+  }
+
+  function handleLanguageSelect(langCode: LanguageCode) {
+    setLocale({
+      region: selectedRegion,
+      language: langCode,
+      remember: true
+    });
+  }
+
+  const currentRegionLabel = getRegionLabel(region, language);
+  const currentLanguageLabel = getLanguageLabel(language, language);
 
   return (
     <>
-      <div className="ls-overlay" onClick={isBlocking ? undefined : closeSelector} />
-      <div className="ls-modal" role="dialog" aria-modal="true">
-        <div className="ls-logo">★ TONER TORRENTINNI®</div>
+      <div className="tonet-locale-overlay" onClick={isBlocking ? undefined : closeSelector} />
+      <div className="tonet-locale-container" role="dialog" aria-modal="true" aria-labelledby="tonet-locale-title">
+        
+        <div className="tonet-locale-header">
+          <h2 id="tonet-locale-title" className="tonet-locale-title">Región e idioma</h2>
+          {!isBlocking && (
+            <button className="tonet-locale-close" onClick={closeSelector} aria-label="Cerrar modal">✕</button>
+          )}
+        </div>
 
-        <h2 className="ls-title">{t('locale.title')}</h2>
+        <div className="tonet-locale-current">
+          <span className="tonet-locale-current-label">Mercado actual:</span>
+          <span className="tonet-locale-current-value">
+            {currentRegionLabel.toUpperCase()} / {currentLanguageLabel.toUpperCase()}
+          </span>
+        </div>
 
-        <label className="ls-label">{t('locale.region')}</label>
-        <select
-          className="ls-select"
-          value={selectedRegion}
-          onChange={(e) => handleRegionChange(e.target.value as RegionCode)}
-        >
-          {REGION_CODES.map((code) => (
-            <option key={code} value={code}>
-              {getRegionLabel(code, displayLang)}
-            </option>
-          ))}
-        </select>
+        <div className="tonet-locale-divider" />
 
-        <label className="ls-label">{t('locale.language')}</label>
-        <select
-          className="ls-select"
-          value={selectedLanguage}
-          onChange={(e) => setSelectedLanguage(e.target.value as LanguageCode)}
-        >
-          {getAvailableLanguages(selectedRegion).map((code) => (
-            <option key={code} value={code}>
-              {getLanguageLabel(code, displayLang)}
-            </option>
-          ))}
-        </select>
+        <div className="tonet-locale-grid">
+          
+          <div className="tonet-locale-col">
+            <h3 className="tonet-locale-col-title">Seleccionar región</h3>
+            <div className="tonet-locale-list">
+              {REGION_CODES.map((code) => {
+                const isSelected = selectedRegion === code;
+                return (
+                  <button
+                    key={code}
+                    type="button"
+                    className={`tonet-locale-item-btn ${isSelected ? 'active' : ''}`}
+                    onClick={() => handleRegionSelect(code)}
+                  >
+                    {getRegionLabel(code, language).toUpperCase()}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-        <label className="ls-remember">
-          <input
-            type="checkbox"
-            checked={rememberChoice}
-            onChange={(e) => setRememberChoice(e.target.checked)}
-          />
-          <span>{t('locale.remember')}</span>
-        </label>
+          <div className="tonet-locale-col">
+            <h3 className="tonet-locale-col-title">Seleccionar idioma</h3>
+            <div className="tonet-locale-list">
+              {availableLanguages.map((langCode) => {
+                const isSelected = selectedRegion === region && language === langCode;
+                const nativeLabel = getLanguageLabel(langCode, langCode);
+                
+                return (
+                  <button
+                    key={langCode}
+                    type="button"
+                    className={`tonet-locale-item-btn ${isSelected ? 'active' : ''}`}
+                    onClick={() => handleLanguageSelect(langCode)}
+                  >
+                    {nativeLabel.toUpperCase()}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-        <button className="ls-continue" onClick={handleContinue}>
-          {t('locale.continue')}
-        </button>
+        </div>
 
-        {!isBlocking && (
-          <button className="ls-close-btn" onClick={closeSelector} aria-label="Close">✕</button>
-        )}
       </div>
 
       <style>{`
-        .ls-overlay {
+        .tonet-locale-overlay {
           position: fixed;
           inset: 0;
-          background: rgba(255,255,255,0.15);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
           z-index: 9998;
         }
-        .ls-modal {
+
+        .tonet-locale-container {
           position: fixed;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
           z-index: 9999;
-          background: #fff;
-          width: 380px;
+          background: #ffffff;
+          width: 720px;
           max-width: calc(100vw - 40px);
-          padding: 48px 36px 40px;
+          padding: 48px 48px 60px;
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+          border: 1px solid rgba(0, 0, 0, 0.08);
+          font-family: var(--font-primary), sans-serif;
+          box-sizing: border-box;
           display: flex;
           flex-direction: column;
           gap: 0;
-          font-family: var(--font-primary);
-          box-shadow: 0 8px 40px rgba(0,0,0,0.18);
         }
-        .ls-logo {
-          font-family: var(--font-brand);
-          font-size: 26px;
-          font-weight: normal;
-          letter-spacing: 0.01em;
-          text-align: center;
-          margin-bottom: 32px;
-          color: #111;
-        }
-        .ls-title {
-          font-size: 11px;
-          font-weight: 500;
-          text-transform: uppercase;
-          letter-spacing: 0.12em;
-          color: #0000cc;
-          margin: 0 0 28px;
-          text-align: center;
-        }
-        .ls-label {
-          font-size: 9px;
-          font-weight: 500;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          color: #888;
-          margin-bottom: 6px;
-        }
-        .ls-select {
+
+        .tonet-locale-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
           width: 100%;
-          padding: 12px 14px;
-          border: none;
-          border-bottom: 1px solid #ccc;
-          font-size: 13px;
-          font-family: inherit;
-          font-weight: 400;
-          color: #111;
-          background: transparent;
-          outline: none;
-          margin-bottom: 24px;
-          cursor: pointer;
-          appearance: none;
-          border-radius: 0;
+          margin-bottom: 8px;
         }
-        .ls-select:focus { border-bottom-color: #111; }
-        .ls-remember {
+
+        .tonet-locale-title {
+          font-size: 12px;
+          font-weight: 400;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          color: #000000;
+          margin: 0;
+        }
+
+        .tonet-locale-close {
+          background: none !important;
+          border: none !important;
+          padding: 4px !important;
+          font-size: 14px;
+          color: #888888;
+          cursor: pointer;
+          transition: color 0.2s;
+          border-radius: 0 !important;
+          transform: none !important;
+        }
+        .tonet-locale-close:hover {
+          color: #000000;
+        }
+
+        .tonet-locale-current {
           display: flex;
           align-items: center;
           gap: 8px;
-          margin: 8px 0 28px;
-          cursor: pointer;
+          margin-bottom: 24px;
+          font-size: 10px;
+          letter-spacing: 0.08em;
         }
-        .ls-remember input[type="checkbox"] {
-          width: 14px;
-          height: 14px;
-          accent-color: #111;
-          cursor: pointer;
-        }
-        .ls-remember span {
-          font-size: 11px;
-          font-weight: 400;
-          letter-spacing: 0.04em;
-          color: #111;
-        }
-        .ls-continue {
-          width: 100%;
-          padding: 16px;
-          border: 1px solid #111;
-          background: #fff;
-          color: #111;
-          font-size: 11px;
-          font-weight: 500;
-          text-transform: uppercase;
-          letter-spacing: 0.16em;
-          font-family: inherit;
-          cursor: pointer;
-          transition: background 0.15s, color 0.15s;
-        }
-        .ls-continue:hover {
-          background: #111;
-          color: #fff;
-        }
-        .ls-close-btn {
-          position: absolute;
-          top: 16px;
-          right: 16px;
-          background: none;
-          border: none;
-          font-size: 16px;
-          cursor: pointer;
-          color: #999;
-          padding: 4px;
-          line-height: 1;
-        }
-        .ls-close-btn:hover { color: #111; }
 
-        @media (max-width: 480px) {
-          .ls-modal {
+        .tonet-locale-current-label {
+          color: #888888;
+        }
+
+        .tonet-locale-current-value {
+          color: #000000;
+          font-weight: 400;
+        }
+
+        .tonet-locale-divider {
+          width: 100%;
+          height: 1px;
+          background-color: rgba(0, 0, 0, 0.08);
+          margin-bottom: 32px;
+        }
+
+        .tonet-locale-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 60px;
+          width: 100%;
+        }
+
+        .tonet-locale-col {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        .tonet-locale-col-title {
+          font-size: 9px;
+          font-weight: 400;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          color: #888888;
+          margin: 0;
+        }
+
+        .tonet-locale-list {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+          width: 100%;
+        }
+
+        .tonet-locale-item-btn {
+          background: none !important;
+          border: none !important;
+          padding: 6px 0 !important;
+          font-family: inherit;
+          font-size: 11px;
+          font-weight: 300;
+          letter-spacing: 0.12em;
+          color: #888888;
+          cursor: pointer;
+          text-align: left;
+          width: auto;
+          transition: color 0.3s, text-decoration 0.3s;
+          border-radius: 0 !important;
+          transform: none !important;
+        }
+
+        .tonet-locale-item-btn:hover {
+          color: #000000;
+        }
+
+        .tonet-locale-item-btn.active {
+          color: #000000;
+          text-decoration: underline;
+          text-underline-offset: 4px;
+          font-weight: 400;
+        }
+
+        @media (max-width: 1023px) {
+          .tonet-locale-container {
             width: 100vw;
             max-width: 100vw;
             height: 100vh;
-            top: 0; left: 0;
+            max-height: 100vh;
+            top: 0;
+            left: 0;
             transform: none;
-            padding: 60px 28px 40px;
-            justify-content: center;
+            padding: 40px 24px;
+            overflow-y: auto;
+            border: none;
             box-shadow: none;
+          }
+
+          .tonet-locale-header {
+            margin-bottom: 12px;
+          }
+
+          .tonet-locale-current {
+            margin-bottom: 20px;
+          }
+
+          .tonet-locale-divider {
+            margin-bottom: 24px;
+          }
+
+          .tonet-locale-grid {
+            grid-template-columns: 1fr;
+            gap: 40px;
+          }
+
+          .tonet-locale-item-btn {
+            font-size: 12px;
+            padding: 12px 0 !important;
+            width: 100%;
           }
         }
       `}</style>
