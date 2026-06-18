@@ -12,11 +12,7 @@ import { useWishlist } from "@/context/WishlistContext";
 const logoFonts = [
   { family: "'Coolvetica Condensed', sans-serif", weight: "normal" },
   { family: "'Saint Carell', sans-serif", weight: "normal" },
-  { family: "'Against', sans-serif", weight: "normal" },
-  { family: "'Twilight New Moon', sans-serif", weight: "normal" },
-  { family: "'A Star Demo', sans-serif", weight: "normal" },
   { family: "'Creato Display', sans-serif", weight: "bold" },
-  { family: "var(--font-jost), sans-serif", weight: "500" },
   { family: "var(--font-cormorant), serif", weight: "300" }
 ];
 
