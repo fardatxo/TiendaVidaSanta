@@ -4,11 +4,22 @@ import HomeSnapInitializer from "@/components/HomeSnapInitializer";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "TONET | Official Online Store",
-  description: "Explore the TONET Pre-Fall 2026 Collection, Men's and Women's New Arrivals, and iconic California streetwear.",
+  title: "TONET TORRENTINNI | Official Online Store",
+  description: "Explore the TONET TORRENTINNI Pre-Fall 2026 Collection, Men's and Women's New Arrivals, and iconic California streetwear.",
 };
 
+function getRandomLuxuryColor() {
+  const h = Math.floor(Math.random() * 360);
+  const s = Math.floor(Math.random() * 12) + 6; // 6% to 18% saturation
+  const l = Math.floor(Math.random() * 15) + 12; // 12% to 27% lightness (refined dark tone)
+  return `hsl(${h}, ${s}%, ${l}%)`;
+}
+
 export default async function Home() {
+  const color1 = getRandomLuxuryColor();
+  const color2 = getRandomLuxuryColor();
+  const color3 = getRandomLuxuryColor();
+
   return (
     <div className="am-home">
       <HomeSnapInitializer />
@@ -26,10 +37,9 @@ export default async function Home() {
           />
         </div>
         <div className="am-hero-overlay">
-          <div className="am-hero-content">
-            <h2 className="am-hero-title">Pre-Fall 2026 Collection</h2>
-            <Link href="/collection/pre-fall-2026" className="am-hero-cta">Discover</Link>
-          </div>
+          <Link href="/collection" className="am-hero-feeling-block">
+            how do you feel today - Discover the global collection
+          </Link>
         </div>
       </section>
 
@@ -68,66 +78,44 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 5. TRIPLE CORE CATEGORY GRID: DENIM, EYEWEAR, HANDBAGS */}
-      <section className="am-triple-grid">
-        <div className="am-triple-col">
-          <div className="am-triple-media">
-            <img src="/hero/ComfyUI-main_reference_00028_.png" alt="men's denim" className="am-triple-img" />
-          </div>
-          <div className="am-triple-content">
-            <h4 className="am-triple-title">Men's Denim</h4>
-            <Link href="/collection/mens-denim" className="am-triple-cta">Shop Now</Link>
-          </div>
-        </div>
-        <div className="am-triple-col">
-          <div className="am-triple-media">
-            <img src="/hero/ComfyUI-main_reference_00022_.png" alt="eyewear" className="am-triple-img" />
-          </div>
-          <div className="am-triple-content">
-            <h4 className="am-triple-title">Eyewear</h4>
-            <Link href="/collection/eyewear" className="am-triple-cta">Shop Now</Link>
-          </div>
-        </div>
-        <div className="am-triple-col">
-          <div className="am-triple-media">
-            <img src="/hero/ComfyUI-main_reference_00018_.png" alt="handbags" className="am-triple-img" />
-          </div>
-          <div className="am-triple-content">
-            <h4 className="am-triple-title">Handbags</h4>
-            <Link href="/collection/handbags" className="am-triple-cta">Shop Now</Link>
-          </div>
-        </div>
-      </section>
-
-      {/* 6. BRAND WORLD: RUNWAYS, CAMPAIGNS, HERITAGE */}
-      <section className="am-brand-world">
-        <h3 className="am-section-title">World of Tonet</h3>
-        <div className="am-world-grid">
-          <div className="am-world-card">
-            <div className="am-world-media">
-              <img src="/hero/collection_garden_landscape.png" alt="runways" className="am-world-img" />
-            </div>
-            <div className="am-world-content">
-              <h4 className="am-world-card-title">Runways</h4>
-              <Link href="/collection/runways" className="am-world-cta">View Collection</Link>
+      {/* 5. THE WORLD OF TONET */}
+      <section className="am-world-tonet-section">
+        <h2 className="am-world-tonet-title">THE WORLD OF TONET</h2>
+        <div className="am-world-tonet-grid">
+          <div className="am-world-tonet-col">
+            <div className="am-world-tonet-media" style={{ backgroundColor: color1 }} />
+            <div className="am-world-tonet-overlay">
+              <div className="am-world-tonet-hover-content">
+                <span className="am-world-tonet-label">ABOUT</span>
+                <div className="am-world-tonet-sublinks">
+                  <Link href="/about" className="am-world-tonet-sublink">ABOUT TONET</Link>
+                  <Link href="/careers" className="am-world-tonet-sublink">CAREERS</Link>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="am-world-card">
-            <div className="am-world-media">
-              <img src="/hero/world_garden_landscape.png" alt="campaigns" className="am-world-img" />
-            </div>
-            <div className="am-world-content">
-              <h4 className="am-world-card-title">Campaigns</h4>
-              <Link href="/collection/campaigns" className="am-world-cta">Explore</Link>
+          <div className="am-world-tonet-col">
+            <div className="am-world-tonet-media" style={{ backgroundColor: color2 }} />
+            <div className="am-world-tonet-overlay">
+              <div className="am-world-tonet-hover-content">
+                <span className="am-world-tonet-label">COLLECTIONS</span>
+                <div className="am-world-tonet-sublinks">
+                  <Link href="/collection/runways" className="am-world-tonet-sublink">RUNWAYS</Link>
+                  <Link href="/collection/campaigns" className="am-world-tonet-sublink">CAMPAIGNS</Link>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="am-world-card">
-            <div className="am-world-media">
-              <img src="/hero/journal_garden_landscape_1.png" alt="heritage" className="am-world-img" />
-            </div>
-            <div className="am-world-content">
-              <h4 className="am-world-card-title">Savoir-Faire</h4>
-              <Link href="/about" className="am-world-cta">Read Story</Link>
+          <div className="am-world-tonet-col">
+            <div className="am-world-tonet-media" style={{ backgroundColor: color3 }} />
+            <div className="am-world-tonet-overlay">
+              <div className="am-world-tonet-hover-content">
+                <span className="am-world-tonet-label">STORES</span>
+                <div className="am-world-tonet-sublinks">
+                  <Link href="/stores" className="am-world-tonet-sublink">STORE LOCATOR</Link>
+                  <Link href="/stores" className="am-world-tonet-sublink">STOCKISTS</Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -176,8 +164,27 @@ export default async function Home() {
           background: rgba(0, 0, 0, 0.08);
           display: flex;
           align-items: flex-end;
-          justify-content: flex-start;
+          justify-content: center;
           padding: 60px 48px;
+        }
+        .am-hero-feeling-block {
+          display: inline-block;
+          border: 1px solid #ffffff;
+          background-color: transparent;
+          color: #ffffff;
+          padding: 18px 44px;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 11.5px;
+          font-weight: 300;
+          letter-spacing: 0.22em;
+          text-align: center;
+          text-transform: uppercase;
+          text-decoration: none;
+          transition: background-color 0.3s, color 0.3s, opacity 0.3s;
+        }
+        .am-hero-feeling-block:hover {
+          background-color: #ffffff;
+          color: #000000;
         }
         .am-hero-content {
           display: flex;
@@ -347,149 +354,114 @@ export default async function Home() {
           opacity: 0.7;
         }
 
-        /* ── TRIPLE GRID ── */
-        .am-triple-grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          width: 100%;
-          border-bottom: 1px solid #eaeaea;
-          height: 100vh;
-          scroll-snap-align: start;
-          scroll-snap-stop: always;
-        }
-        @media (min-width: 768px) {
-          .am-triple-grid {
-            grid-template-columns: repeat(3, 1fr);
-          }
-        }
-        .am-triple-col {
-          display: flex;
-          flex-direction: column;
-          position: relative;
-          height: 100%;
-        }
-        @media (min-width: 768px) {
-          .am-triple-col:not(:last-child) {
-            border-right: 1px solid #eaeaea;
-          }
-        }
-        .am-triple-media {
-          width: 100%;
-          flex: 1 1 auto;
-          overflow: hidden;
-          background: #fcfcfc;
-        }
-        .am-triple-img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
-        }
-        .am-triple-content {
-          padding: 24px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 10px;
-          text-align: center;
-          flex: 0 0 auto;
-        }
-        .am-triple-title {
-          font-size: 12px;
-          font-weight: 400;
-          letter-spacing: 0.15em;
-          text-transform: uppercase;
-          margin: 0;
-          color: #000000;
-        }
-        .am-triple-cta {
-          font-size: 9px;
-          font-weight: 400;
-          letter-spacing: 0.15em;
-          color: #000000;
-          text-transform: uppercase;
-          text-decoration: underline;
-          text-underline-offset: 3px;
-          transition: opacity 0.3s;
-        }
-        .am-triple-cta:hover {
-          opacity: 0.6;
-        }
-
-        /* ── BRAND WORLD ── */
-        .am-brand-world {
-          padding: 80px 48px;
-          height: 100vh;
+        /* ── THE WORLD OF TONET ── */
+        .am-world-tonet-section {
+          padding: 100px 48px;
+          min-height: 100vh;
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
           justify-content: center;
+          align-items: center;
+          background-color: #ffffff;
           scroll-snap-align: start;
           scroll-snap-stop: always;
         }
-        .am-world-grid {
+        .am-world-tonet-title {
+          font-size: 13px;
+          font-weight: 500;
+          letter-spacing: 0.25em;
+          text-align: center;
+          margin: 0 0 50px 0;
+          text-transform: uppercase;
+          color: #000000;
+        }
+        .am-world-tonet-grid {
           display: grid;
-          grid-template-columns: 1fr;
-          gap: 32px;
-          flex: 1;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 24px;
+          width: 100%;
+          max-width: 1300px;
+          margin: 0 auto;
         }
-        @media (min-width: 768px) {
-          .am-world-grid {
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-          }
-        }
-        .am-world-card {
+        .am-world-tonet-col {
+          position: relative;
           display: flex;
           flex-direction: column;
-          position: relative;
-          height: 100%;
+          overflow: hidden;
         }
-        .am-world-media {
+        .am-world-tonet-media {
           width: 100%;
-          flex: 1 1 auto;
+          aspect-ratio: 4 / 5;
           overflow: hidden;
           background: #fcfcfc;
-          margin-bottom: 20px;
+          transition: filter 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-        .am-world-img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
-          transition: opacity 0.5s ease;
+        .am-world-tonet-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.05);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background-color 0.6s ease;
         }
-        .am-world-card:hover .am-world-img {
-          opacity: 0.85;
+        .am-world-tonet-col:hover .am-world-tonet-overlay {
+          background-color: rgba(0, 0, 0, 0.35);
         }
-        .am-world-content {
+        .am-world-tonet-col:hover .am-world-tonet-media {
+          filter: blur(6px) brightness(0.5);
+        }
+        .am-world-tonet-hover-content {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 10px;
+          width: 100%;
+        }
+        .am-world-tonet-label {
+          color: #ffffff;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 14px;
+          font-weight: 400;
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          pointer-events: none;
+          display: block;
           text-align: center;
-          flex: 0 0 auto;
         }
-        .am-world-card-title {
-          font-size: 13px;
-          font-weight: 400;
-          letter-spacing: 0.15em;
-          text-transform: uppercase;
-          margin: 0;
-          color: #000000;
+        .am-world-tonet-sublinks {
+          opacity: 0;
+          visibility: hidden;
+          max-height: 0;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          transition: opacity 0.4s ease, max-height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), visibility 0.4s, margin-top 0.4s;
+          margin-top: 0;
+          width: 100%;
         }
-        .am-world-cta {
-          font-size: 9px;
-          font-weight: 400;
-          letter-spacing: 0.15em;
-          color: rgba(0, 0, 0, 0.55);
+        .am-world-tonet-col:hover .am-world-tonet-sublinks {
+          opacity: 1;
+          visibility: visible;
+          max-height: 100px;
+          margin-top: 20px;
+        }
+        .am-world-tonet-sublink {
+          color: rgba(255, 255, 255, 0.7);
+          font-family: var(--font-primary), sans-serif;
+          font-size: 11px;
+          font-weight: 300;
+          letter-spacing: 0.2em;
           text-transform: uppercase;
-          text-decoration: underline;
-          text-underline-offset: 3px;
+          text-decoration: none;
           transition: color 0.3s;
+          display: block;
+          text-align: center;
         }
-        .am-world-cta:hover {
-          color: #000000;
+        .am-world-tonet-sublink:hover {
+          color: #ffffff;
         }
 
         /* ── MOBILE OVERRIDES ── */
@@ -533,61 +505,53 @@ export default async function Home() {
           .am-landscape-title {
             font-size: 22px;
           }
-          .am-triple-grid {
-            grid-template-columns: 1fr;
-            height: auto;
-            scroll-snap-align: none;
-            scroll-snap-stop: none;
-            border-bottom: none;
-          }
-          .am-triple-col {
-            height: 100vh;
-            scroll-snap-align: start;
-            scroll-snap-stop: always;
-          }
-          .am-triple-col:not(:last-child) {
-            border-bottom: 1px solid #eaeaea;
-          }
-          .am-triple-content {
-            padding: 20px 16px;
-          }
-          .am-triple-title {
-            font-size: 11px;
-          }
-          .am-brand-world {
-            padding: 40px 20px;
+          .am-world-tonet-section {
+            padding: 80px 0;
             height: auto;
             scroll-snap-align: none;
             scroll-snap-stop: none;
           }
-          .am-world-grid {
-            gap: 0px;
+          .am-world-tonet-title {
+            margin-bottom: 40px;
+            font-size: 13px;
+            padding: 0 20px;
           }
-          .am-world-card {
-            height: 100vh;
+          .am-world-tonet-grid {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 16px;
+            padding: 0 20px;
+            scrollbar-width: none;
+          }
+          .am-world-tonet-grid::-webkit-scrollbar {
+            display: none;
+          }
+          .am-world-tonet-col {
+            flex: 0 0 80%;
             scroll-snap-align: start;
-            scroll-snap-stop: always;
-            justify-content: center;
-            padding: 40px 0;
-            box-sizing: border-box;
+            height: auto;
           }
-          .am-world-card:not(:last-child) {
-            border-bottom: 1px solid #eaeaea;
+          .am-world-tonet-media {
+            filter: blur(4px) brightness(0.6);
           }
-          .am-world-media {
-            margin-bottom: 16px;
+          .am-world-tonet-overlay {
+            background-color: rgba(0, 0, 0, 0.25);
           }
-          .am-world-card-title {
-            font-size: 12px;
+          .am-world-tonet-sublinks {
+            opacity: 1;
+            visibility: visible;
+            max-height: 100px;
+            margin-top: 16px;
           }
           
           /* Active feedbacks */
           .am-prod-card:active,
           .am-split-cta:active,
+          .am-hero-feeling-block:active,
           .am-hero-cta:active,
           .am-landscape-cta:active,
-          .am-triple-cta:active,
-          .am-world-cta:active {
+          .am-world-tonet-sublink:active {
             opacity: 0.5;
           }
         }

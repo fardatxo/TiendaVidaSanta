@@ -629,7 +629,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         {completeOutfit.length > 0 && (
           <section className="amiri-ctl-section">
             <div className="amiri-ctl-header">
-              <span className="amiri-ctl-logo">TONET</span>
+              <span className="amiri-ctl-logo">TONET TORRENTINNI</span>
               <h2 className="amiri-ctl-title">COMPLETE THE LOOK</h2>
             </div>
             
@@ -690,7 +690,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         {recommended.length > 0 && (
           <section className="amiri-ctl-section">
             <div className="amiri-ctl-header">
-              <span className="amiri-ctl-logo">TONET</span>
+              <span className="amiri-ctl-logo">TONET TORRENTINNI</span>
               <h2 className="amiri-ctl-title">YOU MIGHT ALSO LIKE</h2>
             </div>
             

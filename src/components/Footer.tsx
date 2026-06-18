@@ -70,7 +70,7 @@ export default function Footer() {
               <span className="ft-col-toggle">{expandedCol === 'corporate-info' ? ' —' : ' +'}</span>
             </p>
             <ul className={`ft-links ${expandedCol === 'corporate-info' ? 'open' : ''}`}>
-              <li><Link href="/about">about tonet</Link></li>
+              <li><Link href="/about">about tonet torrentinni</Link></li>
               <li><Link href="#">careers</Link></li>
               <li><Link href="#">stockists</Link></li>
             </ul>
@@ -93,7 +93,7 @@ export default function Footer() {
 
       {/* ── BOTTOM ── */}
       <div className="ft-bottom">
-        <span className="ft-copy">© 2026 tonet</span>
+        <span className="ft-copy">© 2026 tonet torrentinni</span>
         <span className="ft-locale" onClick={openSelector}>
           {`${regionLabel} / ${languageLabel} / ${currency}`.toLowerCase()}
         </span>

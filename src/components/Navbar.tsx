@@ -125,7 +125,7 @@ export default function Navbar() {
 
           {/* CENTER: Logo */}
           <Link href="/" className="acne-logo">
-            <span className="acne-logo-text">TONET</span>
+            <span className="acne-logo-text">TONET TORRENTINNI</span>
           </Link>
 
           {/* RIGHT: Account, Bookmark, Bag */}
@@ -270,7 +270,7 @@ export default function Navbar() {
         }
         .acne-logo-text {
           font-family: var(--font-brand), sans-serif;
-          font-size: 36px;
+          font-size: 26px;
           font-weight: 700;
           letter-spacing: 0;
           padding-right: 0;
@@ -373,7 +373,7 @@ export default function Navbar() {
         /* ══ MOBILE ══ */
         @media (max-width: 767px) {
           .acne-header-inner { padding: 0 16px; height: 54px; }
-          .acne-logo-text { font-size: 26px; letter-spacing: 0; font-weight: 700; padding-right: 0; }
+          .acne-logo-text { font-size: 18px; letter-spacing: 0; font-weight: 700; padding-right: 0; }
           .acne-mob-icon { width: 44px; height: 54px; }
           .acne-right-icon { width: 44px; height: 54px; }
           .acne-wishlist-icon { display: none !important; }

@@ -33,8 +33,8 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "TONET",
-  description: "TONET — Online Store",
+  title: "TONET TORRENTINNI",
+  description: "TONET TORRENTINNI — Online Store",
   icons: {
     icon: '/icon.png',
   },

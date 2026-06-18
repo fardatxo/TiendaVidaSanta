@@ -181,13 +181,13 @@ export default function MenuDrawer() {
             <Link href="/collection/women" className="md-nav-item" onClick={closeMenu}>WOMEN</Link>
             <Link href="/collection" className="md-nav-item" onClick={closeMenu}>COLLECTIONS</Link>
             <Link href="/collection/runways" className="md-nav-item" onClick={closeMenu}>RUNWAYS</Link>
-            <Link href="/about" className="md-nav-item" onClick={closeMenu}>WORLD OF TONET</Link>
+            <Link href="/about" className="md-nav-item" onClick={closeMenu}>WORLD OF TONET TORRENTINNI</Link>
           </nav>
 
           {/* Corporate section */}
           <p className="md-nav-eyebrow md-archive-eyebrow">Company</p>
           <div className="md-archive-links">
-            <Link href="/about" className="md-archive-link" onClick={closeMenu}>About Tonet</Link>
+            <Link href="/about" className="md-archive-link" onClick={closeMenu}>About Tonet Torrentinni</Link>
             <Link href="/contact" className="md-archive-link" onClick={closeMenu}>Customer Service</Link>
             <Link href="/stores" className="md-archive-link" onClick={closeMenu}>Stores</Link>
           </div>
