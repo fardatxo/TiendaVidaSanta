@@ -158,7 +158,7 @@ export default function Navbar() {
             </span>
             <span 
               className="acne-logo-text acne-logo-mobile"
-              style={{ fontFamily: "'Coolvetica Condensed', sans-serif", fontWeight: 'normal' }}
+              style={{ fontFamily: "'Saint Carell', sans-serif", fontWeight: 'normal' }}
             >
               TONET
             </span>
