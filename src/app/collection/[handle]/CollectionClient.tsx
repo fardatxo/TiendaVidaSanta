@@ -37,6 +37,18 @@ function getProductImageClass(title: string, tags: string[]): string {
   return 'amiri-product-img--top'; // Default
 }
 
+function getProductScore(product: Product): number {
+  const title = product.title.toLowerCase();
+  const tags = product.tags.map(t => t.toLowerCase());
+
+  const isShirt = title.includes('shirt') || title.includes('tee') || title.includes('top') || title.includes('camiseta') || tags.includes('tops') || tags.includes('t-shirts') || tags.includes('tshirt') || tags.includes('tee');
+  const isPant = title.includes('pant') || title.includes('short') || title.includes('trouser') || title.includes('jean') || title.includes('pantalon') || tags.includes('bottoms') || tags.includes('pants') || tags.includes('shorts') || tags.includes('trousers') || tags.includes('jeans');
+
+  if (isShirt) return 0;
+  if (isPant) return 1;
+  return 2;
+}
+
 export default function CollectionClient({ collection }: { collection: CollectionDetail }) {
   const { formatPrice } = useLocale();
 
@@ -189,6 +201,9 @@ export default function CollectionClient({ collection }: { collection: Collectio
       result.sort((a, b) => a.price - b.price);
     } else if (selectedSort === 'price-desc') {
       result.sort((a, b) => b.price - a.price);
+    } else {
+      // Default: sort shirts/camisetas first, then pants/pantalones, then others
+      result.sort((a, b) => getProductScore(a) - getProductScore(b));
     }
 
     return result;

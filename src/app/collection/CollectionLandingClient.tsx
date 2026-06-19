@@ -103,7 +103,7 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
       if (!product.imageUrl) console.warn("Missing image:", product);
     });
 
-    return validProducts.filter(product => {
+    const filtered = validProducts.filter(product => {
       // 1. Garment Type filter
       if (filterGarmentType !== 'all') {
         if (getGarmentType(product) !== filterGarmentType) return false;
@@ -123,6 +123,15 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
       }
 
       return true;
+    });
+
+    // Sort by garment type: tops (camisetas) first, bottoms (pantalones) second, outerwear/others third
+    return [...filtered].sort((a, b) => {
+      const typeA = getGarmentType(a);
+      const typeB = getGarmentType(b);
+      const scoreA = typeA === 'tops' ? 0 : typeA === 'bottoms' ? 1 : 2;
+      const scoreB = typeB === 'tops' ? 0 : typeB === 'bottoms' ? 1 : 2;
+      return scoreA - scoreB;
     });
   }, [products, filterGarmentType, filterCollection, filterState]);
 
