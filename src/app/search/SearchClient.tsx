@@ -81,14 +81,21 @@ export default function SearchClient({ query, products, collections }: Props) {
                 {menProducts.map(p => {
                   const imageClass = getProductImageClass(p.title, p.tags);
                   return (
-                    <Link key={p.handle} href={`/product/${p.handle}`} className="amiri-search-card">
+                    <Link key={p.handle} href={`/product/${p.handle}`} className={`amiri-search-card ${p.images && p.images.length > 1 ? 'amiri-search-card--has-hover' : ''}`}>
                       <span className="amiri-search-card-tag">NEW IN</span>
                       <div className="amiri-search-img-wrap">
                         {p.imageUrl && (
                           <img 
                             src={p.imageUrl} 
                             alt={p.title} 
-                            className={`amiri-search-img ${imageClass}`} 
+                            className={`amiri-search-img amiri-search-img--primary ${imageClass}`} 
+                          />
+                        )}
+                        {p.images && p.images.length > 1 && (
+                          <img 
+                            src={p.images[1]} 
+                            alt={p.title} 
+                            className={`amiri-search-img amiri-search-img--secondary ${imageClass}`} 
                           />
                         )}
                       </div>
@@ -123,14 +130,21 @@ export default function SearchClient({ query, products, collections }: Props) {
                 {womenProducts.map(p => {
                   const imageClass = getProductImageClass(p.title, p.tags);
                   return (
-                    <Link key={p.handle} href={`/product/${p.handle}`} className="amiri-search-card">
+                    <Link key={p.handle} href={`/product/${p.handle}`} className={`amiri-search-card ${p.images && p.images.length > 1 ? 'amiri-search-card--has-hover' : ''}`}>
                       <span className="amiri-search-card-tag">NEW IN</span>
                       <div className="amiri-search-img-wrap">
                         {p.imageUrl && (
                           <img 
                             src={p.imageUrl} 
                             alt={p.title} 
-                            className={`amiri-search-img ${imageClass}`} 
+                            className={`amiri-search-img amiri-search-img--primary ${imageClass}`} 
+                          />
+                        )}
+                        {p.images && p.images.length > 1 && (
+                          <img 
+                            src={p.images[1]} 
+                            alt={p.title} 
+                            className={`amiri-search-img amiri-search-img--secondary ${imageClass}`} 
                           />
                         )}
                       </div>
@@ -224,7 +238,7 @@ export default function SearchClient({ query, products, collections }: Props) {
           display: grid;
           grid-template-columns: 1fr 1px 1fr;
           gap: 0;
-          padding: 0 40px;
+          padding: 0 2px; /* almost a thread / hairline spacing at the left and right outer borders */
           box-sizing: border-box;
           align-items: stretch;
           width: 100%;
@@ -270,9 +284,9 @@ export default function SearchClient({ query, products, collections }: Props) {
         .amiri-search-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
-          gap: 2px;
-          background-color: rgba(0, 0, 0, 0.04); /* hairline dividers inside column */
-          border: 1px solid rgba(0, 0, 0, 0.04);
+          gap: 2px; /* tight spacing matching the carousel */
+          background-color: transparent;
+          border: none;
         }
 
         .amiri-search-column-empty {
@@ -300,7 +314,7 @@ export default function SearchClient({ query, products, collections }: Props) {
           justify-content: space-between;
           text-decoration: none;
           color: inherit;
-          aspect-ratio: 4 / 5;
+          aspect-ratio: 3 / 5; /* matches collection page */
         }
         .amiri-search-card-tag {
           position: absolute;
@@ -311,7 +325,7 @@ export default function SearchClient({ query, products, collections }: Props) {
           font-weight: 300;
           text-transform: uppercase;
           letter-spacing: 0.15em;
-          color: #888888;
+          color: #000000;
           z-index: 2;
         }
         .amiri-search-img-wrap {
@@ -319,7 +333,7 @@ export default function SearchClient({ query, products, collections }: Props) {
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 0;
+          padding: 12px; /* clean spacing for garments */
           box-sizing: border-box;
           width: 100%;
           height: 100%;
@@ -327,16 +341,56 @@ export default function SearchClient({ query, products, collections }: Props) {
           isolation: isolate;
           background-color: #f6f6f6;
         }
+        @media (max-width: 767px) {
+          .amiri-search-img-wrap {
+            padding: 8px; /* optimized spacing on mobile */
+          }
+        }
+
         .amiri-search-img {
           width: 100%;
           height: 100%;
           display: block;
-          object-fit: cover;
-          transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+          object-fit: contain; /* contained inside the wrapper */
           mix-blend-mode: multiply;
         }
-        .amiri-search-card:hover .amiri-search-img {
-          transform: scale(1.03);
+
+        .amiri-search-img--primary {
+          opacity: 1;
+          transition: opacity 0.2s ease-in-out;
+        }
+        .amiri-search-img--secondary {
+          position: absolute;
+          top: 12px;
+          left: 12px;
+          right: 12px;
+          bottom: 12px;
+          width: calc(100% - 24px);
+          height: calc(100% - 24px);
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.2s ease-in-out;
+        }
+        @media (max-width: 767px) {
+          .amiri-search-img--secondary {
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            width: calc(100% - 16px);
+            height: calc(100% - 16px);
+          }
+        }
+
+        /* Hover behaviors */
+        .amiri-search-card:hover {
+          opacity: 1 !important; /* prevent transparent white overlay */
+        }
+        .amiri-search-card--has-hover:hover .amiri-search-img--primary {
+          opacity: 0;
+        }
+        .amiri-search-card--has-hover:hover .amiri-search-img--secondary {
+          opacity: 1;
         }
 
         /* Optical Scaling classes - Overridden for full fill */
@@ -458,7 +512,7 @@ export default function SearchClient({ query, products, collections }: Props) {
           }
           .amiri-search-split {
             grid-template-columns: 1fr; /* stack columns vertically on mobile */
-            padding: 0 16px;
+            padding: 0 2px;
           }
           .amiri-search-column:first-of-type {
             padding-right: 0;

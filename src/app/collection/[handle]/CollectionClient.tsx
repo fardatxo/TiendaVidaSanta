@@ -8,17 +8,9 @@ import Link from 'next/link';
 
 // Predefined set of ComfyUI fashion lifestyle images
 const LIFESTYLE_IMAGES = [
-  '/hero/ComfyUI-main_reference_00012_.png',
-  '/hero/ComfyUI-main_reference_00016_.png',
-  '/hero/ComfyUI-main_reference_00017_.png',
-  '/hero/ComfyUI-main_reference_00018_.png',
-  '/hero/ComfyUI-main_reference_00019_.png',
-  '/hero/ComfyUI-main_reference_00020_.png',
-  '/hero/ComfyUI-main_reference_00021_.png',
-  '/hero/ComfyUI-main_reference_00022_.png',
-  '/hero/ComfyUI-main_reference_00023_.png',
-  '/hero/ComfyUI-main_reference_00028_.png',
-  '/hero/ComfyUI-main_reference_00032_.png'
+  '/hero/summer_lifestyle_1.jpg',
+  '/hero/summer_lifestyle_2.jpg',
+  '/hero/summer_lifestyle_3.jpg'
 ];
 
 interface GridItem {
@@ -369,7 +361,13 @@ export default function CollectionClient({ collection }: { collection: Collectio
             className="amiri-refine-trigger"
             onClick={openRefine}
           >
-            REFINE
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px', display: 'inline-block', verticalAlign: 'middle' }}>
+              <line x1="6" y1="3" x2="6" y2="21" />
+              <line x1="18" y1="3" x2="18" y2="21" />
+              <circle cx="6" cy="15" r="3" fill="#ffffff" stroke="currentColor" strokeWidth="1.6" />
+              <circle cx="18" cy="9" r="3" fill="#ffffff" stroke="currentColor" strokeWidth="1.6" />
+            </svg>
+            <span>REFINE</span>
           </button>
         </div>
 
@@ -389,15 +387,22 @@ export default function CollectionClient({ collection }: { collection: Collectio
                       key={item.key}
                       className={`amiri-grid-item amiri-grid-item--product ${
                         isLarge ? 'amiri-grid-item--span-2 amiri-grid-item--row-2' : ''
-                      }`}
+                      } ${p.images && p.images.length > 1 ? 'amiri-grid-item--has-hover' : ''}`}
                     >
-                      <span className="amiri-product-tag">TOURNAMENT</span>
+                      <span className="amiri-product-tag">SUMMER</span>
                       <div className="amiri-product-img-wrap">
                         {p.imageUrl && (
                           <img
                             src={p.imageUrl}
                             alt={p.title}
-                            className={`amiri-product-img ${imageClass}`}
+                            className={`amiri-product-img amiri-product-img--primary ${imageClass}`}
+                          />
+                        )}
+                        {p.images && p.images.length > 1 && (
+                          <img
+                            src={p.images[1]}
+                            alt={p.title}
+                            className={`amiri-product-img amiri-product-img--secondary ${imageClass}`}
                           />
                         )}
                       </div>
@@ -676,20 +681,26 @@ export default function CollectionClient({ collection }: { collection: Collectio
           position: absolute;
           right: 40px;
           bottom: 60px;
-          background: none;
-          border: none;
+          background-color: #ffffff;
+          border: 1px solid #d3d3d3;
+          border-radius: 0; /* rectangular corners */
           color: #000000;
           font-family: var(--font-primary), sans-serif;
-          font-size: 11px;
-          font-weight: 300;
+          font-size: 10.5px;
+          font-weight: 400;
           text-transform: uppercase;
           letter-spacing: 0.15em;
           cursor: pointer;
-          padding: 0;
-          transition: opacity 0.2s ease;
+          padding: 8px 20px;
+          transition: all 0.2s ease;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          outline: none;
         }
         .amiri-refine-trigger:hover {
-          opacity: 0.6;
+          background-color: #f9f9f9;
+          border-color: #b0b0b0;
         }
 
         @media (max-width: 767px) {
@@ -704,33 +715,34 @@ export default function CollectionClient({ collection }: { collection: Collectio
 
         /* GRID SYSTEM */
         .amiri-grid-wrapper {
-          padding: 0 40px;
+          padding: 0 2px; /* almost a thread / hairline spacing at the left and right outer borders */
           box-sizing: border-box;
           width: 100%;
         }
         @media (max-width: 767px) {
           .amiri-grid-wrapper {
-            padding: 0 16px;
+            padding: 0 2px;
           }
         }
 
         .amiri-modular-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 2px;
-          background-color: rgba(0, 0, 0, 0.04); /* hairline dividers */
+          gap: 2px; /* tight spacing matching the carousel */
+          background-color: transparent;
           box-sizing: border-box;
-          border: 1px solid rgba(0, 0, 0, 0.04);
+          border: none;
         }
         @media (max-width: 1023px) {
           .amiri-modular-grid {
             grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
           }
         }
         @media (max-width: 767px) {
           .amiri-modular-grid {
             grid-template-columns: repeat(2, 1fr);
-            gap: 1px;
+            gap: 2px;
           }
         }
 
@@ -756,7 +768,7 @@ export default function CollectionClient({ collection }: { collection: Collectio
           justify-content: space-between;
           text-decoration: none;
           color: inherit;
-          aspect-ratio: 3 / 4;
+          aspect-ratio: 3 / 5; /* narrower and longer aspect ratio */
         }
 
         .amiri-grid-item--span-2 {
@@ -766,7 +778,7 @@ export default function CollectionClient({ collection }: { collection: Collectio
           grid-row: span 2;
         }
         .amiri-grid-item--wide {
-          aspect-ratio: 3 / 2;
+          aspect-ratio: 6 / 5; /* mathematically adjusted for wide cards under 3/5 aspect ratio */
         }
 
         @media (max-width: 767px) {
@@ -788,7 +800,7 @@ export default function CollectionClient({ collection }: { collection: Collectio
           font-weight: 300;
           text-transform: uppercase;
           letter-spacing: 0.15em;
-          color: #888888;
+          color: #000000;
           z-index: 2;
         }
 
@@ -797,7 +809,7 @@ export default function CollectionClient({ collection }: { collection: Collectio
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 0;
+          padding: 12px; /* clean spacing for garments */
           box-sizing: border-box;
           width: 100%;
           height: 100%;
@@ -805,18 +817,56 @@ export default function CollectionClient({ collection }: { collection: Collectio
           isolation: isolate;
           background-color: #f6f6f6;
         }
+        @media (max-width: 767px) {
+          .amiri-product-img-wrap {
+            padding: 8px; /* optimized spacing on mobile */
+          }
+        }
 
         .amiri-product-img {
           width: 100%;
           height: 100%;
           display: block;
-          object-fit: cover;
-          transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+          object-fit: contain; /* contained inside the wrapper */
           mix-blend-mode: multiply;
         }
 
-        .amiri-grid-item--product:hover .amiri-product-img {
-          transform: scale(1.03);
+        .amiri-product-img--primary {
+          opacity: 1;
+          transition: opacity 0.2s ease-in-out;
+        }
+        .amiri-product-img--secondary {
+          position: absolute;
+          top: 12px;
+          left: 12px;
+          right: 12px;
+          bottom: 12px;
+          width: calc(100% - 24px);
+          height: calc(100% - 24px);
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.2s ease-in-out;
+        }
+        @media (max-width: 767px) {
+          .amiri-product-img--secondary {
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            width: calc(100% - 16px);
+            height: calc(100% - 16px);
+          }
+        }
+
+        /* Hover behaviors */
+        .amiri-grid-item--product:hover {
+          opacity: 1 !important; /* prevent transparent white overlay */
+        }
+        .amiri-grid-item--has-hover:hover .amiri-product-img--primary {
+          opacity: 0;
+        }
+        .amiri-grid-item--has-hover:hover .amiri-product-img--secondary {
+          opacity: 1;
         }
 
         /* Optical Scaling classes - Overridden for full fill */
