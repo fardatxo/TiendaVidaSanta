@@ -38,7 +38,7 @@ export default async function Home() {
         </div>
         <div className="am-hero-overlay">
           <Link href="/collection/summer" className="am-hero-feeling-block">
-            how do you feel today - Discover the global collection
+            different collection
           </Link>
         </div>
       </section>
