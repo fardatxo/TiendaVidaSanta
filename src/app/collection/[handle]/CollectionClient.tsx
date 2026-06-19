@@ -49,6 +49,19 @@ function getProductScore(product: Product): number {
   return 2;
 }
 
+function hasBlackColor(product: Product): boolean {
+  return product.variants.some(v => 
+    v.selectedOptions.some(opt => {
+      const name = opt.name.toLowerCase();
+      if (name === 'color' || name === 'colour') {
+        const val = opt.value.toLowerCase();
+        return val.includes('black') || val.includes('negro');
+      }
+      return false;
+    })
+  );
+}
+
 export default function CollectionClient({ collection }: { collection: CollectionDetail }) {
   const { formatPrice } = useLocale();
 
@@ -202,8 +215,16 @@ export default function CollectionClient({ collection }: { collection: Collectio
     } else if (selectedSort === 'price-desc') {
       result.sort((a, b) => b.price - a.price);
     } else {
-      // Default: sort shirts/camisetas first, then pants/pantalones, then others
-      result.sort((a, b) => getProductScore(a) - getProductScore(b));
+      // Default: sort by black color first, then shirts/camisetas first, then pants/pantalones, then others
+      result.sort((a, b) => {
+        const blackA = hasBlackColor(a) ? 0 : 1;
+        const blackB = hasBlackColor(b) ? 0 : 1;
+        if (blackA !== blackB) return blackA - blackB;
+
+        const scoreA = getProductScore(a);
+        const scoreB = getProductScore(b);
+        return scoreA - scoreB;
+      });
     }
 
     return result;

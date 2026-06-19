@@ -37,6 +37,19 @@ const getGarmentType = (product: Product): 'tops' | 'bottoms' | 'outerwear' => {
   return 'tops';
 };
 
+const hasBlackColor = (product: Product): boolean => {
+  return product.variants.some(v => 
+    v.selectedOptions.some(opt => {
+      const name = opt.name.toLowerCase();
+      if (name === 'color' || name === 'colour') {
+        const val = opt.value.toLowerCase();
+        return val.includes('black') || val.includes('negro');
+      }
+      return false;
+    })
+  );
+};
+
 const philosophicalQuotes = [
   "We are not interested in trends. Only permanence and the raw truth of nature.",
   "Repetition is the ultimate form of restraint, mirroring the eternal cycles of landscapes.",
@@ -125,8 +138,12 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
       return true;
     });
 
-    // Sort by garment type: tops (camisetas) first, bottoms (pantalones) second, outerwear/others third
+    // Sort by color first (black first), then by garment type (tops/camisetas first, bottoms/pantalones second, outerwear/others third)
     return [...filtered].sort((a, b) => {
+      const blackA = hasBlackColor(a) ? 0 : 1;
+      const blackB = hasBlackColor(b) ? 0 : 1;
+      if (blackA !== blackB) return blackA - blackB;
+
       const typeA = getGarmentType(a);
       const typeB = getGarmentType(b);
       const scoreA = typeA === 'tops' ? 0 : typeA === 'bottoms' ? 1 : 2;
