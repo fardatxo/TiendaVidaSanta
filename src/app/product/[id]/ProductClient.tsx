@@ -136,10 +136,17 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
     return () => el.removeEventListener('wheel', handleWheel);
   }, [completeOutfit]);
 
-  const images = product.images.length > 0 ? product.images : [product.imageUrl].filter(Boolean);
   const [selectedVariant, setSelectedVariant] = useState<ShopifyVariant>(
     product.variants[0] ?? { id: '', title: '', availableForSale: true, price: { amount: String(product.price), currencyCode: product.currencyCode }, selectedOptions: [] }
   );
+
+  const allImages = product.images.length > 0 ? product.images : [product.imageUrl].filter(Boolean);
+  const variantIndex = product.variants.findIndex(v => v.id === selectedVariant.id);
+  const activeIndex = variantIndex >= 0 ? variantIndex : 0;
+  const startIndex = activeIndex * 2;
+  const images = allImages.length >= (startIndex + 2)
+    ? allImages.slice(startIndex, startIndex + 2)
+    : (allImages.length >= (startIndex + 1) ? allImages.slice(startIndex, startIndex + 1) : allImages.slice(0, 2));
   const [adding, setAdding] = useState(false);
   const [expandedAccordion, setExpandedAccordion] = useState<string | null>(null);
   const [availModal, setAvailModal] = useState(false);

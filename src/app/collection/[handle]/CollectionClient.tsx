@@ -278,7 +278,6 @@ export default function CollectionClient({ collection }: { collection: Collectio
     const pattern = [
       { type: 'product', colSpan: 1, rowSpan: 1 },
       { type: 'product', colSpan: 1, rowSpan: 1 },
-      { type: 'lifestyle', colSpan: 2, rowSpan: 2 }, // large lifestyle cover
       { type: 'product', colSpan: 1, rowSpan: 1 },
       { type: 'product', colSpan: 1, rowSpan: 1 },
       { type: 'product', colSpan: 1, rowSpan: 1 },
