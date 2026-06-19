@@ -703,7 +703,7 @@ export default function CollectionClient({ collection }: { collection: Collectio
         }
         .amiri-collection-title {
           font-family: var(--font-brand), var(--font-serif), serif;
-          font-size: clamp(24px, 3.5vw, 36px);
+          font-size: clamp(18px, 2.5vw, 26px);
           font-weight: 300;
           color: #000000;
           text-align: center;

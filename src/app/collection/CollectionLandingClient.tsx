@@ -432,7 +432,7 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
           text-transform: uppercase;
         }
         .tonet-archive-hero__title {
-          font-size: clamp(26px, 4.5vw, 44px);
+          font-size: clamp(20px, 3.5vw, 34px);
           font-weight: 200;
           letter-spacing: 0.28em;
           line-height: 1.2;
