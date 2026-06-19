@@ -140,13 +140,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
     product.variants[0] ?? { id: '', title: '', availableForSale: true, price: { amount: String(product.price), currencyCode: product.currencyCode }, selectedOptions: [] }
   );
 
-  const allImages = product.images.length > 0 ? product.images : [product.imageUrl].filter(Boolean);
-  const variantIndex = product.variants.findIndex(v => v.id === selectedVariant.id);
-  const activeIndex = variantIndex >= 0 ? variantIndex : 0;
-  const startIndex = activeIndex * 2;
-  const images = allImages.length >= (startIndex + 2)
-    ? allImages.slice(startIndex, startIndex + 2)
-    : (allImages.length >= (startIndex + 1) ? allImages.slice(startIndex, startIndex + 1) : allImages.slice(0, 2));
+  // images calculated below based on color index
   const [adding, setAdding] = useState(false);
   const [expandedAccordion, setExpandedAccordion] = useState<string | null>(null);
   const [availModal, setAvailModal] = useState(false);
@@ -336,6 +330,16 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
     }
     return result;
   }, [sizeOptionName]);
+
+  const allImages = product.images.length > 0 ? product.images : [product.imageUrl].filter(Boolean);
+  const activeColorIndex = colorOptionName && colorOptions.length > 0
+    ? colorOptions.findIndex(c => c.value === selectedColor)
+    : -1;
+  const activeIndex = activeColorIndex >= 0 ? activeColorIndex : 0;
+  const startIndex = activeIndex * 2;
+  const images = allImages.length >= (startIndex + 2)
+    ? allImages.slice(startIndex, startIndex + 2)
+    : (allImages.length >= (startIndex + 1) ? allImages.slice(startIndex, startIndex + 1) : allImages.slice(0, 2));
 
   const priceNum = parseFloat(selectedVariant.price.amount);
   const currencyCode = selectedVariant.price.currencyCode || 'EUR';
