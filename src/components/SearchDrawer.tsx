@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUI } from "@/context/UIContext";
 import { useLocale } from "@/context/LocaleContext";
-import { getProducts } from "@/lib/shopify";
+import { getProducts, searchProducts } from "@/lib/shopify";
 
 export default function SearchDrawer() {
   const { isSearchOpen, closeSearch } = useUI();
@@ -15,6 +15,10 @@ export default function SearchDrawer() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestedProducts, setSuggestedProducts] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [allProductsCache, setAllProductsCache] = useState<any[]>([]);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Fallback recommended products for "You Might Like"
   const fallbackSuggestions = [
@@ -55,6 +59,7 @@ export default function SearchDrawer() {
       .then((prods) => {
         if (prods && prods.length > 0) {
           setSuggestedProducts(prods.slice(0, 4));
+          setAllProductsCache(prods);
         } else {
           setSuggestedProducts(fallbackSuggestions);
         }
@@ -64,6 +69,52 @@ export default function SearchDrawer() {
       });
   }, [isSearchOpen]);
 
+  // Real-time search with debounce
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    // Instant client-side filter from cache for responsiveness
+    const q = searchQuery.toLowerCase().trim();
+    if (allProductsCache.length > 0) {
+      const localMatches = allProductsCache.filter((p: any) =>
+        (p.title?.toLowerCase().includes(q)) ||
+        (p.description?.toLowerCase().includes(q)) ||
+        (p.tags?.some((t: string) => t.toLowerCase().includes(q)))
+      );
+      if (localMatches.length > 0) {
+        setSearchResults(localMatches.slice(0, 8));
+      }
+    }
+
+    setIsSearching(true);
+
+    // Debounced API search for accurate results
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      searchProducts(searchQuery.trim(), 8)
+        .then((results) => {
+          if (results && results.length > 0) {
+            setSearchResults(results);
+          }
+          // If API returns empty but local had results, keep local results
+        })
+        .catch(() => {
+          // Keep local results on error
+        })
+        .finally(() => {
+          setIsSearching(false);
+        });
+    }, 300);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [searchQuery, allProductsCache]);
+
   // Focus input when opened
   useEffect(() => {
     if (isSearchOpen) {
@@ -72,6 +123,8 @@ export default function SearchDrawer() {
     } else {
       document.body.style.overflow = "";
       setSearchQuery("");
+      setSearchResults([]);
+      setIsSearching(false);
     }
     return () => {
       document.body.style.overflow = "";
@@ -177,37 +230,48 @@ export default function SearchDrawer() {
               </ul>
             </div>
 
-            {/* You Might Like */}
+            {/* You Might Like / Search Results */}
             <div className="sd-section-suggestions">
-              <h4 className="sd-section-title">You Might Like</h4>
-              <div className="sd-suggestions-grid">
-                {suggestedProducts.map((p) => {
-                  const image = p.imageUrl || p.images?.[0];
-                  const priceStr = formatPrice(p.price, p.currencyCode ?? 'EUR');
-                  return (
-                    <Link
-                      href={`/product/${p.handle}`}
-                      key={p.handle}
-                      className="sd-suggested-item"
-                      onClick={closeSearch}
-                    >
-                      <div className="sd-suggested-img-wrap">
-                        {image && (
-                          <img 
-                            src={image} 
-                            alt={p.title} 
-                            className="sd-suggested-img" 
-                          />
-                        )}
-                      </div>
-                      <div className="sd-suggested-info">
-                        <span className="sd-suggested-name">{p.title}</span>
-                        <span className="sd-suggested-price">{priceStr}</span>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
+              <h4 className="sd-section-title">
+                {searchQuery.trim() ? (
+                  <>
+                    Search Results
+                    {isSearching && <span className="sd-searching-dot">...</span>}
+                  </>
+                ) : 'You Might Like'}
+              </h4>
+              {searchQuery.trim() && searchResults.length === 0 && !isSearching ? (
+                <p className="sd-no-results">No products found</p>
+              ) : (
+                <div className="sd-suggestions-grid">
+                  {(searchQuery.trim() ? searchResults : suggestedProducts).map((p) => {
+                    const image = p.imageUrl || p.images?.[0];
+                    const priceStr = formatPrice(p.price, p.currencyCode ?? 'EUR');
+                    return (
+                      <Link
+                        href={`/product/${p.handle}`}
+                        key={p.handle + p.id}
+                        className="sd-suggested-item"
+                        onClick={closeSearch}
+                      >
+                        <div className="sd-suggested-img-wrap">
+                          {image && (
+                            <img 
+                              src={image} 
+                              alt={p.title} 
+                              className="sd-suggested-img" 
+                            />
+                          )}
+                        </div>
+                        <div className="sd-suggested-info">
+                          <span className="sd-suggested-name">{p.title}</span>
+                          <span className="sd-suggested-price">{priceStr}</span>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
           </div>
@@ -373,6 +437,22 @@ export default function SearchDrawer() {
         .sd-section-suggestions {
           margin-bottom: 40px;
           overflow: hidden;
+        }
+        .sd-no-results {
+          font-size: 9px;
+          font-weight: 300;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: rgba(0, 0, 0, 0.45);
+          margin: 20px 0;
+        }
+        .sd-searching-dot {
+          display: inline;
+          animation: sd-pulse 1s infinite;
+        }
+        @keyframes sd-pulse {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 1; }
         }
         .sd-suggestions-grid {
           display: grid;

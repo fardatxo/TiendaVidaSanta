@@ -400,6 +400,19 @@ export async function getRecommendedProducts(
   return mapped.slice(0, count);
 }
 
+export async function searchProducts(query: string, count = 8): Promise<Product[]> {
+  if (!query.trim()) return [];
+  const data = await shopifyFetch<{ products: { edges: { node: Record<string, any> }[] } }>(
+    `query SearchProducts($query: String!, $first: Int!) {
+      products(first: $first, query: $query) {
+        edges { node { ${PRODUCT_FIELDS} } }
+      }
+    }`,
+    { query: query.trim(), first: count }
+  );
+  return splitProductsByColor(data.products.edges.map(e => normalizeProduct(e.node)));
+}
+
 export async function getProduct(handle: string): Promise<Product | null> {
   const data = await shopifyFetch<{ productByHandle: Record<string, any> | null }>(
     `query GetProduct($handle: String!) { productByHandle(handle: $handle) { ${PRODUCT_FIELDS} } }`,
