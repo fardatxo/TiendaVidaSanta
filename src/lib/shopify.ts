@@ -112,6 +112,7 @@ const COLLECTION_PRODUCT_FIELDS = `
         availableForSale
         price { amount currencyCode }
         selectedOptions { name value }
+        image { url }
       }
     }
   }
@@ -139,11 +140,62 @@ function normalizeProduct(node: Record<string, any>): Product {
   };
 }
 
+export function splitProductsByColor(products: Product[]): Product[] {
+  const result: Product[] = [];
+  for (const p of products) {
+    // Find all color options
+    const colors = new Set<string>();
+    for (const v of p.variants) {
+      const colorOpt = v.selectedOptions.find(
+        o => o.name.toLowerCase() === 'color' || o.name.toLowerCase() === 'colour'
+      );
+      if (colorOpt) {
+        colors.add(colorOpt.value);
+      }
+    }
+
+    if (colors.size > 1) {
+      for (const color of colors) {
+        const colorVariants = p.variants.filter(v =>
+          v.selectedOptions.some(
+            o => (o.name.toLowerCase() === 'color' || o.name.toLowerCase() === 'colour') && o.value === color
+          )
+        );
+
+        const variantImages = colorVariants
+          .map(v => v.image?.url)
+          .filter((url): url is string => !!url);
+        const uniqueVariantImages = Array.from(new Set(variantImages));
+        const otherImages = p.images.filter(img => !uniqueVariantImages.includes(img));
+        const newImages = [...uniqueVariantImages, ...otherImages];
+        const newImageUrl = newImages[0] || p.imageUrl;
+        
+        // Use the first variant's price if available
+        const newPrice = colorVariants.length > 0 ? parseFloat(colorVariants[0].price.amount) : p.price;
+
+        result.push({
+          ...p,
+          id: `${p.id}-${color}`,
+          handle: `${p.handle}?color=${encodeURIComponent(color)}`,
+          title: `${p.title} - ${color}`,
+          price: newPrice,
+          imageUrl: newImageUrl,
+          images: newImages,
+          variants: colorVariants,
+        });
+      }
+    } else {
+      result.push(p);
+    }
+  }
+  return result;
+}
+
 export async function getProducts(): Promise<Product[]> {
   const data = await shopifyFetch<{ products: { edges: { node: Record<string, any> }[] } }>(
     `query GetProducts { products(first: 250, query: "available_for_sale:true") { edges { node { ${PRODUCT_FIELDS} } } } }`
   );
-  return data.products.edges.map(e => normalizeProduct(e.node));
+  return splitProductsByColor(data.products.edges.map(e => normalizeProduct(e.node)));
 }
 
 export interface CollectionSummary {
@@ -221,6 +273,14 @@ export async function getCollection(handle: string): Promise<CollectionDetail | 
   // fall back to showing all available products so the page is never empty.
   if (products.length === 0) {
     products = await getProducts();
+    return {
+      id: node.id as string,
+      handle: node.handle as string,
+      title: node.title as string,
+      description: (node.description as string) ?? '',
+      imageUrl: (node.image?.url as string) ?? '',
+      products,
+    };
   }
 
   return {
@@ -229,7 +289,7 @@ export async function getCollection(handle: string): Promise<CollectionDetail | 
     title: node.title as string,
     description: (node.description as string) ?? '',
     imageUrl: (node.image?.url as string) ?? '',
-    products,
+    products: splitProductsByColor(products),
   };
 }
 
@@ -260,10 +320,7 @@ export async function getRecommendedProducts(
         products(first: $first, query: "available_for_sale:true") {
           edges {
             node {
-              handle
-              title
-              featuredImage { url }
-              priceRange { minVariantPrice { amount currencyCode } }
+              ${PRODUCT_FIELDS}
             }
           }
         }
@@ -315,17 +372,23 @@ export async function getRecommendedProducts(
     }
   }
 
-  const mapped = productsData.products.edges
-    .map(({ node }) => ({
-      handle: node.handle as string,
-      title: node.title as string,
-      imageUrl: (node.featuredImage?.url as string) ?? '',
-      price: parseFloat(node.priceRange?.minVariantPrice?.amount ?? '0'),
-      currencyCode: (node.priceRange?.minVariantPrice?.currencyCode as string) ?? 'EUR',
-      collectionTitle: handleToCollection[node.handle as string] ?? '',
-      collectionHandle: handleToCollectionHandle[node.handle as string] ?? '',
-      siblings: handleToSiblings[node.handle as string] ?? [],
-    }))
+  const normalizedProducts = productsData.products.edges.map(e => normalizeProduct(e.node));
+  const splitProducts = splitProductsByColor(normalizedProducts);
+
+  const mapped = splitProducts
+    .map(p => {
+      const baseHandle = p.handle.split('?')[0];
+      return {
+        handle: p.handle,
+        title: p.title,
+        imageUrl: p.imageUrl,
+        price: p.price,
+        currencyCode: p.currencyCode,
+        collectionTitle: handleToCollection[baseHandle] ?? '',
+        collectionHandle: handleToCollectionHandle[baseHandle] ?? '',
+        siblings: handleToSiblings[baseHandle] ?? [],
+      };
+    })
     .filter(p => p.handle !== excludeHandle);
 
   // Shuffle the pool for true randomness

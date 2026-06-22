@@ -9,7 +9,7 @@ import { useLocale } from '@/context/LocaleContext';
 import { Product, ShopifyVariant, RecommendedProduct } from '@/lib/shopify';
 import { useTranslatedText } from '@/hooks/useTranslatedText';
 import RecommendedCard from '@/components/RecommendedCard';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useWishlist } from '@/context/WishlistContext';
 
@@ -139,6 +139,37 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   const [selectedVariant, setSelectedVariant] = useState<ShopifyVariant>(
     product.variants[0] ?? { id: '', title: '', availableForSale: true, price: { amount: String(product.price), currencyCode: product.currencyCode }, selectedOptions: [] }
   );
+
+  const searchParams = useSearchParams();
+  const initialColor = searchParams.get('color');
+
+  useEffect(() => {
+    if (initialColor) {
+      const match = product.variants.find(v =>
+        v.selectedOptions.some(opt =>
+          (opt.name.toLowerCase() === 'color' || opt.name.toLowerCase() === 'colour') &&
+          opt.value.toLowerCase() === initialColor.toLowerCase()
+        )
+      );
+      if (match) {
+        setSelectedVariant(match);
+        // Also sync selectedColor and selectedOptionsState so images/UI reflect the URL color
+        const colorOpt = match.selectedOptions.find(o => {
+          const n = o.name.toLowerCase();
+          return n === 'color' || n === 'colour';
+        });
+        if (colorOpt) {
+          setSelectedColor(colorOpt.value);
+        }
+        setSelectedSize('');
+        const opts: Record<string, string> = {};
+        for (const o of match.selectedOptions) {
+          opts[o.name] = o.value;
+        }
+        setSelectedOptionsState(opts);
+      }
+    }
+  }, [initialColor, product.variants]);
 
   // images calculated below based on color index
   const [adding, setAdding] = useState(false);
@@ -999,7 +1030,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
         @media (min-width: 1024px) {
           .tonet-pdp-page {
-            padding-top: 100px;
+            padding-top: 0;
           }
         }
 
@@ -1032,9 +1063,9 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           .tonet-pdp-layout {
             grid-template-columns: 50% 50%;
             column-gap: 0;
-            padding: 0 64px;
-            max-width: 1440px;
-            margin: 0 auto;
+            padding: 0;
+            max-width: none;
+            margin: 0;
             box-sizing: border-box;
           }
         }
@@ -1046,6 +1077,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         @media (min-width: 1024px) {
           .tonet-gallery-column {
             background-color: #f6f6f6;
+            padding-top: 100px;
           }
         }
 
@@ -1201,7 +1233,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
         @media (min-width: 1024px) {
           .tonet-info-column {
-            padding: 0 0 120px 64px;
+            padding: 100px 64px 120px 64px;
           }
         }
         .tonet-info-sticky {
@@ -1220,6 +1252,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             align-items: center;
             text-align: center;
             max-width: 460px;
+            margin-left: auto;
+            margin-right: auto;
           }
         }
 
