@@ -2203,11 +2203,11 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
         .sticky-size-dropdown {
           position: absolute;
-          bottom: 100%;
+          top: 100%;
           right: 0;
           background: #000000;
           border: 1px solid rgba(255, 255, 255, 0.15);
-          border-bottom: none;
+          border-top: none;
           display: flex;
           flex-direction: column;
           min-width: 160px;
