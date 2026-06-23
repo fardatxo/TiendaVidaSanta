@@ -8,17 +8,82 @@ export const metadata = {
   description: "Explore the TONET TORRENTINNI Pre-Fall 2026 Collection, Men's and Women's New Arrivals, and iconic California streetwear.",
 };
 
-function getRandomLuxuryColor() {
-  const h = Math.floor(Math.random() * 360);
-  const s = Math.floor(Math.random() * 12) + 6; // 6% to 18% saturation
-  const l = Math.floor(Math.random() * 15) + 12; // 12% to 27% lightness (refined dark tone)
-  return `hsl(${h}, ${s}%, ${l}%)`;
+function generateGridBlocks(length: number, paletteType: string) {
+  return Array.from({ length }, (_, i) => {
+    const x = Math.sin(i + 13) * 10000;
+    const r = x - Math.floor(x);
+    
+    let shades: string[] = [];
+    if (paletteType === 'monochromatic') {
+      if (r < 0.25) {
+        shades = ["#000000", "#080808", "#101010", "#181818", "#1c1c1c"];
+      } else if (r < 0.65) {
+        shades = ["#2d2d2d", "#404040", "#555555", "#707070", "#858585", "#9e9e9e"];
+      } else {
+        shades = ["#b5b5b5", "#cccccc", "#e0e0e0", "#f0f0f0", "#f7f7f7", "#ffffff"];
+      }
+    } else if (paletteType === 'mens') {
+      if (r < 0.3) {
+        shades = ["#020617", "#0f172a", "#070c14", "#0b0f19"];
+      } else if (r < 0.7) {
+        shades = ["#1e293b", "#334155", "#111827", "#1f2937", "#1a2238"];
+      } else {
+        shades = ["#475569", "#64748b", "#374151", "#4b5563", "#586984"];
+      }
+    } else if (paletteType === 'womens') {
+      if (r < 0.2) {
+        shades = ["#1c1917", "#292524", "#26211e"];
+      } else if (r < 0.6) {
+        shades = ["#44403c", "#57534e", "#78716c", "#6e6761"];
+      } else {
+        shades = ["#a8a29e", "#d6d3d1", "#e7e5e4", "#f5f5f4", "#fafaf9", "#ffffff"];
+      }
+    } else if (paletteType === 'landscape') {
+      if (r < 0.3) {
+        shades = ["#022c22", "#064e3b", "#011f17", "#043528"];
+      } else if (r < 0.7) {
+        shades = ["#0f5132", "#14532d", "#1b4332", "#113824", "#1a462f"];
+      } else {
+        shades = ["#2d6a4f", "#3a5a40", "#588157", "#8fab8c", "#a3b18a"];
+      }
+    } else if (paletteType === 'world-about') {
+      if (r < 0.3) {
+        shades = ["#140205", "#1e0409", "#170204"];
+      } else if (r < 0.7) {
+        shades = ["#3a0610", "#450c14", "#501720", "#280307"];
+      } else {
+        shades = ["#6b2a31", "#780a17", "#8e0c1f", "#551511"];
+      }
+    } else if (paletteType === 'world-collections') {
+      if (r < 0.3) {
+        shades = ["#170904", "#230f05", "#1c0702"];
+      } else if (r < 0.7) {
+        shades = ["#351607", "#421d0a", "#501f09", "#3b1105"];
+      } else {
+        shades = ["#6c260f", "#862c0e", "#a9370b", "#be6705", "#cc4b0a"];
+      }
+    } else if (paletteType === 'world-stores') {
+      if (r < 0.3) {
+        shades = ["#02050f", "#0c0e1e", "#060814"];
+      } else if (r < 0.7) {
+        shades = ["#1a1742", "#2b2871", "#131e4b", "#0d121f"];
+      } else {
+        shades = ["#302a90", "#3a30b4", "#453ccb", "#1943b8", "#2055d4"];
+      }
+    }
+    
+    return shades[Math.floor(r * shades.length) % shades.length];
+  });
 }
 
 export default async function Home() {
-  const color1 = getRandomLuxuryColor();
-  const color2 = getRandomLuxuryColor();
-  const color3 = getRandomLuxuryColor();
+  const gridBlocks = generateGridBlocks(100, 'monochromatic');
+  const mensBlocks = generateGridBlocks(100, 'mens');
+  const womensBlocks = generateGridBlocks(100, 'womens');
+  const landscapeBlocks = generateGridBlocks(100, 'landscape');
+  const world1Blocks = generateGridBlocks(100, 'world-about');
+  const world2Blocks = generateGridBlocks(100, 'world-collections');
+  const world3Blocks = generateGridBlocks(100, 'world-stores');
 
   return (
     <div className="am-home">
@@ -27,14 +92,15 @@ export default async function Home() {
       {/* 1. HERO CAMPAIGN BANNER: PRE-FALL 2026 */}
       <section className="am-hero">
         <div className="am-hero-media">
-          <video
-            src="/videoplayback.mp4"
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="am-hero-video"
-          />
+          <div className="am-hero-grid">
+            {gridBlocks.map((color, idx) => (
+              <div
+                key={idx}
+                className="am-hero-grid-block"
+                style={{ backgroundColor: color }}
+              />
+            ))}
+          </div>
         </div>
         <div className="am-hero-overlay">
           <Link href="/collection/summer" className="am-hero-feeling-block">
@@ -47,7 +113,15 @@ export default async function Home() {
       <section className="am-split-grid">
         <div className="am-split-col">
           <div className="am-split-media">
-            <img src="/hero/ComfyUI-main_reference_00020_.png" alt="men's new arrivals" className="am-split-img" />
+            <div className="am-hero-grid">
+              {mensBlocks.map((color, idx) => (
+                <div
+                  key={idx}
+                  className="am-hero-grid-block"
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
           </div>
           <div className="am-split-content">
             <h3 className="am-split-title">Men's New Arrivals</h3>
@@ -56,7 +130,15 @@ export default async function Home() {
         </div>
         <div className="am-split-col">
           <div className="am-split-media">
-            <img src="/hero/ComfyUI-main_reference_00016_.png" alt="women's new arrivals" className="am-split-img" />
+            <div className="am-hero-grid">
+              {womensBlocks.map((color, idx) => (
+                <div
+                  key={idx}
+                  className="am-hero-grid-block"
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
           </div>
           <div className="am-split-content">
             <h3 className="am-split-title">Women's New Arrivals</h3>
@@ -68,7 +150,15 @@ export default async function Home() {
       {/* 4. LANDSCAPE HIGHLIGHT: SNEAKER MA-94 */}
       <section className="am-landscape">
         <div className="am-landscape-media">
-          <img src="/hero/hero_garden_landscape.png" alt="discover ma-94 sneaker campaign" className="am-landscape-img" />
+          <div className="am-hero-grid">
+            {landscapeBlocks.map((color, idx) => (
+              <div
+                key={idx}
+                className="am-hero-grid-block"
+                style={{ backgroundColor: color }}
+              />
+            ))}
+          </div>
         </div>
         <div className="am-landscape-overlay">
           <div className="am-landscape-content">
@@ -83,7 +173,17 @@ export default async function Home() {
         <h2 className="am-world-tonet-title">THE WORLD OF TONET</h2>
         <div className="am-world-tonet-grid">
           <div className="am-world-tonet-col">
-            <div className="am-world-tonet-media" style={{ backgroundColor: color1 }} />
+            <div className="am-world-tonet-media">
+              <div className="am-hero-grid">
+                {world1Blocks.map((color, idx) => (
+                  <div
+                    key={idx}
+                    className="am-hero-grid-block"
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </div>
+            </div>
             <div className="am-world-tonet-overlay">
               <div className="am-world-tonet-hover-content">
                 <span className="am-world-tonet-label">ABOUT</span>
@@ -95,7 +195,17 @@ export default async function Home() {
             </div>
           </div>
           <div className="am-world-tonet-col">
-            <div className="am-world-tonet-media" style={{ backgroundColor: color2 }} />
+            <div className="am-world-tonet-media">
+              <div className="am-hero-grid">
+                {world2Blocks.map((color, idx) => (
+                  <div
+                    key={idx}
+                    className="am-hero-grid-block"
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </div>
+            </div>
             <div className="am-world-tonet-overlay">
               <div className="am-world-tonet-hover-content">
                 <span className="am-world-tonet-label">COLLECTIONS</span>
@@ -107,7 +217,17 @@ export default async function Home() {
             </div>
           </div>
           <div className="am-world-tonet-col">
-            <div className="am-world-tonet-media" style={{ backgroundColor: color3 }} />
+            <div className="am-world-tonet-media">
+              <div className="am-hero-grid">
+                {world3Blocks.map((color, idx) => (
+                  <div
+                    key={idx}
+                    className="am-hero-grid-block"
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </div>
+            </div>
             <div className="am-world-tonet-overlay">
               <div className="am-world-tonet-hover-content">
                 <span className="am-world-tonet-label">STORES</span>
@@ -150,6 +270,25 @@ export default async function Home() {
         .am-hero-media {
           width: 100%;
           height: 100%;
+          position: relative;
+        }
+        .am-hero-grid {
+          display: grid;
+          grid-template-columns: repeat(10, 1fr);
+          grid-template-rows: repeat(10, 1fr);
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+        }
+        .am-hero-grid-block {
+          transition: background-color 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          border: 1px solid rgba(0, 0, 0, 0.02);
+          box-sizing: border-box;
+        }
+        .am-hero-grid-block:hover {
+          background-color: #000000 !important;
         }
         .am-hero-img,
         .am-hero-video {
@@ -257,6 +396,7 @@ export default async function Home() {
           flex: 1 1 auto;
           overflow: hidden;
           background: #fcfcfc;
+          position: relative;
         }
         .am-split-img {
           width: 100%;
@@ -309,6 +449,7 @@ export default async function Home() {
         .am-landscape-media {
           width: 100%;
           height: 100%;
+          position: relative;
         }
         .am-landscape-img {
           width: 100%;
@@ -396,6 +537,7 @@ export default async function Home() {
           overflow: hidden;
           background: #fcfcfc;
           transition: filter 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          position: relative;
         }
         .am-world-tonet-overlay {
           position: absolute;
