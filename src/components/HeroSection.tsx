@@ -12,11 +12,14 @@ export default function HeroSection() {
   return (
     <section className="tn-hero">
       <div className="tn-hero-img-wrap">
-        <img
-          src="/hero/ComfyUI-main_reference_00028_.png"
-          alt="Campaign Editorial"
+        <video
+          src="/videoplayback.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster="/hero/ComfyUI-main_reference_00028_.png"
           className="tn-hero-img"
-          draggable={false}
         />
         <div className="tn-hero-overlay" />
       </div>

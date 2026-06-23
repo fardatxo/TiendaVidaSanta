@@ -28,7 +28,7 @@ export default async function Home() {
       <section className="am-hero">
         <div className="am-hero-media">
           <video
-            src="/hero-video.mp4"
+            src="/videoplayback.mp4"
             autoPlay
             muted
             loop

@@ -9,11 +9,16 @@ import { useCart } from "@/context/CartContext";
 import { useTranslation } from "@/lib/i18n";
 import { useWishlist } from "@/context/WishlistContext";
 
-const logoFonts = [
-  { family: "'Coolvetica Condensed', sans-serif", weight: "normal" },
-  { family: "'Saint Carell', sans-serif", weight: "normal" },
-  { family: "'Creato Display', sans-serif", weight: "bold" },
-  { family: "var(--font-cormorant), serif", weight: "300" }
+// Logo font: Saint Carell is used exclusively
+
+const thumbnails = [
+  { label: "All Products", href: "/collection", img: "/hero/ComfyUI-main_reference_00012_.png" },
+  { label: "Women's Ready-to-wear", href: "/collection/women", img: "/hero/ComfyUI-main_reference_00016_.png" },
+  { label: "Men's Ready-to-wear", href: "/collection/men", img: "/hero/ComfyUI-main_reference_00020_.png" },
+  { label: "Women's Accessories", href: "/collection/women", img: "/hero/ComfyUI-main_reference_00018_.png" },
+  { label: "Men's Accessories", href: "/collection/men", img: "/hero/ComfyUI-main_reference_00021_.png" },
+  { label: "Sneakers", href: "/collection/mens-new-arrivals", img: "/hero/ComfyUI-main_reference_00022_.png" },
+  { label: "Children", href: "/collection", img: "/hero/ComfyUI-main_reference_00023_.png" }
 ];
 
 export default function Navbar() {
@@ -24,23 +29,23 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const [currentFont, setCurrentFont] = useState(logoFonts[0]);
+  const [activeMegaMenu, setActiveMegaMenu] = useState<'private-sale' | 'women' | 'men' | 'children' | 'curb' | 'maison' | null>(null);
 
+  // Close mega menu on scroll
   useEffect(() => {
-    const randomFont = logoFonts[Math.floor(Math.random() * logoFonts.length)];
-    setCurrentFont(randomFont);
+    const handleScrollClose = () => {
+      setActiveMegaMenu(null);
+    };
+    window.addEventListener('scroll', handleScrollClose, { passive: true });
+    return () => window.removeEventListener('scroll', handleScrollClose);
+  }, []);
+
+  // Close mega menu on path change
+  useEffect(() => {
+    setActiveMegaMenu(null);
   }, [pathname]);
 
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        const randomFont = logoFonts[Math.floor(Math.random() * logoFonts.length)];
-        setCurrentFont(randomFont);
-      }
-    };
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, []);
+  // Logo font is set statically to Saint Carell
 
   const isHome = pathname === "/";
   const isProduct = pathname.startsWith("/product/");
@@ -113,11 +118,17 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
+  const headerRef = useRef<HTMLElement>(null);
   const [headerHeight, setHeaderHeight] = useState(64);
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setHeaderHeight(window.innerWidth < 768 ? 54 : 64);
-    }
+    if (!headerRef.current) return;
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        setHeaderHeight(entry.target.clientHeight);
+      }
+    });
+    resizeObserver.observe(headerRef.current);
+    return () => resizeObserver.disconnect();
   }, []);
 
   // Body padding: always pad body to accommodate the header height + banner (0 on homepage/product page for transparent overlay)
@@ -130,17 +141,25 @@ export default function Navbar() {
 
   return (
     <>
+      <div 
+        className={`acne-megamenu-backdrop ${activeMegaMenu ? 'open' : ''}`}
+        onMouseEnter={() => setActiveMegaMenu(null)}
+      />
+
       <header 
-        className={`acne-header ${isHome ? "transparent-home" : isProduct ? (isAtTop ? "transparent-pdp" : "solid") : "solid"} ${!headerVisible ? "header-hidden" : ""} ${isSearchOpen ? "search-active" : ""}`} 
+        ref={headerRef}
+        className={`acne-header ${activeMegaMenu ? "solid" : (isHome ? "transparent-home" : isProduct ? (isAtTop ? "transparent-pdp" : "solid") : "solid")} ${!headerVisible ? "header-hidden" : ""} ${isSearchOpen ? "search-active" : ""}`} 
         style={{top: `${navTop}px`}}
+        onMouseLeave={() => setActiveMegaMenu(null)}
       >
         <div className="acne-header-inner">
-          {/* LEFT: Menu trigger + Search trigger */}
+          {/* LEFT: Menu trigger + Mobile Search */}
           <div className="acne-nav-left">
             <button className="acne-right-icon" aria-label="Menu" onClick={openMenu}>
               <Menu size={18} strokeWidth={1} />
             </button>
-            <button className="acne-right-icon" aria-label="Search" onClick={openSearch}>
+            {/* Search on mobile only */}
+            <button className="acne-right-icon acne-mobile-only" aria-label="Search" onClick={openSearch}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8"/>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -152,7 +171,7 @@ export default function Navbar() {
           <Link href="/" className="acne-logo">
             <span 
               className="acne-logo-text acne-logo-desktop"
-              style={{ fontFamily: currentFont.family, fontWeight: currentFont.weight }}
+              style={{ fontFamily: "'Saint Carell', sans-serif", fontWeight: 'normal' }}
             >
               TONET TORRENTINNI
             </span>
@@ -164,9 +183,17 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {/* RIGHT: Account, Bookmark, Bag */}
+          {/* RIGHT: Utility Icons (Search, Account, Wishlist, Cart) */}
           <div className="acne-nav-right">
             <div className="acne-right-icons">
+              {/* Search on desktop only */}
+              <button className="acne-right-icon acne-desktop-only" aria-label="Search" onClick={openSearch}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+              </button>
+
               {/* Account icon */}
               <button onClick={openAccount} className="acne-right-icon" aria-label="Account">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
@@ -196,6 +223,255 @@ export default function Navbar() {
               </button>
             </div>
           </div>
+        </div>
+
+        {/* MEGA DROPDOWNS CONTAINER */}
+        <div className={`acne-megamenus-container ${activeMegaMenu ? 'open' : ''}`}>
+          {/* 1. PRIVATE SALE DROPDOWN */}
+          {activeMegaMenu === 'private-sale' && (
+            <div className="acne-megamenu-content">
+              <div className="acne-megamenu-cols">
+                <div className="acne-megamenu-col">
+                  <h4 className="acne-megamenu-col-title">Women</h4>
+                  <ul className="acne-megamenu-list">
+                    <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Ready to wear</Link></li>
+                    <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Accessories</Link></li>
+                  </ul>
+                </div>
+                <div className="acne-megamenu-col">
+                  <h4 className="acne-megamenu-col-title">Men</h4>
+                  <ul className="acne-megamenu-list">
+                    <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>Ready to wear</Link></li>
+                    <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>Accessories</Link></li>
+                  </ul>
+                </div>
+                <div className="acne-megamenu-col">
+                  <h4 className="acne-megamenu-col-title">Children</h4>
+                  <ul className="acne-megamenu-list">
+                    <li><Link href="/collection" onClick={() => setActiveMegaMenu(null)}>View All</Link></li>
+                  </ul>
+                </div>
+              </div>
+              
+              {/* Bottom Thumbnails */}
+              <div className="acne-megamenu-thumbnails">
+                {thumbnails.map((t, idx) => (
+                  <Link key={idx} href={t.href} className="acne-megamenu-thumbnail" onClick={() => setActiveMegaMenu(null)}>
+                    <div className="acne-megamenu-thumbnail-img-wrap">
+                      <img src={t.img} alt={t.label} />
+                    </div>
+                    <span>{t.label}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 2. WOMEN DROPDOWN */}
+          {activeMegaMenu === 'women' && (
+            <div className="acne-megamenu-content">
+              <div className="acne-megamenu-cols-wrap">
+                <div className="acne-megamenu-cols">
+                  <div className="acne-megamenu-col">
+                    <h4 className="acne-megamenu-col-title">Collections</h4>
+                    <ul className="acne-megamenu-list">
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>New Arrivals</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Spring 2026 Collection</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Summer 2026 Collection</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Charmeuse Dresses</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Wedding dresses</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Gifts</Link></li>
+                    </ul>
+                  </div>
+                  <div className="acne-megamenu-col">
+                    <h4 className="acne-megamenu-col-title">Ready to Wear</h4>
+                    <ul className="acne-megamenu-list">
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>View All</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Coats & Jackets</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Dresses</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Knitwear</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Pants & Shorts</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Skirts</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Tops</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>T-shirts & Sweatshirts</Link></li>
+                    </ul>
+                  </div>
+                  <div className="acne-megamenu-col">
+                    <h4 className="acne-megamenu-col-title">Bags</h4>
+                    <ul className="acne-megamenu-list">
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>View All</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Cat Bags</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Catch</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Confident</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Compagnon</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Crossbody Bags</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Totes & Top Handle Bags</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Mini Bags & Clutches</Link></li>
+                    </ul>
+                  </div>
+                  <div className="acne-megamenu-col">
+                    <h4 className="acne-megamenu-col-title">Shoes</h4>
+                    <ul className="acne-megamenu-list">
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>View All</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Curb</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Midnight Step</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Ballerinas</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Sandals & Mules</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Sneakers</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Pumps</Link></li>
+                    </ul>
+                  </div>
+                  <div className="acne-megamenu-col">
+                    <h4 className="acne-megamenu-col-title">Accessories</h4>
+                    <ul className="acne-megamenu-list">
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>View All</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Jewelry</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Belts</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Silks & Scarves</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Sunglasses</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Hats</Link></li>
+                      <li><Link href="/collection/women" onClick={() => setActiveMegaMenu(null)}>Small Leather Goods</Link></li>
+                    </ul>
+                  </div>
+                </div>
+                
+                {/* Featured Highlight Panel */}
+                <div className="acne-megamenu-highlight">
+                  <div className="acne-megamenu-highlight-img-wrap">
+                    <img src="/hero/ComfyUI-main_reference_00019_.png" alt="Women Featured" />
+                  </div>
+                  <div className="acne-megamenu-highlight-title">Pre-Fall 2026 Campaign</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 3. MEN DROPDOWN */}
+          {activeMegaMenu === 'men' && (
+            <div className="acne-megamenu-content">
+              <div className="acne-megamenu-cols-wrap">
+                <div className="acne-megamenu-cols">
+                  <div className="acne-megamenu-col">
+                    <h4 className="acne-megamenu-col-title">Collections</h4>
+                    <ul className="acne-megamenu-list">
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>New Arrivals</Link></li>
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>Spring 2026 Collection</Link></li>
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>Summer 2026 Collection</Link></li>
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>The Sneakers Edit</Link></li>
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>Gifts</Link></li>
+                    </ul>
+                  </div>
+                  <div className="acne-megamenu-col">
+                    <h4 className="acne-megamenu-col-title">Ready to Wear</h4>
+                    <ul className="acne-megamenu-list">
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>View All</Link></li>
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>Coats & Jackets</Link></li>
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>Knitwear & Polo</Link></li>
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>T-shirts & Sweat-shirts</Link></li>
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>Shirts & Tops</Link></li>
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>Pants & Shorts</Link></li>
+                    </ul>
+                  </div>
+                  <div className="acne-megamenu-col">
+                    <h4 className="acne-megamenu-col-title">Shoes</h4>
+                    <ul className="acne-megamenu-list">
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>View All</Link></li>
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>Curb</Link></li>
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>DBB1</Link></li>
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>Sneakers</Link></li>
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>Loafers & Derbies</Link></li>
+                    </ul>
+                  </div>
+                  <div className="acne-megamenu-col">
+                    <h4 className="acne-megamenu-col-title">Bags</h4>
+                    <ul className="acne-megamenu-list">
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>View All</Link></li>
+                    </ul>
+                  </div>
+                  <div className="acne-megamenu-col">
+                    <h4 className="acne-megamenu-col-title">Accessories</h4>
+                    <ul className="acne-megamenu-list">
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>View All</Link></li>
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>Small Leather Goods</Link></li>
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>Belts</Link></li>
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>Hats</Link></li>
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>Scarves & Ties</Link></li>
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>Socks</Link></li>
+                      <li><Link href="/collection/men" onClick={() => setActiveMegaMenu(null)}>Sunglasses</Link></li>
+                    </ul>
+                  </div>
+                </div>
+                
+                {/* Featured Highlight Panel */}
+                <div className="acne-megamenu-highlight">
+                  <div className="acne-megamenu-highlight-img-wrap">
+                    <img src="/hero/ComfyUI-main_reference_00028_.png" alt="Men Featured" />
+                  </div>
+                  <div className="acne-megamenu-highlight-title">Summer 2026 Collection</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 6. MAISON TONET DROPDOWN */}
+          {activeMegaMenu === 'maison' && (
+            <div className="acne-megamenu-content">
+              <div className="acne-megamenu-cols">
+                <div className="acne-megamenu-col">
+                  <h4 className="acne-megamenu-col-title">La Maison</h4>
+                  <ul className="acne-megamenu-list">
+                    <li><Link href="/about" onClick={() => setActiveMegaMenu(null)}>Tonet Torrentinni</Link></li>
+                    <li><Link href="/about" onClick={() => setActiveMegaMenu(null)}>History of the House</Link></li>
+                    <li><Link href="/about" onClick={() => setActiveMegaMenu(null)}>22 rue du Faubourg Saint-Honoré</Link></li>
+                    <li><Link href="/about" onClick={() => setActiveMegaMenu(null)}>855 Madison Avenue</Link></li>
+                    <li><Link href="/about" onClick={() => setActiveMegaMenu(null)}>65 Boulevard de la Croisette</Link></li>
+                  </ul>
+                </div>
+                <div className="acne-megamenu-col">
+                  <h4 className="acne-megamenu-col-title">Shows</h4>
+                  <ul className="acne-megamenu-list">
+                    <li><Link href="/collection" onClick={() => setActiveMegaMenu(null)}>Winter 2026</Link></li>
+                    <li><Link href="/collection" onClick={() => setActiveMegaMenu(null)}>Summer 2026</Link></li>
+                    <li><Link href="/collection" onClick={() => setActiveMegaMenu(null)}>Autumn Winter 2025</Link></li>
+                  </ul>
+                </div>
+                <div className="acne-megamenu-col">
+                  <h4 className="acne-megamenu-col-title">Tonet Lab</h4>
+                  <ul className="acne-megamenu-list">
+                    <li><Link href="/collection" onClick={() => setActiveMegaMenu(null)}>Tonet Lab by Future</Link></li>
+                  </ul>
+                </div>
+                <div className="acne-megamenu-col">
+                  <h4 className="acne-megamenu-col-title">Projects</h4>
+                  <ul className="acne-megamenu-list">
+                    <li><Link href="/collection" onClick={() => setActiveMegaMenu(null)}>Créations Spéciales</Link></li>
+                    <li><Link href="/collection" onClick={() => setActiveMegaMenu(null)}>Tonet x Benjamin Millepied</Link></li>
+                    <li><Link href="/collection" onClick={() => setActiveMegaMenu(null)}>Tonet on the Renaissance World Tour</Link></li>
+                  </ul>
+                </div>
+                <div className="acne-megamenu-col">
+                  <h4 className="acne-megamenu-col-title">Campaigns</h4>
+                  <ul className="acne-megamenu-list">
+                    <li><Link href="/collection" onClick={() => setActiveMegaMenu(null)}>Character Studies: The Final Chapter</Link></li>
+                    <li><Link href="/collection" onClick={() => setActiveMegaMenu(null)}>Character Studies: Modern Heroes</Link></li>
+                    <li><Link href="/collection" onClick={() => setActiveMegaMenu(null)}>Character Studies: Le chic ultime</Link></li>
+                  </ul>
+                </div>
+              </div>
+              
+              {/* Bottom Thumbnails */}
+              <div className="acne-megamenu-thumbnails">
+                {thumbnails.map((t, idx) => (
+                  <Link key={idx} href={t.href} className="acne-megamenu-thumbnail" onClick={() => setActiveMegaMenu(null)}>
+                    <div className="acne-megamenu-thumbnail-img-wrap">
+                      <img src={t.img} alt={t.label} />
+                    </div>
+                    <span>{t.label}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
@@ -331,26 +607,57 @@ export default function Navbar() {
           justify-content: flex-start;
           gap: 6px;
         }
-        .acne-nav-links a {
+        .acne-nav-desktop-links {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          margin-right: 15px;
+        }
+        .acne-nav-desktop-link {
           font-family: var(--font-primary);
-          font-size: 9.5px;
+          font-size: 10px;
           font-weight: 300;
           text-transform: uppercase;
           text-decoration: none;
-          color: rgba(0, 0, 0, 0.9);
+          color: rgba(0, 0, 0, 0.85);
           letter-spacing: 0.15em;
-          line-height: 1;
-          white-space: nowrap;
-          transition: opacity 0.3s ease;
+          padding: 8px 0;
+          position: relative;
           background: none;
           border: none;
-          outline: none;
           cursor: pointer;
-          padding: 0;
+          transition: opacity 0.25s ease, color 0.25s ease;
         }
-        .acne-nav-links a:hover { opacity: 0.6; }
-        .acne-mobile-only { display: flex; }
-        .acne-desktop-only { display: none; }
+        
+        /* Sibling hover fade effect */
+        .acne-nav-desktop-links:hover .acne-nav-desktop-link:not(:hover) {
+          opacity: 0.35;
+        }
+        
+        .acne-nav-desktop-link::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 1px;
+          background-color: currentColor;
+          transform: scaleX(0);
+          transform-origin: right;
+          transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .acne-nav-desktop-link:hover::after {
+          transform: scaleX(1);
+          transform-origin: left;
+        }
+
+        /* Transparent header states for links */
+        .acne-header.transparent-home .acne-nav-desktop-link {
+          color: #ffffff;
+        }
+        .acne-header.transparent-pdp .acne-nav-desktop-link {
+          color: #000000;
+        }
 
         /* ══ RIGHT ICONS ══ */
         .acne-nav-right {
@@ -389,13 +696,13 @@ export default function Navbar() {
           width: 5px;
           height: 5px;
           background-color: #000000;
-          border-radius: 50%;
+          border-radius: 0;
         }
 
         /* ══ MOB ICON ══ */
         .acne-mob-icon {
           display: flex; align-items: center; justify-content: center;
-          width: 40px; height: 64px;
+          width: 40px; height: 40px;
           background: none; border: none;
           cursor: pointer;
           color: rgba(0, 0, 0, 0.9);
@@ -407,14 +714,210 @@ export default function Navbar() {
 
         /* ══ DESKTOP ══ */
         @media (min-width: 768px) {
-          .acne-mobile-only { display: none !important; }
-          .acne-desktop-only { display: flex !important; }
-          .acne-header-inner { padding: 0 64px; }
+          .acne-header-inner { padding: 12px 64px; }
+        }
+
+        /* ══ MEGAMENU STYLING ══ */
+        .acne-megamenu-backdrop {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.25);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          opacity: 0;
+          pointer-events: none;
+          z-index: 490;
+          transition: opacity 0.35s ease;
+        }
+        .acne-megamenu-backdrop.open {
+          opacity: 1;
+          pointer-events: auto;
+        }
+
+        /* ══ MEGA DROPDOWNS CONTAINER ══ */
+        .acne-megamenus-container {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          width: 100vw;
+          background: #ffffff;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+          opacity: 0;
+          visibility: hidden;
+          transform: translateY(-8px);
+          transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.25s;
+          z-index: 501;
+          border-radius: 0 !important; /* Rectangular borders */
+          max-height: 90vh;
+          overflow-y: auto;
+        }
+        .acne-megamenus-container.open {
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(0);
+        }
+
+        /* Mega Dropdown Content */
+        .acne-megamenu-content {
+          padding: 40px 64px 48px;
+          color: #000000;
+          max-width: 1440px;
+          margin: 0 auto;
+        }
+
+        /* Columns Grid */
+        .acne-megamenu-cols {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 32px;
+          align-items: start;
+        }
+        .acne-megamenu-col {
+          display: flex;
+          flex-direction: column;
+        }
+        .acne-megamenu-col-title {
+          font-family: var(--font-primary);
+          font-size: 10px;
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
+          color: rgba(0, 0, 0, 0.85);
+          margin: 0 0 16px 0;
+        }
+        .acne-megamenu-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+        .acne-megamenu-list a {
+          font-family: var(--font-primary);
+          font-size: 10px;
+          font-weight: 300;
+          text-decoration: none;
+          color: rgba(0, 0, 0, 0.55);
+          letter-spacing: 0.08em;
+          transition: color 0.25s ease;
+        }
+        .acne-megamenu-list a:hover {
+          color: #000000;
+        }
+
+        /* Layout with Highlight Panel */
+        .acne-megamenu-cols-wrap {
+          display: grid;
+          grid-template-columns: 1fr 280px;
+          gap: 64px;
+        }
+        .acne-megamenu-highlight {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .acne-megamenu-highlight-img-wrap {
+          width: 100%;
+          height: 320px;
+          overflow: hidden;
+          background: #f7f7f7;
+          border-radius: 0 !important; /* Rectangular borders */
+        }
+        .acne-megamenu-highlight-img-wrap img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+          border-radius: 0 !important;
+        }
+        .acne-megamenu-highlight:hover .acne-megamenu-highlight-img-wrap img {
+          transform: scale(1.04);
+        }
+        .acne-megamenu-highlight-title {
+          font-family: var(--font-primary);
+          font-size: 10px;
+          font-weight: 300;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Bottom Row Thumbnails */
+        .acne-megamenu-thumbnails {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 20px;
+          border-top: 1px solid rgba(0, 0, 0, 0.08);
+          margin-top: 36px;
+          padding-top: 36px;
+        }
+        .acne-megamenu-thumbnail {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          text-decoration: none;
+          text-align: center;
+        }
+        .acne-megamenu-thumbnail-img-wrap {
+          width: 100%;
+          aspect-ratio: 1;
+          overflow: hidden;
+          background: #f7f7f7;
+          border-radius: 0 !important; /* Rectangular borders */
+        }
+        .acne-megamenu-thumbnail-img-wrap img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+          border-radius: 0 !important;
+        }
+        .acne-megamenu-thumbnail:hover .acne-megamenu-thumbnail-img-wrap img {
+          transform: scale(1.05);
+        }
+        .acne-megamenu-thumbnail span {
+          font-family: var(--font-primary);
+          font-size: 9px;
+          font-weight: 300;
+          letter-spacing: 0.08em;
+          color: rgba(0, 0, 0, 0.75);
+          text-transform: uppercase;
+          transition: color 0.25s ease;
+        }
+        .acne-megamenu-thumbnail:hover span {
+          color: #000000;
+        }
+
+        /* ══ DESKTOP/MOBILE VISIBILITY ══ */
+        .acne-mobile-only {
+          display: none !important;
+        }
+        @media (max-width: 767px) {
+          .acne-desktop-only {
+            display: none !important;
+          }
+          .acne-mobile-only {
+            display: flex !important;
+          }
+          button.acne-mobile-only {
+            display: flex !important;
+          }
         }
 
         /* ══ MOBILE ══ */
         @media (max-width: 767px) {
-          .acne-header-inner { padding: 0 16px; height: 54px; }
+          .acne-header-inner { 
+            padding: 0 16px; 
+            height: 54px; 
+            display: grid; 
+            grid-template-columns: 1fr auto 1fr; 
+            align-items: center; 
+          }
           .acne-logo-text { font-size: 24px; letter-spacing: 0.03em; font-weight: normal; padding-right: 0; }
           .acne-mob-icon { width: 44px; height: 54px; }
           .acne-right-icon { width: 44px; height: 54px; }
