@@ -183,6 +183,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   const [ceremonyOpen, setCeremonyOpen] = useState(false);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [sizeDropdownOpen, setSizeDropdownOpen] = useState(false);
+  const [stickyDropdownOpen, setStickyDropdownOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const mobileCarouselRef = useRef<HTMLDivElement>(null);
 
@@ -986,6 +987,37 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
       {/* Floating Sticky Buy Bar */}
       <div className={`tonet-sticky-buy-bar ${stickyBarVisible ? 'visible' : ''}`}>
+        {/* Inline size dropdown that unfolds above the bar */}
+        {stickyDropdownOpen && hasSizes && (
+          <>
+            <div className="sticky-size-backdrop" onClick={() => setStickyDropdownOpen(false)} />
+            <div className="sticky-size-dropdown">
+              {sizeOptions.map(size => {
+                const isAvailable = isSizeAvailable(size);
+                const isSelected = selectedSize === size;
+                return (
+                  <button
+                    key={size}
+                    type="button"
+                    className={`sticky-size-option ${isSelected ? 'selected' : ''} ${!isAvailable ? 'sold-out' : ''}`}
+                    onClick={() => {
+                      if (isAvailable) {
+                        handleSizeSelectInDrawer(size);
+                        setStickyDropdownOpen(false);
+                      } else {
+                        setStickyDropdownOpen(false);
+                        openAvailModal(size);
+                      }
+                    }}
+                  >
+                    {size.toUpperCase()}
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
+
         <div className="tonet-sticky-buy-bar-inner">
           <div className="tonet-sticky-buy-left">
             {product.imageUrl && (
@@ -999,7 +1031,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           <button 
             type="button" 
             className="tonet-sticky-buy-btn"
-            onClick={hasSizes ? () => setSizeDropdownOpen(true) : handleAddToBag}
+            onClick={hasSizes ? () => setStickyDropdownOpen(prev => !prev) : handleAddToBag}
             disabled={adding}
           >
             <span>
@@ -1008,7 +1040,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                 : (adding ? 'ADDING...' : 'ADD TO BAG')
               }
             </span>
-            {hasSizes && <span className="tonet-sticky-arrow"> ▾</span>}
+            {hasSizes && <span className={`tonet-sticky-arrow ${stickyDropdownOpen ? 'flipped' : ''}`}> ▾</span>}
           </button>
         </div>
       </div>
@@ -2156,6 +2188,62 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .tonet-sticky-arrow {
           font-size: 10px;
           margin-left: 2px;
+          transition: transform 0.2s ease;
+          display: inline-block;
+        }
+        .tonet-sticky-arrow.flipped {
+          transform: rotate(180deg);
+        }
+
+        /* ── STICKY BAR INLINE SIZE DROPDOWN ── */
+        .sticky-size-backdrop {
+          position: fixed;
+          inset: 0;
+          z-index: 488;
+        }
+        .sticky-size-dropdown {
+          position: absolute;
+          bottom: 100%;
+          right: 0;
+          background: #000000;
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          border-bottom: none;
+          display: flex;
+          flex-direction: column;
+          min-width: 160px;
+          z-index: 489;
+          max-height: 280px;
+          overflow-y: auto;
+        }
+        .sticky-size-option {
+          background: transparent;
+          border: none;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          color: #ffffff;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 11px;
+          font-weight: 400;
+          letter-spacing: 0.12em;
+          padding: 12px 20px;
+          text-align: left;
+          cursor: pointer;
+          transition: background 0.15s ease;
+          text-transform: uppercase;
+        }
+        .sticky-size-option:last-child {
+          border-bottom: none;
+        }
+        .sticky-size-option:hover {
+          background: rgba(255, 255, 255, 0.1);
+        }
+        .sticky-size-option.selected {
+          background: rgba(255, 255, 255, 0.15);
+          font-weight: 600;
+        }
+        .sticky-size-option.sold-out {
+          color: rgba(255, 255, 255, 0.3);
+          text-decoration: line-through;
+          cursor: pointer;
         }
 
         @media (min-width: 1024px) {
