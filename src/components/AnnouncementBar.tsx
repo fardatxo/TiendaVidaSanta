@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 
 const ANNOUNCEMENTS = [
-  "DISFRUTE DE ENVÍO GRATUITO EN TODOS SUS PEDIDOS",
-  "DESCUBRA LAS NUEVAS COLECCIONES"
+  "COMPLIMENTARY SHIPPING ON ALL ORDERS",
+  "DISCOVER THE NEW COLLECTIONS"
 ];
 
 export default function AnnouncementBar() {
