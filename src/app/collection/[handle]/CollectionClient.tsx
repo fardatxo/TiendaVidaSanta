@@ -424,7 +424,9 @@ export default function CollectionClient({ collection }: { collection: Collectio
                         isLarge ? 'amiri-grid-item--span-2 amiri-grid-item--row-2' : ''
                       } ${p.images && p.images.length > 1 ? 'amiri-grid-item--has-hover' : ''}`}
                     >
-                      <span className="amiri-product-tag">SUMMER</span>
+                      <span className="amiri-product-tag">
+                        {collection.handle === 'coleccion-1' ? 'PRE-FALL' : 'SUMMER'}
+                      </span>
                       <div className="amiri-product-img-wrap">
                         {p.imageUrl && (
                           <img

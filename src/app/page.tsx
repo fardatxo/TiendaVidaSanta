@@ -1,5 +1,6 @@
 import Link from "next/link";
 import HomeSnapInitializer from "@/components/HomeSnapInitializer";
+import { getCollections } from "@/lib/shopify";
 
 export const dynamic = "force-dynamic";
 
@@ -77,9 +78,8 @@ function generateGridBlocks(length: number, paletteType: string) {
 }
 
 export default async function Home() {
+  const collections = await getCollections();
   const gridBlocks = generateGridBlocks(100, 'monochromatic');
-  const mensBlocks = generateGridBlocks(100, 'mens');
-  const womensBlocks = generateGridBlocks(100, 'womens');
   const landscapeBlocks = generateGridBlocks(100, 'landscape');
   const world1Blocks = generateGridBlocks(100, 'world-about');
   const world2Blocks = generateGridBlocks(100, 'world-collections');
@@ -109,42 +109,34 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 2. SPLIT ARRIVALS: MEN'S & WOMEN'S NEW ARRIVALS */}
-      <section className="am-split-grid">
-        <div className="am-split-col">
-          <div className="am-split-media">
-            <div className="am-hero-grid">
-              {mensBlocks.map((color, idx) => (
-                <div
-                  key={idx}
-                  className="am-hero-grid-block"
-                  style={{ backgroundColor: color }}
-                />
-              ))}
+      {/* 2. SHOP COLLECTIONS */}
+      <section className="am-split-grid" style={{ "--cols": collections.length || 2 } as React.CSSProperties}>
+        {collections.map((col, cIdx) => {
+          const palettes = ["world-collections", "world-stores", "mens", "womens", "landscape", "world-about"];
+          const palette = palettes[cIdx % palettes.length];
+          const blocks = generateGridBlocks(100, palette);
+          return (
+            <div key={col.id} className="am-split-col">
+              <div className="am-split-media">
+                <div className="am-hero-grid">
+                  {blocks.map((color, idx) => (
+                    <div
+                      key={idx}
+                      className="am-hero-grid-block"
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="am-split-content">
+                <h3 className="am-split-title">{col.title}</h3>
+                <Link href={`/collection/${col.handle}`} className="am-split-cta">
+                  Shop Now
+                </Link>
+              </div>
             </div>
-          </div>
-          <div className="am-split-content">
-            <h3 className="am-split-title">Men's New Arrivals</h3>
-            <Link href="/collection/mens-new-arrivals" className="am-split-cta">Shop Now</Link>
-          </div>
-        </div>
-        <div className="am-split-col">
-          <div className="am-split-media">
-            <div className="am-hero-grid">
-              {womensBlocks.map((color, idx) => (
-                <div
-                  key={idx}
-                  className="am-hero-grid-block"
-                  style={{ backgroundColor: color }}
-                />
-              ))}
-            </div>
-          </div>
-          <div className="am-split-content">
-            <h3 className="am-split-title">Women's New Arrivals</h3>
-            <Link href="/collection/womens-new-arrivals" className="am-split-cta">Shop Now</Link>
-          </div>
-        </div>
+          );
+        })}
       </section>
 
       {/* 4. LANDSCAPE HIGHLIGHT: SNEAKER MA-94 */}
@@ -377,7 +369,7 @@ export default async function Home() {
         }
         @media (min-width: 768px) {
           .am-split-grid {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(var(--cols, 2), 1fr);
           }
         }
         .am-split-col {
@@ -387,7 +379,7 @@ export default async function Home() {
           height: 100%;
         }
         @media (min-width: 768px) {
-          .am-split-col:first-child {
+          .am-split-col:not(:last-child) {
             border-right: 1px solid #eaeaea;
           }
         }
