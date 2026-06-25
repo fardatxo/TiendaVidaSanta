@@ -15,13 +15,36 @@ function generateGridBlocks(length: number, paletteType: string) {
     const r = x - Math.floor(x);
     
     let shades: string[] = [];
-    if (paletteType === 'monochromatic') {
-      if (r < 0.25) {
-        shades = ["#000000", "#080808", "#101010", "#181818", "#1c1c1c"];
-      } else if (r < 0.65) {
-        shades = ["#2d2d2d", "#404040", "#555555", "#707070", "#858585", "#9e9e9e"];
+    if (paletteType === 'monochromatic' || paletteType === 'gray-red-white') {
+      if (paletteType === 'gray-red-white') {
+        if (r < 0.70) {
+          shades = ["#000000"];
+        } else {
+          const subR = (r - 0.70) / 0.30;
+          if (subR < 0.5) {
+            shades = ["#1e1e1e", "#2b2b2b", "#3d3d3d", "#525252", "#6b6b6b", "#888888", "#a6a6a6", "#c4c4c4", "#e2e2e2"];
+          } else if (subR < 0.8) {
+            shades = ["#ffffff", "#f9f9f9", "#f2f2f2", "#ebebeb", "#e0e0e0"];
+          } else {
+            shades = ["#7a1a1a", "#962323", "#b33030", "#cf3e3e", "#520f0f", "#661313"];
+          }
+        }
       } else {
-        shades = ["#b5b5b5", "#cccccc", "#e0e0e0", "#f0f0f0", "#f7f7f7", "#ffffff"];
+        if (r < 0.25) {
+          shades = ["#000000", "#080808", "#101010", "#181818", "#1c1c1c"];
+        } else if (r < 0.65) {
+          shades = ["#2d2d2d", "#404040", "#555555", "#707070", "#858585", "#9e9e9e"];
+        } else {
+          shades = ["#b5b5b5", "#cccccc", "#e0e0e0", "#f0f0f0", "#f7f7f7", "#ffffff"];
+        }
+      }
+    } else if (paletteType === 'black-gray-red') {
+      if (r < 0.45) {
+        shades = ["#0c0c0c", "#141414", "#1a1a1a", "#020202", "#000000"];
+      } else if (r < 0.8) {
+        shades = ["#2b2b2b", "#404040", "#5a5a5a", "#787878", "#969696", "#b0b0b0"];
+      } else {
+        shades = ["#7a1a1a", "#962323", "#b33030", "#cf3e3e", "#520f0f", "#661313"];
       }
     } else if (paletteType === 'mens') {
       if (r < 0.3) {
@@ -79,7 +102,7 @@ function generateGridBlocks(length: number, paletteType: string) {
 
 export default async function Home() {
   const collections = await getCollections();
-  const gridBlocks = generateGridBlocks(100, 'monochromatic');
+  const gridBlocks = generateGridBlocks(100, 'gray-red-white');
   const landscapeBlocks = generateGridBlocks(100, 'landscape');
   const world1Blocks = generateGridBlocks(100, 'world-about');
   const world2Blocks = generateGridBlocks(100, 'world-collections');
@@ -93,13 +116,22 @@ export default async function Home() {
       <section className="am-hero">
         <div className="am-hero-media">
           <div className="am-hero-grid">
-            {gridBlocks.map((color, idx) => (
+            {gridBlocks.map((_, idx) => (
               <div
                 key={idx}
                 className="am-hero-grid-block"
-                style={{ backgroundColor: color }}
-              />
+                style={{ backgroundColor: 'transparent' }}
+              >
+                <img src="/icon.png" alt="" className="am-grid-logo" />
+              </div>
             ))}
+          </div>
+          <div className="am-hero-logo-wrap">
+            <img 
+              src="/icon.png" 
+              alt="Logo" 
+              className="am-hero-logo"
+            />
           </div>
         </div>
         <div className="am-hero-overlay">
@@ -112,20 +144,36 @@ export default async function Home() {
       {/* 2. SHOP COLLECTIONS */}
       <section className="am-split-grid" style={{ "--cols": collections.length || 2 } as React.CSSProperties}>
         {collections.map((col, cIdx) => {
-          const palettes = ["world-collections", "world-stores", "mens", "womens", "landscape", "world-about"];
-          const palette = palettes[cIdx % palettes.length];
+          const titleLower = col.title.toLowerCase();
+          let palette = 'monochromatic';
+          if (titleLower.includes('private') || titleLower.includes('capsule')) {
+            palette = 'black-gray-red';
+          } else if (titleLower.includes('freedom')) {
+            palette = 'monochromatic';
+          } else {
+            palette = cIdx % 2 === 0 ? 'monochromatic' : 'black-gray-red';
+          }
           const blocks = generateGridBlocks(100, palette);
           return (
             <div key={col.id} className="am-split-col">
               <div className="am-split-media">
                 <div className="am-hero-grid">
-                  {blocks.map((color, idx) => (
+                  {blocks.map((_, idx) => (
                     <div
                       key={idx}
                       className="am-hero-grid-block"
-                      style={{ backgroundColor: color }}
-                    />
+                      style={{ backgroundColor: 'transparent' }}
+                    >
+                      <img src="/icon.png" alt="" className="am-grid-logo" />
+                    </div>
                   ))}
+                </div>
+                <div className="am-hero-logo-wrap am-split-logo-wrap">
+                  <img 
+                    src="/icon.png" 
+                    alt="Logo" 
+                    className="am-hero-logo am-split-logo"
+                  />
                 </div>
               </div>
               <div className="am-split-content">
@@ -148,7 +196,9 @@ export default async function Home() {
                 key={idx}
                 className="am-hero-grid-block"
                 style={{ backgroundColor: color }}
-              />
+              >
+                <img src="/icon.png" alt="" className="am-grid-logo" />
+              </div>
             ))}
           </div>
         </div>
@@ -172,7 +222,9 @@ export default async function Home() {
                     key={idx}
                     className="am-hero-grid-block"
                     style={{ backgroundColor: color }}
-                  />
+                  >
+                    <img src="/icon.png" alt="" className="am-grid-logo" />
+                  </div>
                 ))}
               </div>
             </div>
@@ -194,7 +246,9 @@ export default async function Home() {
                     key={idx}
                     className="am-hero-grid-block"
                     style={{ backgroundColor: color }}
-                  />
+                  >
+                    <img src="/icon.png" alt="" className="am-grid-logo" />
+                  </div>
                 ))}
               </div>
             </div>
@@ -216,7 +270,9 @@ export default async function Home() {
                     key={idx}
                     className="am-hero-grid-block"
                     style={{ backgroundColor: color }}
-                  />
+                  >
+                    <img src="/icon.png" alt="" className="am-grid-logo" />
+                  </div>
                 ))}
               </div>
             </div>
@@ -263,6 +319,26 @@ export default async function Home() {
           width: 100%;
           height: 100%;
           position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #e3e7ec;
+        }
+        .am-hero-logo-wrap {
+          background: #000000;
+          padding: 24px;
+          border: 1px solid #ffffff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 2;
+          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+        }
+        .am-hero-logo {
+          width: 120px;
+          height: 120px;
+          object-fit: contain;
+          filter: invert(1);
         }
         .am-hero-grid {
           display: grid;
@@ -278,6 +354,17 @@ export default async function Home() {
           transition: background-color 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           border: 1px solid rgba(0, 0, 0, 0.02);
           box-sizing: border-box;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .am-grid-logo {
+          width: 45%;
+          height: 45%;
+          object-fit: contain;
+          opacity: 0.22;
+          filter: invert(1);
+          pointer-events: none;
         }
         .am-hero-grid-block:hover {
           background-color: #000000 !important;
@@ -292,17 +379,18 @@ export default async function Home() {
         .am-hero-overlay {
           position: absolute;
           inset: 0;
-          background: rgba(0, 0, 0, 0.08);
+          background: transparent;
           display: flex;
           align-items: flex-end;
           justify-content: center;
           padding: 60px 48px;
+          z-index: 3;
         }
         .am-hero-feeling-block {
           display: inline-block;
-          border: 1px solid #ffffff;
+          border: 1px solid #000000;
           background-color: transparent;
-          color: #ffffff;
+          color: #000000;
           padding: 18px 44px;
           font-family: var(--font-primary), sans-serif;
           font-size: 11.5px;
@@ -314,8 +402,8 @@ export default async function Home() {
           transition: background-color 0.3s, color 0.3s, opacity 0.3s;
         }
         .am-hero-feeling-block:hover {
-          background-color: #ffffff;
-          color: #000000;
+          background-color: #000000;
+          color: #ffffff;
         }
         .am-hero-content {
           display: flex;
@@ -387,8 +475,19 @@ export default async function Home() {
           width: 100%;
           flex: 1 1 auto;
           overflow: hidden;
-          background: #fcfcfc;
+          background: #e3e7ec;
           position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .am-split-logo-wrap {
+          padding: 16px;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        .am-split-logo {
+          width: 80px;
+          height: 80px;
         }
         .am-split-img {
           width: 100%;

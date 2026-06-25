@@ -472,18 +472,29 @@ export default function AccountDrawer() {
           position: fixed;
           top: 0; right: 0; bottom: 0;
           width: min(100vw, 480px);
-          background: #ffffff;
+          background: #ffffff !important;
           z-index: 1001;
           display: flex;
           flex-direction: column;
           transform: translateX(100%);
           transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
           font-family: var(--font-primary), sans-serif;
-          color: #000000;
+          color: #000000 !important;
           overflow: hidden;
           box-shadow: -10px 0 40px rgba(0,0,0,0.08);
         }
         .ad-drawer.open { transform: translateX(0); }
+
+        /* Force all text inside drawer to be black — overrides global body color: #fff */
+        .ad-drawer h1,
+        .ad-drawer h2,
+        .ad-drawer h3,
+        .ad-drawer p,
+        .ad-drawer span,
+        .ad-drawer div,
+        .ad-drawer label {
+          color: inherit !important;
+        }
 
         /* ══ HEADER ══ */
         .ad-header {
@@ -497,13 +508,13 @@ export default function AccountDrawer() {
         }
 
         .ad-close-btn {
-          background: none; border: none;
+          background: none !important; border: none !important;
           font-family: inherit;
           font-size: 11px;
           font-weight: 300;
           letter-spacing: 0.15em;
           text-transform: lowercase;
-          color: #000000;
+          color: #000000 !important;
           cursor: pointer;
           display: flex; align-items: center;
           gap: 8px;
@@ -519,8 +530,8 @@ export default function AccountDrawer() {
         }
 
         .ad-icon-btn {
-          background: none; border: none;
-          color: #000000;
+          background: none !important; border: none !important;
+          color: #000000 !important;
           cursor: pointer;
           padding: 4px;
           display: flex; align-items: center; justify-content: center;
@@ -552,8 +563,17 @@ export default function AccountDrawer() {
           scrollbar-width: none;
           display: flex;
           flex-direction: column;
+          color: #000000;
         }
         .ad-body::-webkit-scrollbar { display: none; }
+
+        /* Welcome view wrapper */
+        .ad-welcome-view {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          color: #000000;
+        }
 
         /* ══ WELCOME BLOCK ══ */
         .ad-welcome-block {
@@ -566,7 +586,7 @@ export default function AccountDrawer() {
           font-size: clamp(20px, 2.5vw, 26px);
           font-weight: 300;
           letter-spacing: 0.04em;
-          color: #000000;
+          color: #000000 !important;
           margin: 0 0 16px;
         }
 
@@ -632,7 +652,7 @@ export default function AccountDrawer() {
           font-weight: 400;
           letter-spacing: 0.08em;
           text-transform: uppercase;
-          color: #000000;
+          color: #000000 !important;
           margin: 0 0 4px;
         }
 
@@ -652,13 +672,13 @@ export default function AccountDrawer() {
         }
 
         .ad-flow-back {
-          background: none; border: none;
+          background: none !important; border: none !important;
           font-family: inherit;
           font-size: 10px;
           font-weight: 300;
           letter-spacing: 0.12em;
           text-transform: lowercase;
-          color: rgba(0, 0, 0, 0.4);
+          color: rgba(0, 0, 0, 0.4) !important;
           cursor: pointer;
           display: flex; align-items: center;
           gap: 8px;
@@ -667,7 +687,7 @@ export default function AccountDrawer() {
           transition: color 0.3s;
           align-self: flex-start;
         }
-        .ad-flow-back:hover { color: #000000; }
+        .ad-flow-back:hover { color: #000000 !important; }
 
         .ad-flow-container { padding: 40px; }
 
@@ -730,9 +750,9 @@ export default function AccountDrawer() {
           font-weight: 300;
           letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: #ffffff;
-          background: #000000;
-          border: none;
+          color: #ffffff !important;
+          background: #000000 !important;
+          border: none !important;
           cursor: pointer;
           transition: opacity 0.3s;
           margin-top: 12px;
@@ -775,17 +795,17 @@ export default function AccountDrawer() {
           font-weight: 300;
           letter-spacing: 0.12em;
           text-transform: lowercase;
-          color: rgba(0, 0, 0, 0.7);
-          background: transparent;
-          border: 1px solid rgba(0, 0, 0, 0.15);
+          color: rgba(0, 0, 0, 0.7) !important;
+          background: transparent !important;
+          border: 1px solid rgba(0, 0, 0, 0.15) !important;
           cursor: pointer;
           display: flex; align-items: center; justify-content: center;
           gap: 12px;
           transition: border-color 0.3s, color 0.3s;
         }
         .ad-social-btn:hover {
-          border-color: #000000;
-          color: #000000;
+          border-color: #000000 !important;
+          color: #000000 !important;
         }
 
         /* ══ RESPONSIVE OVERRIDES ══ */
