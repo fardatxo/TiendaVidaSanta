@@ -217,7 +217,7 @@ export default async function Home() {
         <div className="am-landscape-overlay">
           <div className="am-landscape-content">
             <h2 className="am-landscape-title">NEW ARRIVALS</h2>
-            <Link href="/collection/new-arrivals" className="am-landscape-cta">Shop New Arrivals</Link>
+            <Link href="/collection/new-arrivals" className="am-landscape-cta">SHOP NEW PIECES</Link>
           </div>
         </div>
       </section>
@@ -568,6 +568,7 @@ export default async function Home() {
           align-items: flex-end;
           justify-content: flex-start;
           padding: 48px;
+          z-index: 10;
         }
         .am-landscape-content {
           display: flex;
