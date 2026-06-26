@@ -671,7 +671,17 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
               <div className="tonet-mobile-carousel" ref={mobileCarouselRef} onScroll={handleMobileScroll}>
                 {images.map((img, i) => (
                   <div key={i} className="tonet-mobile-slide">
-                    <img src={img} alt={`${product.title} - ${i}`} className="tonet-pdp-img" />
+                    <img 
+                      src={img} 
+                      alt={`${product.title} - ${i}`} 
+                      className="tonet-pdp-img amiri-fade-in" 
+                      loading={i === 0 ? "eager" : "lazy"}
+                      decoding="async"
+                      onLoad={(e) => e.currentTarget.classList.add('loaded')}
+                      ref={(el) => {
+                        if (el && el.complete) el.classList.add('loaded');
+                      }}
+                    />
                   </div>
                 ))}
               </div>
@@ -693,7 +703,17 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             <div className="tonet-desktop-gallery">
               {images.map((img, i) => (
                 <div key={i} className="tonet-desktop-img-wrapper">
-                  <img src={img} alt={`${product.title} - ${i}`} className="tonet-pdp-img" />
+                  <img 
+                    src={img} 
+                    alt={`${product.title} - ${i}`} 
+                    className="tonet-pdp-img amiri-fade-in" 
+                    loading={i === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                    onLoad={(e) => e.currentTarget.classList.add('loaded')}
+                    ref={(el) => {
+                      if (el && el.complete) el.classList.add('loaded');
+                    }}
+                  />
                 </div>
               ))}
             </div>
@@ -831,7 +851,15 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                 <div className={images.length === 1 ? "tonet-mobile-single" : "tonet-mobile-grid"}>
                   {images.map((img, i) => (
                     <div key={i} className="tonet-mobile-grid-item">
-                      <img src={img} alt={`${product.title} - ${i}`} className="tonet-pdp-img" />
+                      <img 
+                        src={img} 
+                        alt={`${product.title} - ${i}`} 
+                        className="tonet-pdp-img amiri-fade-in" 
+                        onLoad={(e) => e.currentTarget.classList.add('loaded')}
+                        ref={(el) => {
+                          if (el && el.complete) el.classList.add('loaded');
+                        }}
+                      />
                     </div>
                   ))}
                 </div>
@@ -871,7 +899,13 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                             <img 
                               src={p.imageUrl} 
                               alt={p.title} 
-                              className={`amiri-ctl-image amiri-ctl-image--${pType}`}
+                              className={`amiri-ctl-image amiri-ctl-image--${pType} amiri-fade-in`}
+                              loading="lazy"
+                              decoding="async"
+                              onLoad={(e) => e.currentTarget.classList.add('loaded')}
+                              ref={(el) => {
+                                if (el && el.complete) el.classList.add('loaded');
+                              }}
                             />
                           )}
                         </div>
@@ -928,7 +962,13 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                             <img 
                               src={p.imageUrl} 
                               alt={p.title} 
-                              className={`amiri-ctl-image amiri-ctl-image--${pType}`}
+                              className={`amiri-ctl-image amiri-ctl-image--${pType} amiri-fade-in`}
+                              loading="lazy"
+                              decoding="async"
+                              onLoad={(e) => e.currentTarget.classList.add('loaded')}
+                              ref={(el) => {
+                                if (el && el.complete) el.classList.add('loaded');
+                              }}
                             />
                           )}
                         </div>

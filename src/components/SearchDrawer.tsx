@@ -285,7 +285,7 @@ export default function SearchDrawer() {
       </div>
 
       <style>{`
-        /* BACKDROP */
+         /* BACKDROP */
         .sd-backdrop {
           position: fixed;
           inset: 0;
@@ -293,7 +293,7 @@ export default function SearchDrawer() {
           z-index: 10000;
           opacity: 0;
           pointer-events: none;
-          transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .sd-backdrop.open {
           opacity: 1;
@@ -315,7 +315,7 @@ export default function SearchDrawer() {
           box-shadow: none;
           font-family: var(--font-primary), sans-serif;
           transform: translateX(100%);
-          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
           overflow-y: auto;
           display: flex;
           flex-direction: column;

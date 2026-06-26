@@ -454,7 +454,13 @@ export default function CollectionClient({ collection }: { collection: Collectio
                           <img
                             src={p.imageUrl}
                             alt={p.title}
-                            className={`amiri-product-img amiri-product-img--primary ${imageClass}`}
+                            className={`amiri-product-img amiri-product-img--primary amiri-fade-in ${imageClass}`}
+                            loading="lazy"
+                            decoding="async"
+                            onLoad={(e) => e.currentTarget.classList.add('loaded')}
+                            ref={(el) => {
+                              if (el && el.complete) el.classList.add('loaded');
+                            }}
                           />
                         )}
                         {p.images && p.images.length > 1 && (
@@ -462,6 +468,8 @@ export default function CollectionClient({ collection }: { collection: Collectio
                             src={p.images[1]}
                             alt={p.title}
                             className={`amiri-product-img amiri-product-img--secondary ${imageClass}`}
+                            loading="lazy"
+                            decoding="async"
                           />
                         )}
                       </div>
@@ -488,7 +496,13 @@ export default function CollectionClient({ collection }: { collection: Collectio
                         <img
                           src={item.imageUrl}
                           alt="Collection Lifestyle"
-                          className="amiri-lifestyle-img"
+                          className="amiri-lifestyle-img amiri-fade-in"
+                          loading="lazy"
+                          decoding="async"
+                          onLoad={(e) => e.currentTarget.classList.add('loaded')}
+                          ref={(el) => {
+                            if (el && el.complete) el.classList.add('loaded');
+                          }}
                         />
                       )}
                     </div>
@@ -892,7 +906,7 @@ export default function CollectionClient({ collection }: { collection: Collectio
 
         .amiri-product-img--primary {
           opacity: 1;
-          transition: opacity 0.2s ease-in-out;
+          transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .amiri-product-img--secondary {
           position: absolute;
@@ -904,7 +918,7 @@ export default function CollectionClient({ collection }: { collection: Collectio
           height: calc(100% - 24px);
           opacity: 0;
           pointer-events: none;
-          transition: opacity 0.2s ease-in-out;
+          transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         @media (max-width: 767px) {
           .amiri-product-img--secondary {
@@ -922,10 +936,10 @@ export default function CollectionClient({ collection }: { collection: Collectio
           opacity: 1 !important; /* prevent transparent white overlay */
         }
         .amiri-grid-item--has-hover:hover .amiri-product-img--primary {
-          opacity: 0;
+          opacity: 0 !important;
         }
         .amiri-grid-item--has-hover:hover .amiri-product-img--secondary {
-          opacity: 1;
+          opacity: 1 !important;
         }
 
         /* Optical Scaling classes - Overridden for full fill */

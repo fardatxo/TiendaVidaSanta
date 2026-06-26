@@ -41,7 +41,7 @@ export default function ProductInfoDrawer({ isOpen, onClose, title, heroImage, c
           background: rgba(0, 0, 0, 0.28);
           z-index: 1100;
           opacity: 0; pointer-events: none;
-          transition: opacity 0.18s ease;
+          transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .pid-backdrop.open { opacity: 1; pointer-events: auto; }
 
@@ -52,7 +52,7 @@ export default function ProductInfoDrawer({ isOpen, onClose, title, heroImage, c
           background: #ffffff;
           z-index: 1101;
           transform: translateX(100%);
-          transition: transform 0.22s ease;
+          transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
           display: flex; flex-direction: column;
           border-left: 1px solid #d0d0d0;
           font-family: Arial, Helvetica, sans-serif;

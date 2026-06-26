@@ -462,7 +462,7 @@ export default function MenuDrawer() {
           -webkit-backdrop-filter: blur(2px);
           opacity: 0;
           pointer-events: none;
-          transition: opacity 0.45s cubic-bezier(0.2, 1, 0.2, 1);
+          transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
           z-index: 1000;
         }
         .md-backdrop.open { opacity: 1; pointer-events: auto; }
@@ -475,7 +475,7 @@ export default function MenuDrawer() {
           flex-direction: row;
           z-index: 1001;
           transform: translateX(-100%);
-          transition: transform 0.45s cubic-bezier(0.2, 1, 0.2, 1);
+          transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
           border-radius: 0 !important;
         }
         .md-drawer.open { transform: translateX(0); }
@@ -493,7 +493,7 @@ export default function MenuDrawer() {
           overflow-y: auto;
           border-right: 1px solid rgba(0, 0, 0, 0.08); /* Fine divider */
           scrollbar-width: none;
-          transition: width 0.45s cubic-bezier(0.2, 1, 0.2, 1);
+          transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .md-col-left::-webkit-scrollbar { display: none; }
 
