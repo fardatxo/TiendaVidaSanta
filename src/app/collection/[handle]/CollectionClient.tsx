@@ -289,6 +289,20 @@ export default function CollectionClient({ collection }: { collection: Collectio
     const totalProducts = filteredAndSortedProducts.length;
     if (totalProducts === 0) return [];
 
+    // For new arrivals, display only products as standard 1x1 grid items
+    if (collection.handle === 'new-arrivals') {
+      filteredAndSortedProducts.forEach((p) => {
+        items.push({
+          key: `prod-${p.id}`,
+          type: 'product',
+          product: p,
+          colSpan: 1,
+          rowSpan: 1
+        });
+      });
+      return items;
+    }
+
     // Simple grid layout if very few products
     if (totalProducts <= 3) {
       filteredAndSortedProducts.forEach((p) => {
@@ -376,7 +390,7 @@ export default function CollectionClient({ collection }: { collection: Collectio
     }
 
     return items;
-  }, [filteredAndSortedProducts]);
+  }, [filteredAndSortedProducts, collection.handle]);
 
   const toggleAccordion = (name: string) => {
     setActiveFilterAccordion(activeFilterAccordion === name ? null : name);
@@ -425,7 +439,7 @@ export default function CollectionClient({ collection }: { collection: Collectio
                       } ${p.images && p.images.length > 1 ? 'amiri-grid-item--has-hover' : ''}`}
                     >
                       <span className="amiri-product-tag">
-                        {collection.handle === 'coleccion-1' ? 'PRE-FALL' : 'SUMMER'}
+                        {collection.handle === 'coleccion-1' ? 'PRE-FALL' : collection.handle === 'new-arrivals' ? 'NEW ARRIVALS' : 'SUMMER'}
                       </span>
                       <div className="amiri-product-img-wrap">
                         {p.imageUrl && (
