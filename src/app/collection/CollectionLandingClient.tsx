@@ -401,7 +401,7 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
         .tonet-archive-hero__bg-overlay {
           position: absolute;
           inset: 0;
-           background: rgba(6, 6, 6, 0.45);
+          background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(6, 6, 6, 0.2) 50%, rgba(6, 6, 6, 0.95) 100%);
           z-index: 1;
         }
         .tonet-archive-hero__image {

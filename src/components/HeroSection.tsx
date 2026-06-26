@@ -66,7 +66,7 @@ export default function HeroSection() {
         .tn-hero-overlay {
           position: absolute;
           inset: 0;
-          background: rgba(0, 0, 0, 0.45);
+          background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 40%, rgba(0,0,0,0.85) 100%);
           z-index: 2;
         }
         .tn-hero-content {
@@ -118,7 +118,7 @@ export default function HeroSection() {
         .tn-hero-scroll-line {
           width: 1px;
           height: 40px;
-          background: rgba(255, 255, 255, 0.25);
+          background: linear-gradient(to bottom, rgba(255, 255, 255, 0.35) 0%, transparent 100%);
         }
 
         @keyframes tn-zoom-out {

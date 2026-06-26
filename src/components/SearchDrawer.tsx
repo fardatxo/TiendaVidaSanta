@@ -525,6 +525,7 @@ export default function SearchDrawer() {
           display: flex;
           align-items: center;
           justify-content: center;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           color: #ffffff;
           font-family: var(--font-brand);
           font-size: 18px;

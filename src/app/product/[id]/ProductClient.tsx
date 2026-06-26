@@ -1772,6 +1772,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           display: flex;
           align-items: center;
           justify-content: center;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           cursor: pointer;
           z-index: 999;
           transition: transform 0.2s ease;
@@ -1801,6 +1802,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           width: 90%;
           max-width: 360px;
           padding: 32px;
+          box-shadow: 0 20px 45px rgba(0,0,0,0.06);
           display: flex;
           flex-direction: column;
           gap: 20px;
@@ -1940,6 +1942,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           padding: 32px;
           position: relative;
           color: #000000;
+          box-shadow: 0 20px 50px rgba(0,0,0,0.06);
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
@@ -2306,6 +2309,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           display: flex;
           align-items: center;
           justify-content: center;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           cursor: pointer;
           z-index: 10;
           transition: transform 0.2s ease;
@@ -2463,7 +2467,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             right: 64px;
             width: 400px;
             height: 54px;
-            border: 1px solid #000000;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
             transform: translateY(-20px);
           }
           .tonet-sticky-buy-bar.visible {

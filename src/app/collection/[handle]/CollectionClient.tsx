@@ -1010,6 +1010,7 @@ export default function CollectionClient({ collection }: { collection: Collectio
           display: flex;
           align-items: center;
           justify-content: center;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           color: #ffffff;
           font-family: var(--font-brand);
           font-size: 18px;
@@ -1050,6 +1051,7 @@ export default function CollectionClient({ collection }: { collection: Collectio
           transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
           display: flex;
           flex-direction: column;
+          box-shadow: 10px 0 30px rgba(0, 0, 0, 0.02);
         }
         .amiri-refine-drawer.open {
           transform: translateX(0);

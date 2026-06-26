@@ -59,7 +59,7 @@ export default function RecommendedCard({ product }: Props) {
           background: #f6f6f6;
           border-radius: 0;
           overflow: hidden;
-          transition: transform 0.3s ease;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
           isolation: isolate;
         }
         .tonet-house-carousel__image {
@@ -78,6 +78,7 @@ export default function RecommendedCard({ product }: Props) {
         }
         .tonet-house-carousel__card:hover .tonet-house-carousel__image-wrap {
           transform: translateY(-2px);
+          box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
         }
         .tonet-house-carousel__card:hover .tonet-house-carousel__image--primary {
           opacity: ${secondImage ? 0 : 1};

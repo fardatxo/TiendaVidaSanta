@@ -134,6 +134,7 @@ export default function LocaleSelectorModal() {
           width: 720px;
           max-width: calc(100vw - 40px);
           padding: 48px 48px 60px;
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
           border: 1px solid rgba(0, 0, 0, 0.08);
           font-family: var(--font-primary), sans-serif;
           box-sizing: border-box;
