@@ -81,7 +81,7 @@ export default function CartDrawer() {
         </div>
 
         {/* ── BODY ── */}
-        <div className="cd-body">
+        <div className="cd-body" data-lenis-prevent>
           {items.length === 0 ? (
             <div className="cd-empty-state">
               <p className="cd-empty-text">Your bag is empty</p>

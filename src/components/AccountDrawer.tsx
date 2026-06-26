@@ -160,7 +160,7 @@ export default function AccountDrawer() {
         </div>
 
         {/* BODY */}
-        <div className="ad-body">
+        <div className="ad-body" data-lenis-prevent>
           {/* USER LOGGED IN: SHOW RESIDENCE DASHBOARD */}
           {user ? (
             <div className="ad-welcome-view">

@@ -173,6 +173,7 @@ export default function SearchDrawer() {
         ref={drawerRef} 
         role="dialog" 
         aria-modal="true"
+        data-lenis-prevent
       >
         <div className="sd-container">
           
