@@ -74,11 +74,197 @@ const MAX_RECENTLY_VIEWED = 10;
 
 type RecentProduct = Pick<RecommendedProduct, 'handle' | 'title' | 'imageUrl' | 'price' | 'currencyCode'>;
 
+const getProductType = (p: RecommendedProduct): 'footwear' | 'top' | 'pants' | 'accessory' => {
+  const title = p.title.toLowerCase();
+  if (title.includes('shoe') || title.includes('sneaker') || title.includes('slide') || title.includes('boot') || title.includes('loafer')) {
+    return 'footwear';
+  }
+  if (title.includes('short') || title.includes('pant') || title.includes('trouser') || title.includes('jeans') || title.includes('denim')) {
+    return 'pants';
+  }
+  if (title.includes('sunglasses') || title.includes('eyewear') || title.includes('glasses') || title.includes('hat') || title.includes('cap') || title.includes('bag') || title.includes('wallet')) {
+    return 'accessory';
+  }
+  return 'top';
+};
+
+const getProductColor = (p: RecommendedProduct): string => {
+  const title = p.title.toLowerCase();
+  const colors = [
+    'white', 'black', 'grey', 'gray', 'navy', 'blue', 'beige', 'cream', 
+    'brown', 'camel', 'olive', 'green', 'red', 'orange', 'yellow', 'pink', 
+    'purple', 'blanco', 'negro', 'gris', 'azul', 'verde', 'rojo', 'rosa', 'amarillo'
+  ];
+  for (const color of colors) {
+    if (title.includes(color)) {
+      return color === 'gray' ? 'grey' : color;
+    }
+  }
+  const hash = p.title.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  const fallbackColors = ['black', 'white', 'grey', 'beige', 'navy'];
+  return fallbackColors[hash % fallbackColors.length];
+};
+
+const arrangeRecommendations = (pool: RecommendedProduct[]): RecommendedProduct[] => {
+  if (pool.length < 4) return pool;
+
+  const annotated = pool.map(p => ({
+    product: p,
+    type: getProductType(p),
+    color: getProductColor(p)
+  }));
+
+  const result: RecommendedProduct[] = [];
+
+  // --- VIEWPORT 1 (Indices 0, 1, 2, 3) ---
+  // Try to find a combination of 4 products with 4 different types and 4 different colors.
+  let v1Combo: typeof annotated = [];
+  
+  for (let i = 0; i < annotated.length; i++) {
+    for (let j = i + 1; j < annotated.length; j++) {
+      for (let k = j + 1; k < annotated.length; k++) {
+        for (let l = k + 1; l < annotated.length; l++) {
+          const combo = [annotated[i], annotated[j], annotated[k], annotated[l]];
+          const types = new Set(combo.map(c => c.type));
+          const colors = new Set(combo.map(c => c.color));
+          
+          if (types.size === 4 && colors.size === 4) {
+            v1Combo = combo;
+            break;
+          }
+        }
+        if (v1Combo.length > 0) break;
+      }
+      if (v1Combo.length > 0) break;
+    }
+    if (v1Combo.length > 0) break;
+  }
+
+  // Fallback 1: Try 4 unique types
+  if (v1Combo.length === 0) {
+    for (let i = 0; i < annotated.length; i++) {
+      for (let j = i + 1; j < annotated.length; j++) {
+        for (let k = j + 1; k < annotated.length; k++) {
+          for (let l = k + 1; l < annotated.length; l++) {
+            const combo = [annotated[i], annotated[j], annotated[k], annotated[l]];
+            const types = new Set(combo.map(c => c.type));
+            if (types.size === 4) {
+              v1Combo = combo;
+              break;
+            }
+          }
+          if (v1Combo.length > 0) break;
+        }
+        if (v1Combo.length > 0) break;
+      }
+      if (v1Combo.length > 0) break;
+    }
+  }
+
+  // Fallback 2: Take the first 4 products
+  if (v1Combo.length === 0) {
+    v1Combo = annotated.slice(0, 4);
+  }
+
+  // Add Viewport 1
+  v1Combo.forEach(c => result.push(c.product));
+
+  // Remaining pool for Viewport 2
+  const v1Handles = new Set(v1Combo.map(c => c.product.handle));
+  const remaining = annotated.filter(c => !v1Handles.has(c.product.handle));
+
+  if (remaining.length < 4) {
+    remaining.forEach(c => result.push(c.product));
+    return result;
+  }
+
+  // --- VIEWPORT 2 (Indices 4, 5, 6, 7) ---
+  // Try to find a combination of 4 products that has:
+  // - 2 of one type and 2 of another type (e.g. 2 tops, 2 pants)
+  // - AND 2 of one color and 2 of another color (e.g. 2 black, 2 white)
+  let v2Combo: typeof annotated = [];
+
+  for (let i = 0; i < remaining.length; i++) {
+    for (let j = i + 1; j < remaining.length; j++) {
+      for (let k = j + 1; k < remaining.length; k++) {
+        for (let l = k + 1; l < remaining.length; l++) {
+          const combo = [remaining[i], remaining[j], remaining[k], remaining[l]];
+          
+          const typeCounts: Record<string, number> = {};
+          combo.forEach(c => { typeCounts[c.type] = (typeCounts[c.type] || 0) + 1; });
+          const typeVals = Object.values(typeCounts).sort();
+          
+          const colorCounts: Record<string, number> = {};
+          combo.forEach(c => { colorCounts[c.color] = (colorCounts[c.color] || 0) + 1; });
+          const colorVals = Object.values(colorCounts).sort();
+
+          const matchesTypePattern = typeVals.length === 2 && typeVals[0] === 2 && typeVals[1] === 2;
+          const matchesColorPattern = colorVals.length === 2 && colorVals[0] === 2 && colorVals[1] === 2;
+
+          if (matchesTypePattern && matchesColorPattern) {
+            v2Combo = combo;
+            break;
+          }
+        }
+        if (v2Combo.length > 0) break;
+      }
+      if (v2Combo.length > 0) break;
+    }
+    if (v2Combo.length > 0) break;
+  }
+
+  // Phase 2: Try 2/2 types OR 2/2 colors
+  if (v2Combo.length === 0) {
+    for (let i = 0; i < remaining.length; i++) {
+      for (let j = i + 1; j < remaining.length; j++) {
+        for (let k = j + 1; k < remaining.length; k++) {
+          for (let l = k + 1; l < remaining.length; l++) {
+            const combo = [remaining[i], remaining[j], remaining[k], remaining[l]];
+            
+            const typeCounts: Record<string, number> = {};
+            combo.forEach(c => { typeCounts[c.type] = (typeCounts[c.type] || 0) + 1; });
+            const typeVals = Object.values(typeCounts).sort();
+            
+            const colorCounts: Record<string, number> = {};
+            combo.forEach(c => { colorCounts[c.color] = (colorCounts[c.color] || 0) + 1; });
+            const colorVals = Object.values(colorCounts).sort();
+
+            const matchesTypePattern = typeVals.length === 2 && typeVals[0] === 2 && typeVals[1] === 2;
+            const matchesColorPattern = colorVals.length === 2 && colorVals[0] === 2 && colorVals[1] === 2;
+
+            if (matchesTypePattern || matchesColorPattern) {
+              v2Combo = combo;
+              break;
+            }
+          }
+          if (v2Combo.length > 0) break;
+        }
+        if (v2Combo.length > 0) break;
+      }
+      if (v2Combo.length > 0) break;
+    }
+  }
+
+  // Fallback: Take the first 4 remaining items
+  if (v2Combo.length === 0) {
+    v2Combo = remaining.slice(0, 4);
+  }
+
+  // Add Viewport 2
+  v2Combo.forEach(c => result.push(c.product));
+
+  return result;
+};
+
 export default function ProductClient({ product, relatedProductsByTag }: Props) {
   const router = useRouter();
   const [recommended, setRecommended] = useState<RecommendedProduct[]>([]);
   const [recentlyViewed, setRecentlyViewed] = useState<RecentProduct[]>([]);
   const [completeOutfit, setCompleteOutfit] = useState<RecommendedProduct[]>([]);
+
+  const arrangedRecommended = useMemo(() => {
+    return arrangeRecommendations(recommended);
+  }, [recommended]);
 
   useEffect(() => {
     import('@/lib/shopify').then(({ getRecommendedProducts }) => {
@@ -216,19 +402,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
     }
   };
 
-  const getProductType = (p: RecommendedProduct): 'footwear' | 'top' | 'pants' | 'accessory' => {
-    const title = p.title.toLowerCase();
-    if (title.includes('shoe') || title.includes('sneaker') || title.includes('slide') || title.includes('boot') || title.includes('loafer')) {
-      return 'footwear';
-    }
-    if (title.includes('short') || title.includes('pant') || title.includes('trouser') || title.includes('jeans') || title.includes('denim')) {
-      return 'pants';
-    }
-    if (title.includes('sunglasses') || title.includes('eyewear') || title.includes('glasses') || title.includes('hat') || title.includes('cap') || title.includes('bag') || title.includes('wallet')) {
-      return 'accessory';
-    }
-    return 'top';
-  };
+
   const handleMobileScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const container = e.currentTarget;
     const scrollLeft = container.scrollLeft;
@@ -730,7 +904,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         )}
 
         {/* RELATED CAROUSEL (YOU MIGHT ALSO LIKE) */}
-        {recommended.length > 0 && (
+        {arrangedRecommended.length > 0 && (
           <section className="amiri-ctl-section">
             <div className="amiri-ctl-header">
               <span className="amiri-ctl-logo">TONET TORRENTINNI</span>
@@ -739,7 +913,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             
             <div className="amiri-ctl-carousel-wrapper">
               <div className="amiri-ctl-carousel">
-                {recommended.slice(0, 8).map((p) => {
+                {arrangedRecommended.map((p) => {
                   const pType = getProductType(p);
                   const symbol = p.currencyCode === 'USD' ? '$' : '€';
                   const formattedPrice = Number.isInteger(p.price)
