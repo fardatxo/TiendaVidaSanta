@@ -58,11 +58,7 @@ export default function FashionClient() {
         .fashion-hero__overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(
-            to bottom,
-            transparent 50%,
-            rgba(0, 0, 0, 0.55) 100%
-          );
+          background: rgba(0, 0, 0, 0.35);
           pointer-events: none;
         }
 
@@ -142,11 +138,7 @@ export default function FashionClient() {
         .fashion-card__overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(
-            to bottom,
-            transparent 60%,
-            rgba(0, 0, 0, 0.5) 100%
-          );
+          background: rgba(0, 0, 0, 0.25);
           pointer-events: none;
         }
 
@@ -186,11 +178,7 @@ export default function FashionClient() {
         .fashion-featured__overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(
-            to bottom,
-            transparent 40%,
-            rgba(0, 0, 0, 0.6) 100%
-          );
+          background: rgba(0, 0, 0, 0.3);
           pointer-events: none;
         }
 

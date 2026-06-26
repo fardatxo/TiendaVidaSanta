@@ -160,7 +160,7 @@ export default function AccountDrawer() {
         </div>
 
         {/* BODY */}
-        <div className="ad-body" data-lenis-prevent>
+        <div className="ad-body">
           {/* USER LOGGED IN: SHOW RESIDENCE DASHBOARD */}
           {user ? (
             <div className="ad-welcome-view">
@@ -495,7 +495,7 @@ export default function AccountDrawer() {
           font-family: var(--font-primary), sans-serif;
           color: #000000 !important;
           overflow: hidden;
-          box-shadow: -10px 0 40px rgba(0,0,0,0.08);
+          box-shadow: none;
         }
         .ad-drawer.open { transform: translateX(0); }
 

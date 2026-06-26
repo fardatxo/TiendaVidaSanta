@@ -165,7 +165,7 @@ export default function MenuDrawer() {
       <div className={`md-drawer ${isMenuOpen ? "open" : ""} ${rightPanelOpen ? "md-expanded" : ""}`} ref={drawerRef} role="dialog" aria-modal="true">
 
         {/* ── LEFT COLUMN (main nav) ── */}
-        <div className={`md-col-left ${rightPanelOpen ? 'md-col-left-hidden-mobile' : ''}`} data-lenis-prevent>
+        <div className={`md-col-left ${rightPanelOpen ? 'md-col-left-hidden-mobile' : ''}`}>
           {/* Top bar: search + close */}
           <div className="md-topbar">
             <button className="md-topbar-btn" onClick={openSearchPanel} aria-label="Search">
@@ -400,7 +400,7 @@ export default function MenuDrawer() {
         </div>
 
         {/* ── RIGHT COLUMN (tags or search) ── */}
-        <div className={`md-col-right ${rightPanelOpen ? 'md-col-right-open' : ''}`} data-lenis-prevent>
+        <div className={`md-col-right ${rightPanelOpen ? 'md-col-right-open' : ''}`}>
           {/* Search panel */}
           {searchOpen && (
             <>

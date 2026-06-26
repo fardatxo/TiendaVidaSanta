@@ -18,7 +18,6 @@ import SearchDrawer from "@/components/SearchDrawer";
 import CookieBanner from "@/components/CookieBanner";
 import TransitionProvider from "@/components/TransitionProvider";
 import LocaleSelectorModal from "@/components/LocaleSelectorModal";
-import LenisProvider from "@/components/LenisProvider";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -50,7 +49,6 @@ export default function RootLayout({
     <html lang="en" className={`${jost.variable} ${cormorant.variable}`} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <TransitionProvider>
-        <LenisProvider>
         <LocaleProvider>
           <UIProvider>
             <CartProvider>
@@ -72,7 +70,6 @@ export default function RootLayout({
             </CartProvider>
           </UIProvider>
         </LocaleProvider>
-        </LenisProvider>
         </TransitionProvider>
       </body>
     </html>

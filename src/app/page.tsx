@@ -344,7 +344,6 @@ export default async function Home() {
           align-items: center;
           justify-content: center;
           z-index: 2;
-          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
         }
         .am-hero-logo {
           width: 120px;
@@ -495,7 +494,6 @@ export default async function Home() {
         }
         .am-split-logo-wrap {
           padding: 16px;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
         .am-split-logo {
           width: 80px;

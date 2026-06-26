@@ -22,7 +22,7 @@ export default function ProductInfoDrawer({ isOpen, onClose, title, heroImage, c
   return (
     <>
       <div className={`pid-backdrop${isOpen ? " open" : ""}`} onClick={onClose} />
-      <div className={`pid-drawer${isOpen ? " open" : ""}`} role="dialog" aria-modal="true" data-lenis-prevent>
+      <div className={`pid-drawer${isOpen ? " open" : ""}`} role="dialog" aria-modal="true">
         <div className="pid-header">
           <span className="pid-title">{title}</span>
           <button className="pid-close" onClick={onClose}>X CLOSE</button>

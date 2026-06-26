@@ -73,12 +73,7 @@ export default function HousePage() {
         .h-hero-grad {
           position: absolute;
           inset: 0;
-          background: linear-gradient(
-            to top,
-            rgba(0,0,0,0.94) 0%,
-            rgba(0,0,0,0.38) 45%,
-            rgba(0,0,0,0.06) 100%
-          );
+          background: rgba(0, 0, 0, 0.45);
         }
         .h-hero-body {
           position: relative;
@@ -279,7 +274,7 @@ export default function HousePage() {
         }
         .h-uniform-p:last-child { margin-bottom: 0; }
         .h-uniform-visual {
-          background: linear-gradient(170deg, #181818 0%, #0d0d0d 60%, #111 100%);
+          background: #111111;
         }
 
         /* ── 6. PULL QUOTE ─────────────────────────── */

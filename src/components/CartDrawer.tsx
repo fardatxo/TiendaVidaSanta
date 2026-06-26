@@ -81,7 +81,7 @@ export default function CartDrawer() {
         </div>
 
         {/* ── BODY ── */}
-        <div className="cd-body" data-lenis-prevent>
+        <div className="cd-body">
           {items.length === 0 ? (
             <div className="cd-empty-state">
               <p className="cd-empty-text">Your bag is empty</p>
@@ -262,7 +262,6 @@ export default function CartDrawer() {
           overflow: hidden;
           padding: 12px; /* Less zoomed in */
           box-sizing: border-box;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); /* Subtle shadow effect */
         }
         .cd-item-img img {
           width: 100%;
