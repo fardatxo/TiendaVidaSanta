@@ -83,6 +83,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           if (profile && active) {
             setUser(profile);
+
+            // Clean OAuth access token hash and redirect to /account
+            if (event === 'SIGNED_IN' && typeof window !== 'undefined' && window.location.hash.includes('access_token')) {
+              window.history.replaceState(null, '', window.location.pathname);
+              const target = !profile.onboardingComplete ? '/account/welcome' : '/account';
+              router.push(target);
+            }
           }
         } catch (error) {
           console.error('[AuthContext] failed to fetch Supabase user profile:', error);
@@ -97,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       active = false;
       unsubscribeSupabase.unsubscribe();
     };
-  }, []);
+  }, [router]);
 
   // Navigate only after React confirms user is non-null
   useEffect(() => {
