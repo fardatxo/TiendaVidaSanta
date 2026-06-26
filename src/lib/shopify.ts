@@ -198,6 +198,22 @@ export async function getProducts(): Promise<Product[]> {
   return splitProductsByColor(data.products.edges.map(e => normalizeProduct(e.node)));
 }
 
+export async function getNewArrivals(first = 50): Promise<Product[]> {
+  const data = await shopifyFetch<{ products: { edges: { node: Record<string, any> }[] } }>(
+    `query GetNewArrivals($first: Int!) {
+      products(first: $first, sortKey: CREATED_AT, reverse: true, query: "available_for_sale:true") {
+        edges {
+          node {
+            ${PRODUCT_FIELDS}
+          }
+        }
+      }
+    }`,
+    { first }
+  );
+  return splitProductsByColor(data.products.edges.map(e => normalizeProduct(e.node)));
+}
+
 export interface CollectionSummary {
   id: string;
   handle: string;

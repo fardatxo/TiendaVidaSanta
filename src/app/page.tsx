@@ -46,6 +46,18 @@ function generateGridBlocks(length: number, paletteType: string) {
       } else {
         shades = ["#7a1a1a", "#962323", "#b33030", "#cf3e3e", "#520f0f", "#661313"];
       }
+    } else if (paletteType === 'multicolor') {
+      if (r < 0.2) {
+        shades = ["#002060", "#003366", "#0a192f", "#112233"];
+      } else if (r < 0.4) {
+        shades = ["#a0522d", "#b25a38", "#d27d2d", "#8b4513"];
+      } else if (r < 0.6) {
+        shades = ["#0c3b2e", "#004b49", "#113c2b", "#1e4620"];
+      } else if (r < 0.8) {
+        shades = ["#5c0612", "#750e1b", "#8b1220", "#450209"];
+      } else {
+        shades = ["#2d142c", "#510a32", "#801336", "#190019"];
+      }
     } else if (paletteType === 'mens') {
       if (r < 0.3) {
         shades = ["#020617", "#0f172a", "#070c14", "#0b0f19"];
@@ -103,7 +115,7 @@ function generateGridBlocks(length: number, paletteType: string) {
 export default async function Home() {
   const collections = await getCollections();
   const gridBlocks = generateGridBlocks(100, 'gray-red-white');
-  const landscapeBlocks = generateGridBlocks(100, 'landscape');
+  const newArrivalsBlocks = generateGridBlocks(100, 'multicolor');
   const world1Blocks = generateGridBlocks(100, 'world-about');
   const world2Blocks = generateGridBlocks(100, 'world-collections');
   const world3Blocks = generateGridBlocks(100, 'world-stores');
@@ -191,7 +203,7 @@ export default async function Home() {
       <section className="am-landscape">
         <div className="am-landscape-media">
           <div className="am-hero-grid">
-            {landscapeBlocks.map((color, idx) => (
+            {newArrivalsBlocks.map((color, idx) => (
               <div
                 key={idx}
                 className="am-hero-grid-block"
@@ -204,8 +216,8 @@ export default async function Home() {
         </div>
         <div className="am-landscape-overlay">
           <div className="am-landscape-content">
-            <h2 className="am-landscape-title">Discover MA-94</h2>
-            <Link href="/collection/ma-94" className="am-landscape-cta">Discover</Link>
+            <h2 className="am-landscape-title">NEW ARRIVALS</h2>
+            <Link href="/collection/new-arrivals" className="am-landscape-cta">Shop New Arrivals</Link>
           </div>
         </div>
       </section>
@@ -551,7 +563,7 @@ export default async function Home() {
         .am-landscape-overlay {
           position: absolute;
           inset: 0;
-          background: rgba(0, 0, 0, 0.05);
+          background: rgba(0, 0, 0, 0.15);
           display: flex;
           align-items: flex-end;
           justify-content: flex-start;
