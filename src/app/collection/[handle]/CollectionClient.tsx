@@ -217,6 +217,14 @@ export default function CollectionClient({ collection }: { collection: Collectio
     } else {
       // Default: sort by black color first, then shirts/camisetas first, then pants/pantalones, then others
       result.sort((a, b) => {
+        if (collection.handle === 'new-arrivals') {
+          const hasColA = (a.collectionHandles && a.collectionHandles.length > 0) ? 1 : 0;
+          const hasColB = (b.collectionHandles && b.collectionHandles.length > 0) ? 1 : 0;
+          if (hasColA !== hasColB) {
+            return hasColA - hasColB; // 0 (no collections) comes before 1 (has collections)
+          }
+        }
+
         const blackA = hasBlackColor(a) ? 0 : 1;
         const blackB = hasBlackColor(b) ? 0 : 1;
         if (blackA !== blackB) return blackA - blackB;
@@ -228,7 +236,7 @@ export default function CollectionClient({ collection }: { collection: Collectio
     }
 
     return result;
-  }, [collection.products, selectedSort, selectedAvailability, selectedColors, selectedSizes, selectedMaterials]);
+  }, [collection.products, collection.handle, selectedSort, selectedAvailability, selectedColors, selectedSizes, selectedMaterials]);
 
   // temp count inside drawer
   const tempFilteredCount = useMemo(() => {

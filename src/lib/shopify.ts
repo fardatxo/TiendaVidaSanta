@@ -32,6 +32,7 @@ export interface Product {
   imageUrl: string;
   images: string[];
   variants: ShopifyVariant[];
+  collectionHandles?: string[];
 }
 
 async function shopifyFetch<T>(
@@ -81,6 +82,7 @@ const PRODUCT_FIELDS = `
   priceRange { minVariantPrice { amount currencyCode } }
   featuredImage { url }
   images(first: 10) { edges { node { url } } }
+  collections(first: 10) { edges { node { handle } } }
   variants(first: 100) {
     edges {
       node {
@@ -104,6 +106,7 @@ const COLLECTION_PRODUCT_FIELDS = `
   priceRange { minVariantPrice { amount currencyCode } }
   featuredImage { url }
   images(first: 10) { edges { node { url } } }
+  collections(first: 10) { edges { node { handle } } }
   variants(first: 20) {
     edges {
       node {
@@ -137,6 +140,7 @@ function normalizeProduct(node: Record<string, any>): Product {
       selectedOptions: e.node.selectedOptions as { name: string; value: string }[],
       image: e.node.image as { url: string } | undefined,
     })),
+    collectionHandles: ((node.collections?.edges ?? []) as { node: { handle: string } }[]).map(e => e.node.handle),
   };
 }
 
