@@ -736,9 +736,9 @@ export default function ArchiveClient() {
       </div>
 
       <style>{`
-        /* Dark luxury space overrides */
+        /* Light luxury space overrides */
         html, body {
-          background: #080808 !important;
+          background: #ffffff !important;
         }
 
         .ar-space-wrap {
@@ -746,7 +746,7 @@ export default function ArchiveClient() {
           margin: 0 auto;
           padding: 140px 24px 100px;
           font-family: var(--font-primary), sans-serif;
-          color: rgba(255, 255, 255, 0.85);
+          color: rgba(0, 0, 0, 0.85);
           box-sizing: border-box;
         }
 
@@ -755,13 +755,13 @@ export default function ArchiveClient() {
           display: grid;
           grid-template-columns: 1fr auto 1fr;
           align-items: center;
-          border-top: 1px solid rgba(255, 255, 255, 0.06);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          border-top: 1px solid rgba(0, 0, 0, 0.08);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
           padding: 18px 0;
           margin-bottom: 72px;
           font-size: 8px;
           letter-spacing: 0.25em;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(0, 0, 0, 0.45);
         }
         .ar-summary-item {
           display: flex;
@@ -773,11 +773,11 @@ export default function ArchiveClient() {
         }
         .ar-summary-center {
           align-items: center;
-          color: rgba(255, 255, 255, 0.7);
+          color: rgba(0, 0, 0, 0.75);
         }
         .ar-summary-label {
           font-weight: 300;
-          color: rgba(255, 255, 255, 0.2);
+          color: rgba(0, 0, 0, 0.3);
         }
         .ar-summary-val {
           font-weight: 400;
@@ -793,7 +793,7 @@ export default function ArchiveClient() {
           font-size: clamp(28px, 5vw, 48px);
           font-weight: 300;
           letter-spacing: 0.18em;
-          color: rgba(255, 255, 255, 0.8);
+          color: rgba(0, 0, 0, 0.85);
           margin: 0 0 20px;
         }
         .ar-main-subtitle {
@@ -801,7 +801,7 @@ export default function ArchiveClient() {
           font-weight: 300;
           line-height: 2.1;
           letter-spacing: 0.08em;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(0, 0, 0, 0.45);
           max-width: 520px;
           margin: 0 auto;
         }
@@ -836,7 +836,7 @@ export default function ArchiveClient() {
           font-weight: 300;
           letter-spacing: 0.3em;
           text-transform: uppercase;
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.35);
           cursor: pointer;
           padding: 8px 0;
           display: flex;
@@ -846,26 +846,26 @@ export default function ArchiveClient() {
           border-left: 2px solid transparent;
         }
         .ar-nav-item:hover {
-          color: rgba(255, 255, 255, 0.7);
+          color: rgba(0, 0, 0, 0.7);
           padding-left: 6px;
         }
         .ar-nav-item.active {
-          color: #ffffff;
+          color: #000000;
           font-weight: 400;
-          border-left-color: rgba(255, 255, 255, 0.5);
+          border-left-color: rgba(0, 0, 0, 0.5);
           padding-left: 12px;
         }
         .ar-nav-num {
           font-size: 8px;
           font-weight: 300;
-          color: rgba(255, 255, 255, 0.15);
+          color: rgba(0, 0, 0, 0.2);
           letter-spacing: 0.05em;
         }
         .ar-sidebar-footer {
           display: flex;
           flex-direction: column;
           gap: 16px;
-          border-top: 1px solid rgba(255, 255, 255, 0.04);
+          border-top: 1px solid rgba(0, 0, 0, 0.06);
           padding-top: 24px;
         }
         .ar-sidebar-link {
@@ -873,12 +873,12 @@ export default function ArchiveClient() {
           font-weight: 300;
           letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: rgba(255, 255, 255, 0.3);
+          color: rgba(0, 0, 0, 0.45);
           text-decoration: none;
           transition: color 0.3s;
         }
         .ar-sidebar-link:hover {
-          color: #ffffff;
+          color: #000000;
         }
 
         /* Mobile swiper tabs - hidden on desktop */
@@ -905,14 +905,14 @@ export default function ArchiveClient() {
           font-weight: 400;
           letter-spacing: 0.44em;
           text-transform: uppercase;
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.35);
           margin: 0 0 28px;
         }
 
         /* ══ PORTFOLIO SPOTLIGHT ══ */
         .ar-spotlight {
           margin-bottom: 64px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
           padding-bottom: 40px;
         }
         .ar-spotlight-row {
@@ -924,15 +924,15 @@ export default function ArchiveClient() {
           display: flex;
           align-items: center;
           gap: 16px;
-          background: rgba(255, 255, 255, 0.01);
-          border: 1px solid rgba(255, 255, 255, 0.03);
+          background: #fafafa;
+          border: 1px solid rgba(0, 0, 0, 0.04);
           padding: 16px;
         }
         .ar-spot-img {
           width: 48px;
           height: 64px;
           object-fit: contain;
-          background: rgba(255, 255, 255, 0.02);
+          background: rgba(0, 0, 0, 0.015);
           filter: grayscale(0.2);
         }
         .ar-spot-info {
@@ -944,13 +944,13 @@ export default function ArchiveClient() {
           font-size: 7px;
           font-weight: 300;
           letter-spacing: 0.3em;
-          color: rgba(255, 255, 255, 0.2);
+          color: rgba(0, 0, 0, 0.35);
         }
         .ar-spot-title {
           font-size: 9px;
           font-weight: 400;
           letter-spacing: 0.12em;
-          color: rgba(255, 255, 255, 0.7);
+          color: rgba(0, 0, 0, 0.75);
         }
 
         /* ══ FILTER & VIEW SWITCH BAR ══ */
@@ -958,7 +958,7 @@ export default function ArchiveClient() {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
           padding-bottom: 18px;
           margin-bottom: 44px;
         }
@@ -975,13 +975,13 @@ export default function ArchiveClient() {
           font-size: 8px;
           font-weight: 300;
           letter-spacing: 0.2em;
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.35);
           text-transform: uppercase;
         }
         .ar-filter-select {
           background: transparent;
           border: none;
-          color: rgba(255, 255, 255, 0.65);
+          color: rgba(0, 0, 0, 0.7);
           font-family: inherit;
           font-size: 8px;
           font-weight: 400;
@@ -991,8 +991,8 @@ export default function ArchiveClient() {
           cursor: pointer;
         }
         .ar-filter-select option {
-          background: #111111;
-          color: rgba(255, 255, 255, 0.85);
+          background: #ffffff;
+          color: rgba(0, 0, 0, 0.85);
         }
         .ar-view-toggle {
           display: flex;
@@ -1005,14 +1005,14 @@ export default function ArchiveClient() {
           font-size: 8px;
           font-weight: 300;
           letter-spacing: 0.25em;
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.35);
           cursor: pointer;
           transition: color 0.3s;
           padding: 4px;
         }
         .ar-view-btn:hover,
         .ar-view-btn.active {
-          color: #ffffff;
+          color: #000000;
         }
 
         /* ══ GRID CARDS LAYOUT ══ */
@@ -1024,18 +1024,18 @@ export default function ArchiveClient() {
         .ar-grid-card {
           display: flex;
           flex-direction: column;
-          background: #0a0a0a;
-          border: 1px solid rgba(255, 255, 255, 0.03);
+          background: #ffffff;
+          border: 1px solid rgba(0, 0, 0, 0.04);
           transition: border-color 0.4s;
         }
         .ar-grid-card:hover {
-          border-color: rgba(255, 255, 255, 0.08);
+          border-color: rgba(0, 0, 0, 0.12);
         }
         .ar-card-img-container {
           position: relative;
           width: 100%;
           aspect-ratio: 3 / 4;
-          background: rgba(255, 255, 255, 0.015);
+          background: rgba(0, 0, 0, 0.015);
           overflow: hidden;
           display: block;
         }
@@ -1055,13 +1055,13 @@ export default function ArchiveClient() {
         .ar-card-expired-overlay {
           position: absolute;
           inset: 0;
-          background: rgba(0, 0, 0, 0.4);
+          background: rgba(255, 255, 255, 0.45);
           display: flex;
           align-items: center;
           justify-content: center;
           font-size: 10px;
           letter-spacing: 0.4em;
-          color: rgba(255, 255, 255, 0.5);
+          color: rgba(0, 0, 0, 0.6);
           backdrop-filter: blur(2px);
         }
         .ar-card-body {
@@ -1078,13 +1078,13 @@ export default function ArchiveClient() {
           font-size: 8px;
           font-weight: 300;
           letter-spacing: 0.3em;
-          color: rgba(255, 255, 255, 0.2);
+          color: rgba(0, 0, 0, 0.3);
         }
         .ar-card-season {
           font-size: 7px;
           font-weight: 300;
           letter-spacing: 0.3em;
-          color: rgba(255, 255, 255, 0.3);
+          color: rgba(0, 0, 0, 0.45);
         }
         .ar-card-title {
           font-family: var(--font-brand), serif;
@@ -1094,16 +1094,16 @@ export default function ArchiveClient() {
           margin: 0 0 10px;
         }
         .ar-card-title a {
-          color: rgba(255, 255, 255, 0.85);
+          color: rgba(0, 0, 0, 0.85);
           transition: color 0.3s;
         }
         .ar-card-title a:hover {
-          color: #ffffff;
+          color: #000000;
         }
         .ar-card-price {
           font-size: 10px;
           font-weight: 300;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(0, 0, 0, 0.5);
           margin-bottom: 28px;
           letter-spacing: 0.05em;
         }
@@ -1118,33 +1118,33 @@ export default function ArchiveClient() {
         .ar-duration-bar-wrap::before {
           content: "";
           height: 1px;
-          background: rgba(255, 255, 255, 0.06);
+          background: rgba(0, 0, 0, 0.06);
           width: 100%;
         }
         .ar-duration-bar {
           height: 2px;
-          background: rgba(255, 255, 255, 0.65);
+          background: rgba(0, 0, 0, 0.65);
           transition: width 0.4s;
         }
         .ar-grid-card.expired .ar-duration-bar {
-          background: rgba(255, 255, 255, 0.1);
+          background: rgba(0, 0, 0, 0.1);
         }
         .ar-duration-labels {
           display: flex;
           justify-content: space-between;
           font-size: 7px;
           letter-spacing: 0.25em;
-          color: rgba(255, 255, 255, 0.2);
+          color: rgba(0, 0, 0, 0.3);
           font-weight: 300;
         }
         .ar-duration-labels .expired-text {
-          color: rgba(255, 255, 255, 0.12);
+          color: rgba(0, 0, 0, 0.15);
         }
 
         .ar-card-remove-btn {
           background: transparent;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          color: rgba(255, 255, 255, 0.4);
+          border: 1px solid rgba(0, 0, 0, 0.12);
+          color: rgba(0, 0, 0, 0.5);
           font-family: inherit;
           font-size: 8px;
           font-weight: 300;
@@ -1155,8 +1155,8 @@ export default function ArchiveClient() {
           border-radius: 0;
         }
         .ar-card-remove-btn:hover {
-          border-color: rgba(255, 255, 255, 0.4);
-          color: #ffffff;
+          border-color: rgba(0, 0, 0, 0.5);
+          color: #000000;
         }
 
         /* ══ LIST VIEW LAYOUT ══ */
@@ -1170,15 +1170,15 @@ export default function ArchiveClient() {
           grid-template-columns: 64px 2fr 1.5fr 1fr auto;
           align-items: center;
           gap: 40px;
-          background: #0a0a0a;
-          border: 1px solid rgba(255, 255, 255, 0.03);
+          background: #ffffff;
+          border: 1px solid rgba(0, 0, 0, 0.04);
           padding: 16px 24px;
         }
         .ar-list-img {
           width: 64px;
           height: 80px;
           object-fit: contain;
-          background: rgba(255, 255, 255, 0.02);
+          background: rgba(0, 0, 0, 0.015);
           padding: 8px;
           box-sizing: border-box;
           filter: grayscale(0.8);
@@ -1193,7 +1193,7 @@ export default function ArchiveClient() {
         }
         .ar-list-id {
           font-size: 8px;
-          color: rgba(255, 255, 255, 0.2);
+          color: rgba(0, 0, 0, 0.3);
           letter-spacing: 0.2em;
         }
         .ar-list-title {
@@ -1206,7 +1206,7 @@ export default function ArchiveClient() {
         .ar-list-title a { color: inherit; }
         .ar-list-season {
           font-size: 8px;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(0, 0, 0, 0.45);
           letter-spacing: 0.15em;
         }
         .ar-list-duration {
@@ -1216,26 +1216,26 @@ export default function ArchiveClient() {
         }
         .ar-list-label {
           font-size: 7px;
-          color: rgba(255, 255, 255, 0.15);
+          color: rgba(0, 0, 0, 0.25);
           letter-spacing: 0.25em;
         }
         .ar-list-val {
           font-size: 9px;
-          color: rgba(255, 255, 255, 0.5);
+          color: rgba(0, 0, 0, 0.6);
           letter-spacing: 0.05em;
         }
         .ar-list-val.expired-text {
-          color: rgba(255, 255, 255, 0.15);
+          color: rgba(0, 0, 0, 0.2);
         }
         .ar-list-price {
           font-size: 10px;
-          color: rgba(255, 255, 255, 0.6);
+          color: rgba(0, 0, 0, 0.65);
           letter-spacing: 0.05em;
         }
         .ar-list-remove-btn {
           background: none;
           border: none;
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.35);
           font-family: inherit;
           font-size: 8px;
           letter-spacing: 0.25em;
@@ -1245,26 +1245,26 @@ export default function ArchiveClient() {
           transition: color 0.3s;
         }
         .ar-list-remove-btn:hover {
-          color: #ffffff;
+          color: #000000;
         }
 
         /* ══ EDITORIAL EMPTY STATE ══ */
         .ar-editorial-empty {
           text-align: center;
           padding: 100px 0;
-          border: 1px dashed rgba(255, 255, 255, 0.04);
+          border: 1px dashed rgba(0, 0, 0, 0.06);
         }
         .ar-empty-hed {
           font-family: var(--font-brand), serif;
           font-size: 16px;
           font-weight: 300;
           letter-spacing: 0.25em;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(0, 0, 0, 0.5);
           margin: 0 0 16px;
         }
         .ar-empty-sub-text {
           font-size: 11px;
-          color: rgba(255, 255, 255, 0.2);
+          color: rgba(0, 0, 0, 0.35);
           letter-spacing: 0.05em;
           margin: 0 0 36px;
         }
@@ -1274,15 +1274,15 @@ export default function ArchiveClient() {
           font-weight: 300;
           letter-spacing: 0.35em;
           text-transform: uppercase;
-          color: #ffffff;
-          border: 1px solid #ffffff;
+          color: #000000;
+          border: 1px solid #000000;
           padding: 14px 28px;
           text-decoration: none;
           transition: background 0.4s, color 0.4s;
         }
         .ar-editorial-cta:hover {
-          background: #ffffff;
-          color: #000000;
+          background: #000000;
+          color: #ffffff;
         }
 
         /* ══ PAST ACQUISITIONS TIMELINE ══ */
@@ -1292,15 +1292,15 @@ export default function ArchiveClient() {
           gap: 60px;
         }
         .ar-notable-acq {
-          border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
           padding-bottom: 48px;
         }
         .ar-notable-card {
           display: grid;
           grid-template-columns: 140px 1fr;
           gap: 40px;
-          background: rgba(255, 255, 255, 0.01);
-          border: 1px solid rgba(255, 255, 255, 0.04);
+          background: #fafafa;
+          border: 1px solid rgba(0, 0, 0, 0.04);
           padding: 32px;
           align-items: center;
         }
@@ -1308,7 +1308,7 @@ export default function ArchiveClient() {
           width: 140px;
           aspect-ratio: 3 / 4;
           object-fit: contain;
-          background: rgba(255, 255, 255, 0.02);
+          background: rgba(0, 0, 0, 0.015);
           padding: 12px;
           box-sizing: border-box;
           filter: grayscale(0.2);
@@ -1322,7 +1322,7 @@ export default function ArchiveClient() {
           font-size: 7px;
           font-weight: 300;
           letter-spacing: 0.35em;
-          color: rgba(255, 255, 255, 0.3);
+          color: rgba(0, 0, 0, 0.35);
         }
         .ar-notable-title {
           font-family: var(--font-brand), serif;
@@ -1335,13 +1335,13 @@ export default function ArchiveClient() {
           font-size: 11px;
           line-height: 1.9;
           letter-spacing: 0.04em;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(0, 0, 0, 0.45);
           margin: 0;
           max-width: 480px;
         }
         .ar-notable-meta {
           font-size: 8px;
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.3);
           letter-spacing: 0.15em;
           font-weight: 300;
         }
@@ -1352,14 +1352,14 @@ export default function ArchiveClient() {
           gap: 40px;
         }
         .ar-timeline-node {
-          border: 1px solid rgba(255, 255, 255, 0.04);
-          background: #090909;
+          border: 1px solid rgba(0, 0, 0, 0.04);
+          background: #ffffff;
           padding: 32px;
         }
         .ar-node-header {
           display: flex;
           justify-content: space-between;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.04);
           padding-bottom: 18px;
           margin-bottom: 24px;
         }
@@ -1372,12 +1372,12 @@ export default function ArchiveClient() {
           font-size: 10px;
           font-weight: 400;
           letter-spacing: 0.18em;
-          color: rgba(255, 255, 255, 0.85);
+          color: rgba(0, 0, 0, 0.85);
         }
         .ar-node-id {
           font-size: 8px;
           letter-spacing: 0.25em;
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.3);
         }
         .ar-node-right {
           display: flex;
@@ -1387,14 +1387,14 @@ export default function ArchiveClient() {
         .ar-node-total {
           font-size: 10px;
           letter-spacing: 0.1em;
-          color: rgba(255, 255, 255, 0.55);
+          color: rgba(0, 0, 0, 0.6);
         }
         .ar-node-status {
           font-size: 8px;
           letter-spacing: 0.22em;
           font-weight: 400;
         }
-        .ar-node-status.delivered { color: #a3a3a3; }
+        .ar-node-status.delivered { color: #555555; }
 
         .ar-node-body {
           display: flex;
@@ -1411,7 +1411,7 @@ export default function ArchiveClient() {
           width: 52px;
           height: 68px;
           object-fit: contain;
-          background: rgba(255, 255, 255, 0.02);
+          background: rgba(0, 0, 0, 0.015);
           padding: 6px;
           box-sizing: border-box;
           filter: grayscale(0.2);
@@ -1430,12 +1430,12 @@ export default function ArchiveClient() {
         }
         .ar-node-item-meta {
           font-size: 8px;
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.3);
           letter-spacing: 0.15em;
         }
         .ar-node-item-price {
           font-size: 9px;
-          color: rgba(255, 255, 255, 0.45);
+          color: rgba(0, 0, 0, 0.5);
           letter-spacing: 0.05em;
         }
 
@@ -1443,13 +1443,13 @@ export default function ArchiveClient() {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          border-top: 1px solid rgba(255, 255, 255, 0.04);
+          border-top: 1px solid rgba(0, 0, 0, 0.04);
           padding-top: 18px;
         }
         .ar-node-payment {
           font-size: 8px;
           letter-spacing: 0.2em;
-          color: rgba(255, 255, 255, 0.18);
+          color: rgba(0, 0, 0, 0.25);
         }
         .ar-node-actions {
           display: flex;
@@ -1459,19 +1459,19 @@ export default function ArchiveClient() {
           font-size: 8px;
           letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(0, 0, 0, 0.45);
           text-decoration: underline;
           text-underline-offset: 3px;
           transition: color 0.3s;
         }
         .ar-node-link:hover {
-          color: #ffffff;
+          color: #000000;
         }
 
         /* ══ SOURCING REQUESTS TAB ══ */
         .ar-sourcing-section {
-          background: #090909;
-          border: 1px solid rgba(255, 255, 255, 0.04);
+          background: #ffffff;
+          border: 1px solid rgba(0, 0, 0, 0.04);
           padding: 40px;
           margin-bottom: 60px;
         }
@@ -1482,7 +1482,7 @@ export default function ArchiveClient() {
           font-size: 11px;
           line-height: 2.1;
           letter-spacing: 0.05em;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(0, 0, 0, 0.45);
           max-width: 580px;
           margin: 0;
         }
@@ -1510,15 +1510,15 @@ export default function ArchiveClient() {
           font-weight: 300;
           letter-spacing: 0.3em;
           text-transform: uppercase;
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.35);
         }
         .ar-form-input,
         .ar-form-select,
         .ar-form-textarea {
           background: transparent;
           border: none;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-          color: rgba(255, 255, 255, 0.85);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+          color: rgba(0, 0, 0, 0.85);
           font-family: inherit;
           font-size: 11px;
           font-weight: 300;
@@ -1531,11 +1531,11 @@ export default function ArchiveClient() {
         .ar-form-input:focus,
         .ar-form-select:focus,
         .ar-form-textarea:focus {
-          border-color: #ffffff;
+          border-color: #000000;
         }
         .ar-form-select option {
-          background: #111111;
-          color: #ffffff;
+          background: #ffffff;
+          color: #000000;
         }
         .ar-form-textarea {
           min-height: 90px;
@@ -1544,12 +1544,12 @@ export default function ArchiveClient() {
         .ar-form-success {
           font-size: 10px;
           letter-spacing: 0.1em;
-          color: #a3a3a3;
+          color: #555555;
           margin: 0;
         }
         .ar-form-submit-btn {
-          background: #ffffff;
-          color: #000000;
+          background: #000000;
+          color: #ffffff;
           font-family: inherit;
           font-size: 9px;
           font-weight: 400;
@@ -1566,21 +1566,21 @@ export default function ArchiveClient() {
         }
 
         .ar-sourcing-empty-state {
-          border: 1px solid rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(0, 0, 0, 0.04);
           padding: 44px;
           text-align: center;
         }
         .ar-sourcing-empty-text {
           font-size: 10px;
           letter-spacing: 0.25em;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(0, 0, 0, 0.4);
           text-transform: uppercase;
           margin-bottom: 8px;
           display: block;
         }
         .ar-sourcing-empty-sub {
           font-size: 10px;
-          color: rgba(255, 255, 255, 0.2);
+          color: rgba(0, 0, 0, 0.25);
           letter-spacing: 0.05em;
           margin: 0;
         }
@@ -1591,8 +1591,8 @@ export default function ArchiveClient() {
           gap: 20px;
         }
         .ar-sourcing-card {
-          border: 1px solid rgba(255, 255, 255, 0.04);
-          background: #090909;
+          border: 1px solid rgba(0, 0, 0, 0.04);
+          background: #ffffff;
           padding: 28px;
           display: flex;
           flex-direction: column;
@@ -1606,7 +1606,7 @@ export default function ArchiveClient() {
         .ar-sourcing-card-id {
           font-size: 8px;
           letter-spacing: 0.25em;
-          color: rgba(255, 255, 255, 0.2);
+          color: rgba(0, 0, 0, 0.3);
         }
         .ar-sourcing-badge {
           font-size: 7px;
@@ -1616,12 +1616,12 @@ export default function ArchiveClient() {
           border: 1px solid transparent;
         }
         .ar-sourcing-badge.submitted {
-          border-color: rgba(255, 255, 255, 0.15);
-          color: rgba(255, 255, 255, 0.4);
+          border-color: rgba(0, 0, 0, 0.15);
+          color: rgba(0, 0, 0, 0.45);
         }
         .ar-sourcing-badge.under_review {
-          border-color: rgba(255, 255, 255, 0.35);
-          color: rgba(255, 255, 255, 0.75);
+          border-color: rgba(0, 0, 0, 0.35);
+          color: rgba(0, 0, 0, 0.75);
         }
         .ar-sourcing-card-title {
           font-family: var(--font-brand), serif;
@@ -1635,14 +1635,14 @@ export default function ArchiveClient() {
           gap: 24px;
           font-size: 8px;
           letter-spacing: 0.2em;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(0, 0, 0, 0.4);
           margin-bottom: 16px;
         }
         .ar-sourcing-card-notes {
           font-size: 9.5px;
           font-style: italic;
-          color: rgba(255, 255, 255, 0.3);
-          border-left: 1px solid rgba(255, 255, 255, 0.08);
+          color: rgba(0, 0, 0, 0.45);
+          border-left: 1px solid rgba(0, 0, 0, 0.08);
           padding-left: 12px;
           margin-bottom: 20px;
         }
@@ -1650,7 +1650,7 @@ export default function ArchiveClient() {
           align-self: flex-start;
           background: none;
           border: none;
-          color: rgba(255, 255, 255, 0.15);
+          color: rgba(0, 0, 0, 0.25);
           font-family: inherit;
           font-size: 8px;
           letter-spacing: 0.25em;
@@ -1661,7 +1661,7 @@ export default function ArchiveClient() {
           transition: color 0.3s;
         }
         .ar-sourcing-card-dismiss-btn:hover {
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(0, 0, 0, 0.5);
         }
 
         /* ══ COLLECTION REGISTRY TAB ══ */
@@ -1675,18 +1675,18 @@ export default function ArchiveClient() {
           gap: 40px;
         }
         .ar-collection-card {
-          background: #090909;
-          border: 1px solid rgba(255, 255, 255, 0.03);
+          background: #ffffff;
+          border: 1px solid rgba(0, 0, 0, 0.03);
           cursor: pointer;
           transition: border-color 0.4s;
         }
         .ar-collection-card:hover {
-          border-color: rgba(255, 255, 255, 0.08);
+          border-color: rgba(0, 0, 0, 0.08);
         }
         .ar-col-card-img-wrap {
           width: 100%;
           aspect-ratio: 4 / 3;
-          background: rgba(255, 255, 255, 0.015);
+          background: rgba(0, 0, 0, 0.015);
           overflow: hidden;
         }
         .ar-col-card-img {
@@ -1707,7 +1707,7 @@ export default function ArchiveClient() {
           font-size: 7px;
           font-weight: 300;
           letter-spacing: 0.35em;
-          color: rgba(255, 255, 255, 0.3);
+          color: rgba(0, 0, 0, 0.4);
           text-transform: uppercase;
           margin-bottom: 8px;
           display: block;
@@ -1724,7 +1724,7 @@ export default function ArchiveClient() {
           justify-content: space-between;
           font-size: 8px;
           letter-spacing: 0.2em;
-          color: rgba(255, 255, 255, 0.2);
+          color: rgba(0, 0, 0, 0.3);
         }
 
         /* ══ COLLECTION DETAIL VIEW ══ */
@@ -1740,20 +1740,20 @@ export default function ArchiveClient() {
           font-family: inherit;
           font-size: 8px;
           letter-spacing: 0.35em;
-          color: rgba(255, 255, 255, 0.3);
+          color: rgba(0, 0, 0, 0.4);
           cursor: pointer;
           transition: color 0.3s;
           padding: 8px 0;
         }
         .ar-detail-back-btn:hover {
-          color: #ffffff;
+          color: #000000;
         }
         .ar-detail-hero {
           display: grid;
           grid-template-columns: 1.2fr 1fr;
           gap: 40px;
           align-items: center;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
           padding-bottom: 48px;
         }
         .ar-detail-hero-left {
@@ -1763,7 +1763,7 @@ export default function ArchiveClient() {
         .ar-detail-eyebrow {
           font-size: 8px;
           letter-spacing: 0.35em;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(0, 0, 0, 0.45);
           margin-bottom: 12px;
         }
         .ar-detail-title {
@@ -1777,7 +1777,7 @@ export default function ArchiveClient() {
           font-size: 11.5px;
           line-height: 2.1;
           letter-spacing: 0.05em;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(0, 0, 0, 0.45);
           margin: 0;
           max-width: 440px;
         }
@@ -1785,7 +1785,7 @@ export default function ArchiveClient() {
           width: 100%;
           aspect-ratio: 4/3;
           object-fit: cover;
-          background: rgba(255, 255, 255, 0.015);
+          background: rgba(0, 0, 0, 0.015);
           filter: grayscale(0.2);
         }
 
@@ -1802,7 +1802,7 @@ export default function ArchiveClient() {
           width: 100%;
           aspect-ratio: 3 / 4;
           overflow: hidden;
-          background: rgba(255, 255, 255, 0.02);
+          background: rgba(0, 0, 0, 0.02);
         }
         .ar-lookbook-img {
           width: 100%;
@@ -1817,23 +1817,23 @@ export default function ArchiveClient() {
 
         /* Checklist */
         .ar-detail-checklist {
-          border-top: 1px solid rgba(255, 255, 255, 0.04);
+          border-top: 1px solid rgba(0, 0, 0, 0.06);
           padding-top: 48px;
         }
         .ar-checklist-list {
           display: flex;
           flex-direction: column;
-          border: 1px solid rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(0, 0, 0, 0.04);
         }
         .ar-checklist-item {
           display: flex;
           justify-content: space-between;
           align-items: center;
           padding: 24px 32px;
-          background: #090909;
+          background: #ffffff;
         }
         .ar-checklist-item:not(:last-child) {
-          border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.04);
         }
         .ar-checklist-left {
           display: flex;
@@ -1845,7 +1845,7 @@ export default function ArchiveClient() {
           font-size: 11.5px;
           font-weight: 300;
           letter-spacing: 0.15em;
-          color: rgba(255, 255, 255, 0.8);
+          color: rgba(0, 0, 0, 0.8);
         }
         .ar-checklist-status {
           font-size: 7px;
@@ -1853,21 +1853,21 @@ export default function ArchiveClient() {
           font-weight: 400;
         }
         .ar-checklist-status.active {
-          color: #a3a3a3;
+          color: #666666;
         }
         .ar-checklist-status.inactive {
-          color: rgba(255, 255, 255, 0.15);
+          color: rgba(0, 0, 0, 0.25);
         }
         .ar-checklist-action {
           font-size: 8px;
           letter-spacing: 0.25em;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(0, 0, 0, 0.45);
           text-decoration: underline;
           text-underline-offset: 3px;
           transition: color 0.3s;
         }
         .ar-checklist-action:hover {
-          color: #ffffff;
+          color: #000000;
         }
 
         /* ══ RESPONSIVE OVERRIDES ══ */
@@ -1914,7 +1914,7 @@ export default function ArchiveClient() {
           /* Show mobile tab bar */
           .ar-mobile-tabs {
             display: flex;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
             margin-bottom: 40px;
             overflow-x: auto;
             scrollbar-width: none;
@@ -1933,15 +1933,15 @@ export default function ArchiveClient() {
             font-weight: 300;
             letter-spacing: 0.35em;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.25);
+            color: rgba(0, 0, 0, 0.35);
             cursor: pointer;
             border-bottom: 1px solid transparent;
             margin-bottom: -1px;
             transition: color 0.3s;
           }
           .ar-m-tab.active {
-            color: #ffffff;
-            border-bottom-color: rgba(255, 255, 255, 0.4);
+            color: #000000;
+            border-bottom-color: rgba(0, 0, 0, 0.4);
           }
 
           .ar-spotlight-row {

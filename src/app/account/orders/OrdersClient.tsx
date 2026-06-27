@@ -159,9 +159,9 @@ export default function OrdersClient() {
       </div>
 
       <style>{`
-        /* Dark Theme overrides */
+        /* Light Theme overrides */
         html, body {
-          background: #080808 !important;
+          background: #ffffff !important;
         }
 
         .ord-space-wrap {
@@ -169,7 +169,7 @@ export default function OrdersClient() {
           margin: 0 auto;
           padding: 140px 24px 100px;
           font-family: var(--font-primary), sans-serif;
-          color: rgba(255, 255, 255, 0.85);
+          color: rgba(0, 0, 0, 0.85);
           box-sizing: border-box;
         }
 
@@ -178,13 +178,13 @@ export default function OrdersClient() {
           display: grid;
           grid-template-columns: 1fr auto 1fr;
           align-items: center;
-          border-top: 1px solid rgba(255, 255, 255, 0.06);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          border-top: 1px solid rgba(0, 0, 0, 0.08);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
           padding: 18px 0;
           margin-bottom: 56px;
           font-size: 8px;
           letter-spacing: 0.25em;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(0, 0, 0, 0.45);
         }
         .ord-summary-item {
           display: flex;
@@ -196,11 +196,11 @@ export default function OrdersClient() {
         }
         .ord-summary-center {
           align-items: center;
-          color: rgba(255, 255, 255, 0.7);
+          color: rgba(0, 0, 0, 0.75);
         }
         .ord-summary-label {
           font-weight: 300;
-          color: rgba(255, 255, 255, 0.2);
+          color: rgba(0, 0, 0, 0.3);
         }
         .ord-summary-val {
           font-weight: 400;
@@ -209,7 +209,7 @@ export default function OrdersClient() {
         /* ══ NAVIGATION TABS ══ */
         .ord-nav-tabs {
           display: flex;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
           margin-bottom: 72px;
           overflow-x: auto;
           scrollbar-width: none;
@@ -225,18 +225,18 @@ export default function OrdersClient() {
           font-weight: 300;
           letter-spacing: 0.35em;
           text-transform: uppercase;
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.35);
           text-decoration: none;
           border-bottom: 1px solid transparent;
           margin-bottom: -1px;
           transition: color 0.4s, border-color 0.4s;
         }
         .ord-nav-tab:hover {
-          color: rgba(255, 255, 255, 0.7);
+          color: rgba(0, 0, 0, 0.7);
         }
         .ord-nav-tab.active {
-          color: #ffffff;
-          border-bottom-color: rgba(255, 255, 255, 0.4);
+          color: #000000;
+          border-bottom-color: rgba(0, 0, 0, 0.4);
         }
 
         /* ══ EDITORIAL WELCOME HEADER ══ */
@@ -249,7 +249,7 @@ export default function OrdersClient() {
           font-size: clamp(24px, 4.5vw, 38px);
           font-weight: 300;
           letter-spacing: 0.15em;
-          color: rgba(255, 255, 255, 0.85);
+          color: rgba(0, 0, 0, 0.85);
           margin: 0 0 20px;
         }
         .ord-main-subtitle {
@@ -257,7 +257,7 @@ export default function OrdersClient() {
           font-weight: 300;
           line-height: 2.1;
           letter-spacing: 0.06em;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(0, 0, 0, 0.45);
           margin: 0;
         }
 
@@ -266,7 +266,7 @@ export default function OrdersClient() {
           font-weight: 400;
           letter-spacing: 0.44em;
           text-transform: uppercase;
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.35);
           margin: 0 0 28px;
         }
 
@@ -277,15 +277,15 @@ export default function OrdersClient() {
           gap: 60px;
         }
         .ord-notable-acq {
-          border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
           padding-bottom: 48px;
         }
         .ord-notable-card {
           display: grid;
           grid-template-columns: 140px 1fr;
           gap: 40px;
-          background: rgba(255, 255, 255, 0.01);
-          border: 1px solid rgba(255, 255, 255, 0.04);
+          background: #fafafa;
+          border: 1px solid rgba(0, 0, 0, 0.04);
           padding: 32px;
           align-items: center;
         }
@@ -293,7 +293,7 @@ export default function OrdersClient() {
           width: 140px;
           aspect-ratio: 3 / 4;
           object-fit: contain;
-          background: rgba(255, 255, 255, 0.02);
+          background: rgba(0, 0, 0, 0.015);
           padding: 12px;
           box-sizing: border-box;
           filter: grayscale(0.2);
@@ -307,7 +307,7 @@ export default function OrdersClient() {
           font-size: 7px;
           font-weight: 300;
           letter-spacing: 0.35em;
-          color: rgba(255, 255, 255, 0.3);
+          color: rgba(0, 0, 0, 0.35);
         }
         .ord-notable-title {
           font-family: var(--font-brand), serif;
@@ -320,13 +320,13 @@ export default function OrdersClient() {
           font-size: 11px;
           line-height: 1.9;
           letter-spacing: 0.04em;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(0, 0, 0, 0.45);
           margin: 0;
           max-width: 480px;
         }
         .ord-notable-meta {
           font-size: 8px;
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.3);
           letter-spacing: 0.15em;
           font-weight: 300;
         }
@@ -337,14 +337,14 @@ export default function OrdersClient() {
           gap: 40px;
         }
         .ord-timeline-node {
-          border: 1px solid rgba(255, 255, 255, 0.04);
-          background: #090909;
+          border: 1px solid rgba(0, 0, 0, 0.04);
+          background: #ffffff;
           padding: 32px;
         }
         .ord-node-header {
           display: flex;
           justify-content: space-between;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.04);
           padding-bottom: 18px;
           margin-bottom: 24px;
         }
@@ -357,12 +357,12 @@ export default function OrdersClient() {
           font-size: 10px;
           font-weight: 400;
           letter-spacing: 0.18em;
-          color: rgba(255, 255, 255, 0.85);
+          color: rgba(0, 0, 0, 0.85);
         }
         .ord-node-id {
           font-size: 8px;
           letter-spacing: 0.25em;
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.3);
         }
         .ord-node-right {
           display: flex;
@@ -372,14 +372,14 @@ export default function OrdersClient() {
         .ord-node-total {
           font-size: 10px;
           letter-spacing: 0.1em;
-          color: rgba(255, 255, 255, 0.55);
+          color: rgba(0, 0, 0, 0.6);
         }
         .ord-node-status {
           font-size: 8px;
           letter-spacing: 0.22em;
           font-weight: 400;
         }
-        .ord-node-status.delivered { color: #a3a3a3; }
+        .ord-node-status.delivered { color: #555555; }
 
         .ord-node-body {
           display: flex;
@@ -396,7 +396,7 @@ export default function OrdersClient() {
           width: 52px;
           height: 68px;
           object-fit: contain;
-          background: rgba(255, 255, 255, 0.02);
+          background: rgba(0, 0, 0, 0.015);
           padding: 6px;
           box-sizing: border-box;
           filter: grayscale(0.2);
@@ -415,12 +415,12 @@ export default function OrdersClient() {
         }
         .ord-node-item-meta {
           font-size: 8px;
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.3);
           letter-spacing: 0.15em;
         }
         .ord-node-item-price {
           font-size: 9px;
-          color: rgba(255, 255, 255, 0.45);
+          color: rgba(0, 0, 0, 0.5);
           letter-spacing: 0.05em;
         }
 
@@ -428,13 +428,13 @@ export default function OrdersClient() {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          border-top: 1px solid rgba(255, 255, 255, 0.04);
+          border-top: 1px solid rgba(0, 0, 0, 0.04);
           padding-top: 18px;
         }
         .ord-node-payment {
           font-size: 8px;
           letter-spacing: 0.2em;
-          color: rgba(255, 255, 255, 0.18);
+          color: rgba(0, 0, 0, 0.25);
         }
         .ord-node-actions {
           display: flex;
@@ -444,13 +444,13 @@ export default function OrdersClient() {
           font-size: 8px;
           letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(0, 0, 0, 0.45);
           text-decoration: underline;
           text-underline-offset: 3px;
           transition: color 0.3s;
         }
         .ord-node-link:hover {
-          color: #ffffff;
+          color: #000000;
         }
 
         @media (max-width: 767px) {

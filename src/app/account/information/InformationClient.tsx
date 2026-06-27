@@ -145,9 +145,9 @@ export default function InformationClient() {
       </div>
 
       <style>{`
-        /* Dark Theme overrides */
+        /* Light Theme overrides */
         html, body {
-          background: #080808 !important;
+          background: #ffffff !important;
         }
 
         .info-space-wrap {
@@ -155,7 +155,7 @@ export default function InformationClient() {
           margin: 0 auto;
           padding: 140px 24px 100px;
           font-family: var(--font-primary), sans-serif;
-          color: rgba(255, 255, 255, 0.85);
+          color: rgba(0, 0, 0, 0.85);
           box-sizing: border-box;
         }
 
@@ -164,13 +164,13 @@ export default function InformationClient() {
           display: grid;
           grid-template-columns: 1fr auto 1fr;
           align-items: center;
-          border-top: 1px solid rgba(255, 255, 255, 0.06);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          border-top: 1px solid rgba(0, 0, 0, 0.08);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
           padding: 18px 0;
           margin-bottom: 56px;
           font-size: 8px;
           letter-spacing: 0.25em;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(0, 0, 0, 0.45);
         }
         .info-summary-item {
           display: flex;
@@ -182,11 +182,11 @@ export default function InformationClient() {
         }
         .info-summary-center {
           align-items: center;
-          color: rgba(255, 255, 255, 0.7);
+          color: rgba(0, 0, 0, 0.75);
         }
         .info-summary-label {
           font-weight: 300;
-          color: rgba(255, 255, 255, 0.2);
+          color: rgba(0, 0, 0, 0.3);
         }
         .info-summary-val {
           font-weight: 400;
@@ -195,7 +195,7 @@ export default function InformationClient() {
         /* ══ NAVIGATION TABS ══ */
         .info-nav-tabs {
           display: flex;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
           margin-bottom: 72px;
           overflow-x: auto;
           scrollbar-width: none;
@@ -211,18 +211,18 @@ export default function InformationClient() {
           font-weight: 300;
           letter-spacing: 0.35em;
           text-transform: uppercase;
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.35);
           text-decoration: none;
           border-bottom: 1px solid transparent;
           margin-bottom: -1px;
           transition: color 0.4s, border-color 0.4s;
         }
         .info-nav-tab:hover {
-          color: rgba(255, 255, 255, 0.7);
+          color: rgba(0, 0, 0, 0.7);
         }
         .info-nav-tab.active {
-          color: #ffffff;
-          border-bottom-color: rgba(255, 255, 255, 0.4);
+          color: #000000;
+          border-bottom-color: rgba(0, 0, 0, 0.4);
         }
 
         /* ══ WELCOME HEADER ══ */
@@ -235,7 +235,7 @@ export default function InformationClient() {
           font-size: clamp(24px, 4.5vw, 38px);
           font-weight: 300;
           letter-spacing: 0.15em;
-          color: rgba(255, 255, 255, 0.85);
+          color: rgba(0, 0, 0, 0.85);
           margin: 0 0 20px;
         }
         .info-main-subtitle {
@@ -243,14 +243,14 @@ export default function InformationClient() {
           font-weight: 300;
           line-height: 2.1;
           letter-spacing: 0.06em;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(0, 0, 0, 0.45);
           margin: 0;
         }
 
         /* ══ FORM LAYOUT ══ */
         .info-content-panel {
-          background: #090909;
-          border: 1px solid rgba(255, 255, 255, 0.04);
+          background: #ffffff;
+          border: 1px solid rgba(0, 0, 0, 0.04);
           padding: 44px;
         }
         .info-form {
@@ -273,13 +273,13 @@ export default function InformationClient() {
           font-weight: 300;
           letter-spacing: 0.3em;
           text-transform: uppercase;
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.35);
         }
         .info-form-input {
           background: transparent;
           border: none;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-          color: rgba(255, 255, 255, 0.85);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+          color: rgba(0, 0, 0, 0.85);
           font-family: inherit;
           font-size: 11px;
           font-weight: 300;
@@ -290,11 +290,11 @@ export default function InformationClient() {
           transition: border-color 0.4s;
         }
         .info-form-input:focus {
-          border-color: #ffffff;
+          border-color: #000000;
         }
         .info-form-input--disabled {
-          border-bottom-color: rgba(255, 255, 255, 0.04);
-          color: rgba(255, 255, 255, 0.3);
+          border-bottom-color: rgba(0, 0, 0, 0.04);
+          color: rgba(0, 0, 0, 0.4);
           cursor: not-allowed;
         }
 
@@ -310,32 +310,32 @@ export default function InformationClient() {
           cursor: pointer;
         }
         .info-checkbox-input {
-          accent-color: #ffffff;
+          accent-color: #000000;
           width: 14px;
           height: 14px;
           border-radius: 0 !important;
           margin-top: 2px;
           background: transparent;
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          border: 1px solid rgba(0, 0, 0, 0.2);
         }
         .info-checkbox-text {
           font-size: 10px;
           font-weight: 300;
           line-height: 1.8;
           letter-spacing: 0.04em;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(0, 0, 0, 0.45);
         }
 
         .info-success-msg {
           font-size: 10px;
           letter-spacing: 0.08em;
-          color: #a3a3a3;
+          color: #555555;
           margin: 0;
         }
 
         .info-submit-btn {
-          background: #ffffff;
-          color: #000000;
+          background: #000000;
+          color: #ffffff;
           font-family: inherit;
           font-size: 9px;
           font-weight: 400;
@@ -349,8 +349,8 @@ export default function InformationClient() {
           min-width: 240px;
         }
         .info-submit-btn:disabled {
-          background: rgba(255, 255, 255, 0.05);
-          color: rgba(255, 255, 255, 0.25);
+          background: rgba(0, 0, 0, 0.05);
+          color: rgba(0, 0, 0, 0.35);
           cursor: not-allowed;
         }
         .info-submit-btn:not(:disabled):hover {

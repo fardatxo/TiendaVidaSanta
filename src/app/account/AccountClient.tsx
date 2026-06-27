@@ -125,9 +125,9 @@ export default function AccountClient() {
       </div>
 
       <style>{`
-        /* Dark Theme overrides for the residence */
+        /* Light Theme overrides for the residence */
         html, body {
-          background: #080808 !important;
+          background: #ffffff !important;
         }
 
         .acc-space-wrap {
@@ -135,7 +135,7 @@ export default function AccountClient() {
           margin: 0 auto;
           padding: 140px 24px 100px;
           font-family: var(--font-primary), sans-serif;
-          color: rgba(255, 255, 255, 0.85);
+          color: rgba(0, 0, 0, 0.85);
           box-sizing: border-box;
         }
 
@@ -144,13 +144,13 @@ export default function AccountClient() {
           display: grid;
           grid-template-columns: 1fr auto 1fr;
           align-items: center;
-          border-top: 1px solid rgba(255, 255, 255, 0.06);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          border-top: 1px solid rgba(0, 0, 0, 0.08);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
           padding: 18px 0;
           margin-bottom: 56px;
           font-size: 8px;
           letter-spacing: 0.25em;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(0, 0, 0, 0.45);
         }
         .acc-summary-item {
           display: flex;
@@ -162,11 +162,11 @@ export default function AccountClient() {
         }
         .acc-summary-center {
           align-items: center;
-          color: rgba(255, 255, 255, 0.7);
+          color: rgba(0, 0, 0, 0.75);
         }
         .acc-summary-label {
           font-weight: 300;
-          color: rgba(255, 255, 255, 0.2);
+          color: rgba(0, 0, 0, 0.3);
         }
         .acc-summary-val {
           font-weight: 400;
@@ -175,7 +175,7 @@ export default function AccountClient() {
         /* ══ NAVIGATION TABS ══ */
         .acc-nav-tabs {
           display: flex;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
           margin-bottom: 72px;
           overflow-x: auto;
           scrollbar-width: none;
@@ -191,18 +191,18 @@ export default function AccountClient() {
           font-weight: 300;
           letter-spacing: 0.35em;
           text-transform: uppercase;
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.35);
           text-decoration: none;
           border-bottom: 1px solid transparent;
           margin-bottom: -1px;
           transition: color 0.4s, border-color 0.4s;
         }
         .acc-nav-tab:hover {
-          color: rgba(255, 255, 255, 0.7);
+          color: rgba(0, 0, 0, 0.7);
         }
         .acc-nav-tab.active {
-          color: #ffffff;
-          border-bottom-color: rgba(255, 255, 255, 0.4);
+          color: #000000;
+          border-bottom-color: rgba(0, 0, 0, 0.4);
         }
 
         /* ══ EDITORIAL WELCOME HEADER ══ */
@@ -215,7 +215,7 @@ export default function AccountClient() {
           font-size: clamp(24px, 4.5vw, 38px);
           font-weight: 300;
           letter-spacing: 0.15em;
-          color: rgba(255, 255, 255, 0.85);
+          color: rgba(0, 0, 0, 0.85);
           margin: 0 0 20px;
         }
         .acc-main-subtitle {
@@ -223,7 +223,7 @@ export default function AccountClient() {
           font-weight: 300;
           line-height: 2.1;
           letter-spacing: 0.06em;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(0, 0, 0, 0.45);
           margin: 0;
         }
 
@@ -232,12 +232,12 @@ export default function AccountClient() {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
           gap: 1px;
-          background: rgba(255, 255, 255, 0.04);
-          border: 1px solid rgba(255, 255, 255, 0.04);
+          background: rgba(0, 0, 0, 0.06);
+          border: 1px solid rgba(0, 0, 0, 0.06);
           margin-bottom: 64px;
         }
         .acc-card {
-          background: #080808;
+          background: #ffffff;
           padding: 44px;
           min-height: 180px;
           text-decoration: none;
@@ -248,12 +248,12 @@ export default function AccountClient() {
           position: relative;
         }
         .acc-card:hover {
-          background: rgba(255, 255, 255, 0.015);
+          background: rgba(0, 0, 0, 0.01);
         }
         .acc-card-num {
           font-size: 8px;
           font-weight: 300;
-          color: rgba(255, 255, 255, 0.15);
+          color: rgba(0, 0, 0, 0.2);
           letter-spacing: 0.05em;
           margin-bottom: 24px;
         }
@@ -262,14 +262,14 @@ export default function AccountClient() {
           font-weight: 400;
           text-transform: uppercase;
           letter-spacing: 0.3em;
-          color: rgba(255, 255, 255, 0.65);
+          color: rgba(0, 0, 0, 0.65);
           margin: 0 0 16px;
         }
         .acc-card-desc {
           font-size: 10px;
           font-weight: 300;
           letter-spacing: 0.04em;
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.35);
           line-height: 1.8;
           margin: 0;
         }
@@ -285,7 +285,7 @@ export default function AccountClient() {
           width: 48px;
           height: 64px;
           object-fit: contain;
-          background: rgba(255, 255, 255, 0.02);
+          background: rgba(0, 0, 0, 0.015);
           filter: grayscale(0.2);
         }
         .acc-preview-info {
@@ -297,12 +297,12 @@ export default function AccountClient() {
           font-size: 9px;
           font-weight: 400;
           letter-spacing: 0.12em;
-          color: rgba(255, 255, 255, 0.7);
+          color: rgba(0, 0, 0, 0.7);
         }
         .acc-preview-meta {
           font-size: 9px;
           font-weight: 300;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(0, 0, 0, 0.45);
           letter-spacing: 0.05em;
         }
 
@@ -316,13 +316,13 @@ export default function AccountClient() {
           width: 40px;
           height: 52px;
           object-fit: contain;
-          background: rgba(255, 255, 255, 0.02);
+          background: rgba(0, 0, 0, 0.015);
           filter: grayscale(0.2);
         }
         .acc-preview-more {
           font-size: 10px;
           font-weight: 300;
-          color: rgba(255, 255, 255, 0.3);
+          color: rgba(0, 0, 0, 0.35);
           margin-left: 8px;
         }
 
@@ -336,13 +336,13 @@ export default function AccountClient() {
           font-size: 11px;
           font-weight: 300;
           letter-spacing: 0.06em;
-          color: rgba(255, 255, 255, 0.45);
+          color: rgba(0, 0, 0, 0.55);
         }
         .acc-record-email {
           font-size: 9.5px;
           font-weight: 300;
           letter-spacing: 0.05em;
-          color: rgba(255, 255, 255, 0.25);
+          color: rgba(0, 0, 0, 0.35);
         }
 
         /* Logout button */
@@ -352,21 +352,21 @@ export default function AccountClient() {
         }
         .acc-logout-btn {
           background: transparent;
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(0, 0, 0, 0.12);
           padding: 18px 48px;
           font-size: 8.5px;
           font-weight: 300;
           font-family: inherit;
           text-transform: uppercase;
           letter-spacing: 0.3em;
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(0, 0, 0, 0.45);
           cursor: pointer;
           transition: border-color 0.4s, color 0.4s;
           border-radius: 0;
         }
         .acc-logout-btn:hover {
-          border-color: rgba(255, 255, 255, 0.4);
-          color: #ffffff;
+          border-color: rgba(0, 0, 0, 0.5);
+          color: #000000;
         }
 
         @media (max-width: 767px) {
