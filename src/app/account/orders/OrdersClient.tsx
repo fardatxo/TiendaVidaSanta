@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useRequireAuth } from '@/context/AuthContext';
+import { useRequireAuth, useAuth } from '@/context/AuthContext';
 import { useLocale } from '@/context/LocaleContext';
+import { usePathname } from 'next/navigation';
 
 const MOCK_ACQUISITIONS = [
   {
@@ -35,7 +36,7 @@ const MOCK_ACQUISITIONS = [
     items: [
       {
         handle: 'essential-heavyweight-shorts',
-        title: 'ESSENTIAL HEWEIGHT SHORTS',
+        title: 'ESSENTIAL HEAVYWEIGHT SHORTS',
         price: 320.00,
         size: 'M',
         color: 'HUESO',
@@ -53,447 +54,525 @@ function formatDate(ts: number): string {
 
 export default function OrdersClient() {
   const { user, isLoading } = useRequireAuth();
+  const { logout } = useAuth();
   const { formatPrice } = useLocale();
+  const pathname = usePathname();
 
   if (isLoading || !user) return null;
 
   return (
     <>
-      <div className="ord-space-wrap">
-        {/* Collector Metadata Header */}
-        <div className="ord-client-summary">
-          <div className="ord-summary-item">
-            <span className="ord-summary-label">CLIENT REGISTRY</span>
-            <span className="ord-summary-val">
-              {`TNT-${String(user.email.split('').reduce((a,c)=>a+c.charCodeAt(0),0) % 9000 + 1000)}`}
-            </span>
+      {/* ══ HORIZONTAL MAISON NAVIGATION TABS ══ */}
+      <nav className="dior-tabs-nav">
+        <div className="dior-tabs-container">
+          <div className="dior-tabs-list">
+            <Link href="/account" className={`dior-tab ${pathname === '/account' ? 'active' : ''}`}>
+              Overview
+            </Link>
+            <Link href="/account/orders" className={`dior-tab ${pathname === '/account/orders' ? 'active' : ''}`}>
+              Past Acquisitions
+            </Link>
+            <Link href="/archive?tab=personal" className={`dior-tab ${pathname === '/archive' ? 'active' : ''}`}>
+              Personal Archive
+            </Link>
+            <Link href="/account/information" className={`dior-tab ${pathname === '/account/information' ? 'active' : ''}`}>
+              Profile
+            </Link>
+            <Link href="/account/addresses" className={`dior-tab ${pathname === '/account/addresses' ? 'active' : ''}`}>
+              Addresses
+            </Link>
+            <Link href="/archive?tab=requests" className={`dior-tab`}>
+              Sourcing Requests
+            </Link>
+            <Link href="/archive?tab=registry" className={`dior-tab`}>
+              Collection Registry
+            </Link>
           </div>
-          <div className="ord-summary-item ord-summary-center">
-            <span className="ord-summary-label">MAISON ACCESS</span>
-            <span className="ord-summary-val">{`${user.firstName.toUpperCase()} ${user.lastName.toUpperCase()}`}</span>
-          </div>
-          <div className="ord-summary-item">
-            <span className="ord-summary-label">MEMBER STATUS</span>
-            <span className="ord-summary-val">VERIFIED RECORD</span>
-          </div>
+          <button onClick={logout} className="dior-logout-btn">
+            Sign out <span className="dior-logout-arrow">→</span>
+          </button>
         </div>
+      </nav>
 
-        {/* Navigation Tabs */}
-        <nav className="ord-nav-tabs">
-          <Link href="/account" className="ord-nav-tab">The Residence</Link>
-          <Link href="/account/orders" className="ord-nav-tab active">Acquisitions</Link>
-          <Link href="/account/information" className="ord-nav-tab">House Record</Link>
-          <Link href="/archive" className="ord-nav-tab">Archive Room</Link>
-        </nav>
+      <div className="dior-space-wrap">
+        {/* ══ SPLIT ROW LAYOUT (TITLE LEFT, CONTENT RIGHT) ══ */}
+        <div className="dior-split-row">
+          
+          {/* Left Column: Serif Title */}
+          <div className="dior-split-left">
+            <h1 className="dior-main-title">Past Acquisitions</h1>
+            <p className="dior-main-subtitle">
+              A comprehensive ledger of garments acquired and registered to your personal wardrobe from our seasonal releases.
+            </p>
+          </div>
 
-        {/* Header */}
-        <div className="ord-editorial-header">
-          <h1 className="ord-main-title">PAST ACQUISITIONS</h1>
-          <p className="ord-main-subtitle">
-            A permanent chronological record of garments that have entered your wardrobe from the house collections.
-          </p>
-        </div>
-
-        {/* Acquisitions Content */}
-        <div className="ord-acquisitions-panel">
-          {/* Notable acquisitions spotlight */}
-          <div className="ord-notable-acq">
-            <h3 className="ord-section-eyebrow">NOTABLE ACQUISITION</h3>
-            <div className="ord-notable-card">
-              <img src="/hero/ComfyUI-main_reference_00028_.png" alt="Notable Piece" className="ord-notable-img" />
-              <div className="ord-notable-details">
-                <span className="ord-notable-label">SEASON HIGHLIGHT</span>
-                <h2 className="ord-notable-title">HEAVYWEIGHT RAGLAN ZIP HOODIE</h2>
-                <p className="ord-notable-desc">
-                  Selected from SS26 Ready-to-wear. A certified piece registered on your collection registry.
-                </p>
-                <span className="ord-notable-meta">REGISTERED IN WARDROBE ON 15 JUNE 2026</span>
+          {/* Right Column: Timeline / List */}
+          <div className="dior-split-right">
+            
+            {/* Spotlight section */}
+            <div className="dior-timeline-notable">
+              <h3 className="dior-timeline-lbl">NOTABLE PIECE</h3>
+              <div className="dior-spotlight-item">
+                <img src="/hero/ComfyUI-main_reference_00028_.png" alt="Notable garment" className="dior-spotlight-img" />
+                <div className="dior-spotlight-info">
+                  <span className="dior-spotlight-season">SS26 — VOL I</span>
+                  <h4 className="dior-spotlight-title">HEAVYWEIGHT RAGLAN ZIP HOODIE</h4>
+                  <p className="dior-spotlight-desc">Registered in your collection lookbook. Hand-numbered edition.</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Timeline List */}
-          <h3 className="ord-section-eyebrow">ACQUISITIONS REGISTRY</h3>
-          <div className="ord-timeline">
-            {MOCK_ACQUISITIONS.map(acq => (
-              <div key={acq.id} className="ord-timeline-node">
-                <div className="ord-node-header">
-                  <div className="ord-node-left">
-                    <span className="ord-node-date">{formatDate(acq.date)}</span>
-                    <span className="ord-node-id">{acq.id}</span>
-                  </div>
-                  <div className="ord-node-right">
-                    <span className="ord-node-total">Total: {formatPrice(acq.total, acq.currency)}</span>
-                    <span className={`ord-node-status ${acq.status}`}>● {acq.status.toUpperCase()}</span>
-                  </div>
-                </div>
-
-                <div className="ord-node-body">
-                  {acq.items.map(item => (
-                    <div key={item.handle} className="ord-node-item">
-                      <img src={item.imageUrl} alt={item.title} className="ord-node-item-img" />
-                      <div className="ord-node-item-details">
-                        <h4 className="ord-node-item-title">{item.title}</h4>
-                        <span className="ord-node-item-meta">SIZE: {item.size} / COLOR: {item.color}</span>
-                        <span className="ord-node-item-price">{formatPrice(item.price, acq.currency)}</span>
+            <div className="dior-timeline-list">
+              <h3 className="dior-timeline-lbl">ACQUISITION HISTORY</h3>
+              
+              {MOCK_ACQUISITIONS.length > 0 ? (
+                MOCK_ACQUISITIONS.map(acq => (
+                  <div key={acq.id} className="dior-order-node">
+                    
+                    <div className="dior-order-header">
+                      <div className="dior-order-meta">
+                        <span className="dior-order-date">{formatDate(acq.date)}</span>
+                        <span className="dior-order-id">{acq.id}</span>
+                      </div>
+                      <div className="dior-order-status">
+                        <span className={`dior-status-badge ${acq.status}`}>
+                          {acq.status.toUpperCase()}
+                        </span>
                       </div>
                     </div>
-                  ))}
-                </div>
 
-                <div className="ord-node-footer">
-                  <span className="ord-node-payment">{acq.payment}</span>
-                  <div className="ord-node-actions">
-                    <a href="#" onClick={(e) => { e.preventDefault(); alert("Invoice downloaded successfully (Mock PDF)."); }} className="ord-node-link">
-                      Download Invoice (PDF)
-                    </a>
-                    <Link href={`/product/${acq.items[0].handle}`} className="ord-node-link">
-                      Reorder Piece
-                    </Link>
+                    <div className="dior-order-items">
+                      {acq.items.map(item => (
+                        <div key={item.handle} className="dior-order-item-row">
+                          <img src={item.imageUrl} alt={item.title} className="dior-order-item-img" />
+                          <div className="dior-order-item-details">
+                            <h5 className="dior-order-item-title">{item.title}</h5>
+                            <span className="dior-order-item-spec">
+                              SIZE: {item.size} &nbsp;&bull;&nbsp; COLOR: {item.color}
+                            </span>
+                            <span className="dior-order-item-price">
+                              {formatPrice(item.price, acq.currency)}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="dior-order-footer">
+                      <span className="dior-order-payment">{acq.payment}</span>
+                      <div className="dior-order-actions">
+                        <a 
+                          href="#" 
+                          onClick={(e) => { e.preventDefault(); alert("Invoice downloaded successfully (Mock PDF)."); }} 
+                          className="dior-order-link"
+                        >
+                          Invoice (PDF)
+                        </a>
+                        <Link href={`/product/${acq.items[0].handle}`} className="dior-order-link">
+                          Reorder
+                        </Link>
+                      </div>
+                    </div>
+
                   </div>
+                ))
+              ) : (
+                <div className="dior-empty-state">
+                  <p className="dior-empty-text">No acquisitions registered.</p>
+                  <Link href="/collection" className="dior-btn-dark">
+                    Explore Collections
+                  </Link>
                 </div>
-              </div>
-            ))}
+              )}
+
+            </div>
+
           </div>
+
         </div>
+
+        {/* ══ COMPONENT LEGAL FOOTER ══ */}
+        <footer className="dior-internal-footer">
+          <span className="dior-footer-link">PRIVACY POLICY</span>
+          <span className="dior-footer-link">LEGAL NOTICE</span>
+        </footer>
       </div>
 
       <style>{`
-        /* Light Theme overrides */
+        /* ══ DIOR LUXURY THEME STYLING ══ */
         html, body {
-          background: #ffffff !important;
+          background: #f4f3f1 !important;
+          color: #2d2a26 !important;
         }
 
-        .ord-space-wrap {
-          max-width: 1000px;
+        /* Tabs Nav */
+        .dior-tabs-nav {
+          background: #ffffff;
+          border-bottom: 1px solid #ddd8d2;
+          width: 100%;
+          position: sticky;
+          top: 80px;
+          z-index: 10;
+        }
+        .dior-tabs-container {
+          max-width: 1200px;
           margin: 0 auto;
-          padding: 140px 24px 100px;
+          padding: 0 24px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          height: 60px;
+        }
+        .dior-tabs-list {
+          display: flex;
+          height: 100%;
+          overflow-x: auto;
+          scrollbar-width: none;
+        }
+        .dior-tabs-list::-webkit-scrollbar {
+          display: none;
+        }
+        .dior-tab {
           font-family: var(--font-primary), sans-serif;
-          color: rgba(0, 0, 0, 0.85);
-          box-sizing: border-box;
+          font-size: 8.5px;
+          font-weight: 300;
+          letter-spacing: 0.25em;
+          text-transform: uppercase;
+          color: #7c7872;
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+          padding: 0 16px;
+          height: 100%;
+          border-bottom: 1px solid transparent;
+          margin-bottom: -1px;
+          transition: color 0.3s, border-color 0.3s;
+          white-space: nowrap;
+        }
+        .dior-tab:hover {
+          color: #2d2a26;
+        }
+        .dior-tab.active {
+          color: #2d2a26;
+          font-weight: 400;
+          border-bottom-color: #2d2a26;
+        }
+        .dior-logout-btn {
+          background: none;
+          border: none;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 8.5px;
+          font-weight: 300;
+          letter-spacing: 0.25em;
+          text-transform: uppercase;
+          color: #7c7872;
+          cursor: pointer;
+          transition: color 0.3s;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 0;
+        }
+        .dior-logout-btn:hover {
+          color: #2d2a26;
+        }
+        .dior-logout-arrow {
+          font-size: 10px;
         }
 
-        /* ══ COLLECTOR SUMMARY HEADER ══ */
-        .ord-client-summary {
-          display: grid;
-          grid-template-columns: 1fr auto 1fr;
-          align-items: center;
-          border-top: 1px solid rgba(0, 0, 0, 0.08);
-          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-          padding: 18px 0;
-          margin-bottom: 56px;
-          font-size: 8px;
-          letter-spacing: 0.25em;
-          color: rgba(0, 0, 0, 0.45);
+        /* Space Wrap */
+        .dior-space-wrap {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 60px 24px 100px;
+          box-sizing: border-box;
+          font-family: var(--font-primary), sans-serif;
         }
-        .ord-summary-item {
+
+        /* Split layouts */
+        .dior-split-row {
+          display: grid;
+          grid-template-columns: 4fr 6fr;
+          gap: 84px;
+          padding: 32px 0;
+          align-items: start;
+        }
+        .dior-split-left {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          position: sticky;
+          top: 180px;
+        }
+        .dior-main-title {
+          font-family: var(--font-brand), serif;
+          font-size: 26px;
+          font-weight: 300;
+          letter-spacing: 0.08em;
+          color: #2d2a26;
+          margin: 0 0 20px;
+        }
+        .dior-main-subtitle {
+          font-size: 11px;
+          line-height: 2.1;
+          color: #7c7872;
+          letter-spacing: 0.05em;
+          margin: 0;
+        }
+
+        /* Right Panel Details */
+        .dior-timeline-notable {
+          margin-bottom: 48px;
+          padding-bottom: 40px;
+          border-bottom: 1px solid #ddd8d2;
+        }
+        .dior-timeline-lbl {
+          font-size: 8px;
+          font-weight: 400;
+          letter-spacing: 0.3em;
+          color: #7c7872;
+          margin: 0 0 20px;
+          text-transform: uppercase;
+        }
+        .dior-spotlight-item {
+          display: grid;
+          grid-template-columns: 100px 1fr;
+          gap: 28px;
+          background: #ffffff;
+          border: 1px solid #ddd8d2;
+          padding: 24px;
+          align-items: center;
+        }
+        .dior-spotlight-img {
+          width: 100px;
+          aspect-ratio: 3 / 4;
+          object-fit: contain;
+          background: rgba(0, 0, 0, 0.015);
+          padding: 8px;
+          box-sizing: border-box;
+          filter: grayscale(0.1);
+        }
+        .dior-spotlight-info {
           display: flex;
           flex-direction: column;
           gap: 6px;
         }
-        .ord-summary-item:last-child {
-          align-items: flex-end;
+        .dior-spotlight-season {
+          font-size: 7.5px;
+          letter-spacing: 0.25em;
+          color: #7c7872;
         }
-        .ord-summary-center {
-          align-items: center;
-          color: rgba(0, 0, 0, 0.75);
-        }
-        .ord-summary-label {
-          font-weight: 300;
-          color: rgba(0, 0, 0, 0.3);
-        }
-        .ord-summary-val {
-          font-weight: 400;
-        }
-
-        /* ══ NAVIGATION TABS ══ */
-        .ord-nav-tabs {
-          display: flex;
-          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-          margin-bottom: 72px;
-          overflow-x: auto;
-          scrollbar-width: none;
-        }
-        .ord-nav-tabs::-webkit-scrollbar {
-          display: none;
-        }
-        .ord-nav-tab {
-          flex-shrink: 0;
-          padding: 14px 0;
-          margin-right: 44px;
-          font-size: 8.5px;
-          font-weight: 300;
-          letter-spacing: 0.35em;
-          text-transform: uppercase;
-          color: rgba(0, 0, 0, 0.35);
-          text-decoration: none;
-          border-bottom: 1px solid transparent;
-          margin-bottom: -1px;
-          transition: color 0.4s, border-color 0.4s;
-        }
-        .ord-nav-tab:hover {
-          color: rgba(0, 0, 0, 0.7);
-        }
-        .ord-nav-tab.active {
-          color: #000000;
-          border-bottom-color: rgba(0, 0, 0, 0.4);
-        }
-
-        /* ══ EDITORIAL WELCOME HEADER ══ */
-        .ord-editorial-header {
-          margin-bottom: 64px;
-          max-width: 720px;
-        }
-        .ord-main-title {
+        .dior-spotlight-title {
           font-family: var(--font-brand), serif;
-          font-size: clamp(24px, 4.5vw, 38px);
+          font-size: 13px;
           font-weight: 300;
-          letter-spacing: 0.15em;
-          color: rgba(0, 0, 0, 0.85);
-          margin: 0 0 20px;
-        }
-        .ord-main-subtitle {
-          font-size: 11px;
-          font-weight: 300;
-          line-height: 2.1;
-          letter-spacing: 0.06em;
-          color: rgba(0, 0, 0, 0.45);
+          letter-spacing: 0.08em;
           margin: 0;
         }
-
-        .ord-section-eyebrow {
-          font-size: 8px;
-          font-weight: 400;
-          letter-spacing: 0.44em;
-          text-transform: uppercase;
-          color: rgba(0, 0, 0, 0.35);
-          margin: 0 0 28px;
-        }
-
-        /* ══ TIMELINE LAYOUT ══ */
-        .ord-acquisitions-panel {
-          display: flex;
-          flex-direction: column;
-          gap: 60px;
-        }
-        .ord-notable-acq {
-          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-          padding-bottom: 48px;
-        }
-        .ord-notable-card {
-          display: grid;
-          grid-template-columns: 140px 1fr;
-          gap: 40px;
-          background: #fafafa;
-          border: 1px solid rgba(0, 0, 0, 0.04);
-          padding: 32px;
-          align-items: center;
-        }
-        .ord-notable-img {
-          width: 140px;
-          aspect-ratio: 3 / 4;
-          object-fit: contain;
-          background: rgba(0, 0, 0, 0.015);
-          padding: 12px;
-          box-sizing: border-box;
-          filter: grayscale(0.2);
-        }
-        .ord-notable-details {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-        .ord-notable-label {
-          font-size: 7px;
-          font-weight: 300;
-          letter-spacing: 0.35em;
-          color: rgba(0, 0, 0, 0.35);
-        }
-        .ord-notable-title {
-          font-family: var(--font-brand), serif;
-          font-size: 16px;
-          font-weight: 300;
-          letter-spacing: 0.2em;
+        .dior-spotlight-desc {
+          font-size: 10px;
+          color: #7c7872;
           margin: 0;
-        }
-        .ord-notable-desc {
-          font-size: 11px;
-          line-height: 1.9;
           letter-spacing: 0.04em;
-          color: rgba(0, 0, 0, 0.45);
-          margin: 0;
-          max-width: 480px;
-        }
-        .ord-notable-meta {
-          font-size: 8px;
-          color: rgba(0, 0, 0, 0.3);
-          letter-spacing: 0.15em;
-          font-weight: 300;
         }
 
-        .ord-timeline {
+        /* Orders list nodes */
+        .dior-timeline-list {
           display: flex;
           flex-direction: column;
-          gap: 40px;
         }
-        .ord-timeline-node {
-          border: 1px solid rgba(0, 0, 0, 0.04);
+        .dior-order-node {
           background: #ffffff;
+          border: 1px solid #ddd8d2;
           padding: 32px;
-        }
-        .ord-node-header {
-          display: flex;
-          justify-content: space-between;
-          border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-          padding-bottom: 18px;
           margin-bottom: 24px;
         }
-        .ord-node-left {
+        .dior-order-header {
           display: flex;
-          gap: 24px;
+          justify-content: space-between;
+          border-bottom: 1px solid #ddd8d2;
+          padding-bottom: 18px;
+          margin-bottom: 24px;
           align-items: center;
         }
-        .ord-node-date {
-          font-size: 10px;
-          font-weight: 400;
-          letter-spacing: 0.18em;
-          color: rgba(0, 0, 0, 0.85);
-        }
-        .ord-node-id {
-          font-size: 8px;
-          letter-spacing: 0.25em;
-          color: rgba(0, 0, 0, 0.3);
-        }
-        .ord-node-right {
+        .dior-order-meta {
           display: flex;
-          gap: 24px;
-          align-items: center;
+          gap: 20px;
         }
-        .ord-node-total {
+        .dior-order-date {
           font-size: 10px;
-          letter-spacing: 0.1em;
-          color: rgba(0, 0, 0, 0.6);
-        }
-        .ord-node-status {
-          font-size: 8px;
-          letter-spacing: 0.22em;
           font-weight: 400;
+          letter-spacing: 0.15em;
+          color: #2d2a26;
         }
-        .ord-node-status.delivered { color: #555555; }
+        .dior-order-id {
+          font-size: 8.5px;
+          letter-spacing: 0.2em;
+          color: #7c7872;
+        }
+        .dior-status-badge {
+          font-size: 7.5px;
+          font-weight: 400;
+          letter-spacing: 0.2em;
+          padding: 4px 10px;
+          border: 1px solid #ddd8d2;
+          color: #2d2a26;
+        }
 
-        .ord-node-body {
+        .dior-order-items {
           display: flex;
           flex-direction: column;
           gap: 16px;
           margin-bottom: 24px;
         }
-        .ord-node-item {
+        .dior-order-item-row {
           display: flex;
           gap: 20px;
           align-items: center;
         }
-        .ord-node-item-img {
+        .dior-order-item-img {
           width: 52px;
           height: 68px;
           object-fit: contain;
           background: rgba(0, 0, 0, 0.015);
           padding: 6px;
           box-sizing: border-box;
-          filter: grayscale(0.2);
         }
-        .ord-node-item-details {
+        .dior-order-item-details {
           display: flex;
           flex-direction: column;
-          gap: 6px;
+          gap: 4px;
         }
-        .ord-node-item-title {
+        .dior-order-item-title {
           font-family: var(--font-brand), serif;
           font-size: 12px;
           font-weight: 300;
-          letter-spacing: 0.15em;
+          letter-spacing: 0.08em;
           margin: 0;
         }
-        .ord-node-item-meta {
+        .dior-order-item-spec {
           font-size: 8px;
-          color: rgba(0, 0, 0, 0.3);
+          color: #7c7872;
           letter-spacing: 0.15em;
         }
-        .ord-node-item-price {
-          font-size: 9px;
-          color: rgba(0, 0, 0, 0.5);
+        .dior-order-item-price {
+          font-size: 9.5px;
+          color: #2d2a26;
           letter-spacing: 0.05em;
         }
 
-        .ord-node-footer {
+        .dior-order-footer {
+          border-top: 1px solid #ddd8d2;
+          padding-top: 18px;
           display: flex;
           justify-content: space-between;
           align-items: center;
-          border-top: 1px solid rgba(0, 0, 0, 0.04);
-          padding-top: 18px;
         }
-        .ord-node-payment {
+        .dior-order-payment {
           font-size: 8px;
-          letter-spacing: 0.2em;
-          color: rgba(0, 0, 0, 0.25);
+          letter-spacing: 0.18em;
+          color: #7c7872;
+          text-transform: uppercase;
         }
-        .ord-node-actions {
+        .dior-order-actions {
           display: flex;
           gap: 24px;
         }
-        .ord-node-link {
-          font-size: 8px;
+        .dior-order-link {
+          font-size: 8.5px;
+          font-weight: 400;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: #2d2a26;
+          text-decoration: underline;
+          text-underline-offset: 4px;
+        }
+        .dior-order-link:hover {
+          color: #7c7872;
+        }
+
+        /* Empty state */
+        .dior-empty-state {
+          text-align: center;
+          padding: 64px;
+          border: 1px dashed #ddd8d2;
+          background: #ffffff;
+        }
+        .dior-empty-text {
+          font-size: 11px;
+          color: #7c7872;
+          letter-spacing: 0.08em;
+          margin-bottom: 24px;
+        }
+        .dior-btn-dark {
+          background: #34383d;
+          color: #f7f5f0;
+          font-family: inherit;
+          font-size: 9px;
+          font-weight: 400;
           letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: rgba(0, 0, 0, 0.45);
-          text-decoration: underline;
-          text-underline-offset: 3px;
+          text-decoration: none;
+          padding: 15px 32px;
+          transition: opacity 0.3s;
+          display: inline-block;
+          border-radius: 0;
+        }
+        .dior-btn-dark:hover {
+          opacity: 0.9;
+        }
+
+        /* Legal Footer */
+        .dior-internal-footer {
+          display: flex;
+          justify-content: center;
+          gap: 40px;
+          padding: 60px 0 20px;
+          border-top: 1px solid #ddd8d2;
+          margin-top: 40px;
+          font-size: 8px;
+          letter-spacing: 0.25em;
+          color: #7c7872;
+        }
+        .dior-footer-link {
+          cursor: pointer;
           transition: color 0.3s;
         }
-        .ord-node-link:hover {
-          color: #000000;
+        .dior-footer-link:hover {
+          color: #2d2a26;
+        }
+
+        @media (max-width: 991px) {
+          .dior-split-row {
+            grid-template-columns: 1fr;
+            gap: 40px;
+          }
+          .dior-split-left {
+            position: static;
+          }
         }
 
         @media (max-width: 767px) {
-          .ord-space-wrap {
-            padding: 100px 16px 80px;
+          .dior-tabs-nav {
+            top: 70px;
           }
-          .ord-client-summary {
-            grid-template-columns: 1fr;
-            gap: 12px;
-            text-align: center;
-            margin-bottom: 48px;
+          .dior-space-wrap {
+            padding: 40px 16px 80px;
           }
-          .ord-summary-item:last-child {
-            align-items: center;
+          .dior-order-node {
+            padding: 20px;
           }
-          .ord-nav-tabs {
-            margin-bottom: 48px;
-          }
-          .ord-nav-tab {
-            margin-right: 28px;
-          }
-          .ord-editorial-header {
-            margin-bottom: 40px;
-          }
-          .ord-notable-card {
-            grid-template-columns: 1fr;
-            gap: 20px;
-          }
-          .ord-node-header {
+          .dior-order-header {
             flex-direction: column;
-            gap: 12px;
             align-items: flex-start;
+            gap: 12px;
           }
-          .ord-node-right {
-            justify-content: space-between;
-            width: 100%;
-          }
-          .ord-node-footer {
+          .dior-order-footer {
             flex-direction: column;
+            align-items: flex-start;
             gap: 16px;
-            align-items: flex-start;
           }
-          .ord-node-actions {
+          .dior-order-actions {
             width: 100%;
             justify-content: space-between;
           }

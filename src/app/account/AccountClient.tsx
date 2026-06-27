@@ -2,401 +2,407 @@
 
 import Link from 'next/link';
 import { useRequireAuth, useAuth } from '@/context/AuthContext';
-import { useCart } from '@/context/CartContext';
-import { useWishlist } from '@/context/WishlistContext';
-import { useTranslation } from '@/lib/i18n';
-import { useLocale } from '@/context/LocaleContext';
+import { usePathname } from 'next/navigation';
 
 export default function AccountClient() {
   const { user, isLoading } = useRequireAuth();
   const { logout } = useAuth();
-  const { cart } = useCart();
-  const { items: wishlistItems } = useWishlist();
-  const { t } = useTranslation();
-  const { formatPrice } = useLocale();
+  const pathname = usePathname();
 
   if (isLoading || !user) return null;
 
-  const firstCartItem = cart.lines[0];
+  const fullName = `${user.firstName} ${user.lastName}`.toUpperCase();
 
   return (
     <>
-      <div className="acc-space-wrap">
-        {/* Collector Metadata Header */}
-        <div className="acc-client-summary">
-          <div className="acc-summary-item">
-            <span className="acc-summary-label">CLIENT REGISTRY</span>
-            <span className="acc-summary-val">
-              {`TNT-${String(user.email.split('').reduce((a,c)=>a+c.charCodeAt(0),0) % 9000 + 1000)}`}
-            </span>
+      {/* ══ HORIZONTAL MAISON NAVIGATION TABS ══ */}
+      <nav className="dior-tabs-nav">
+        <div className="dior-tabs-container">
+          <div className="dior-tabs-list">
+            <Link href="/account" className={`dior-tab ${pathname === '/account' ? 'active' : ''}`}>
+              Overview
+            </Link>
+            <Link href="/account/orders" className={`dior-tab ${pathname === '/account/orders' ? 'active' : ''}`}>
+              Past Acquisitions
+            </Link>
+            <Link href="/archive?tab=personal" className={`dior-tab ${pathname === '/archive' ? 'active' : ''}`}>
+              Personal Archive
+            </Link>
+            <Link href="/account/information" className={`dior-tab ${pathname === '/account/information' ? 'active' : ''}`}>
+              Profile
+            </Link>
+            <Link href="/account/addresses" className={`dior-tab ${pathname === '/account/addresses' ? 'active' : ''}`}>
+              Addresses
+            </Link>
+            <Link href="/archive?tab=requests" className={`dior-tab`}>
+              Sourcing Requests
+            </Link>
+            <Link href="/archive?tab=registry" className={`dior-tab`}>
+              Collection Registry
+            </Link>
           </div>
-          <div className="acc-summary-item acc-summary-center">
-            <span className="acc-summary-label">MAISON ACCESS</span>
-            <span className="acc-summary-val">{`${user.firstName.toUpperCase()} ${user.lastName.toUpperCase()}`}</span>
-          </div>
-          <div className="acc-summary-item">
-            <span className="acc-summary-label">MEMBER STATUS</span>
-            <span className="acc-summary-val">VERIFIED RECORD</span>
-          </div>
-        </div>
-
-        {/* Navigation Tabs */}
-        <nav className="acc-nav-tabs">
-          <Link href="/account" className="acc-nav-tab active">The Residence</Link>
-          <Link href="/account/orders" className="acc-nav-tab">Acquisitions</Link>
-          <Link href="/account/information" className="acc-nav-tab">House Record</Link>
-          <Link href="/archive" className="acc-nav-tab">Archive Room</Link>
-        </nav>
-
-        {/* Welcome Header */}
-        <div className="acc-editorial-header">
-          <h1 className="acc-main-title">THE RESIDENCE</h1>
-          <p className="acc-main-subtitle">
-            Welcome back to the house of TONET TORRENTINNI, {user.firstName}. 
-            Your private access point for reviewing acquisitions, personal archives and exclusive sourcing requests.
-          </p>
-        </div>
-
-        {/* Grid Blocks */}
-        <div className="acc-grid">
-          {/* Current Selection (Cart) */}
-          <Link href="#" className="acc-card" onClick={(e) => { e.preventDefault(); }}>
-            <span className="acc-card-num">01</span>
-            <h3 className="acc-card-title">CURRENT SELECTION</h3>
-            {firstCartItem ? (
-              <div className="acc-preview-row">
-                {firstCartItem.image && (
-                  <img src={firstCartItem.image} alt={firstCartItem.name} className="acc-preview-img" />
-                )}
-                <div className="acc-preview-info">
-                  <span className="acc-preview-name">{firstCartItem.name.toUpperCase()}</span>
-                  <span className="acc-preview-meta">
-                    {formatPrice(firstCartItem.price, firstCartItem.currencyCode)}
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <p className="acc-card-desc">No pieces currently selected for acquisition.</p>
-            )}
-          </Link>
-
-          {/* Acquisitions */}
-          <Link href="/account/orders" className="acc-card">
-            <span className="acc-card-num">02</span>
-            <h3 className="acc-card-title">PAST ACQUISITIONS</h3>
-            <p className="acc-card-desc">View your verified purchase history, order statuses and download invoice records.</p>
-          </Link>
-
-          {/* Archive Collection */}
-          <Link href="/archive" className="acc-card">
-            <span className="acc-card-num">03</span>
-            <h3 className="acc-card-title">ARCHIVE COLLECTION</h3>
-            {wishlistItems.length > 0 ? (
-              <div className="acc-preview-gallery">
-                {wishlistItems.slice(0, 3).map(item => (
-                  <img key={item.handle} src={item.imageUrl} alt={item.title} className="acc-preview-thumb" />
-                ))}
-                {wishlistItems.length > 3 && (
-                  <span className="acc-preview-more">+{wishlistItems.length - 3}</span>
-                )}
-              </div>
-            ) : (
-              <p className="acc-card-desc">No garments currently retained in your personal archive.</p>
-            )}
-          </Link>
-
-          {/* House Record (Profile) */}
-          <Link href="/account/information" className="acc-card">
-            <span className="acc-card-num">04</span>
-            <h3 className="acc-card-title">HOUSE RECORD</h3>
-            <div className="acc-record-info">
-              <span className="acc-record-line">{user.firstName} {user.lastName}</span>
-              <span className="acc-record-email">{user.email}</span>
-            </div>
-          </Link>
-        </div>
-
-        {/* Depart Button */}
-        <div className="acc-footer">
-          <button className="acc-logout-btn" onClick={logout}>
-            DEPART THE HOUSE
+          <button onClick={logout} className="dior-logout-btn">
+            Sign out <span className="dior-logout-arrow">→</span>
           </button>
         </div>
+      </nav>
+
+      <div className="dior-space-wrap">
+        {/* ══ HERO BANNER AREA ══ */}
+        <div className="dior-hero-banner">
+          <img 
+            src="/hero/ComfyUI-main_reference_00016_.png" 
+            alt="Maison Atelier" 
+            className="dior-hero-img"
+          />
+          <div className="dior-hero-overlay">
+            <h1 className="dior-hero-title">Welcome, {fullName}</h1>
+          </div>
+        </div>
+
+        {/* ══ CONTENT SPLIT GRID (LEFT LABEL, RIGHT CONTENT) ══ */}
+        <div className="dior-split-row dior-split-row--bordered">
+          <div className="dior-split-left">
+            <h2 className="dior-section-title">Your Wardrobe</h2>
+            <p className="dior-section-desc">
+              Explore your personal space, registry files, and request availability for sold-out collections.
+            </p>
+            <Link href="/collection" className="dior-btn-dark">
+              Explore Collections
+            </Link>
+          </div>
+          <div className="dior-split-right">
+            <div className="dior-imagery-grid">
+              <img src="/hero/ComfyUI-main_reference_00018_.png" alt="Lookbook 01" className="dior-editorial-img" />
+              <img src="/hero/ComfyUI-main_reference_00021_.png" alt="Lookbook 02" className="dior-editorial-img" />
+            </div>
+          </div>
+        </div>
+
+        {/* ══ MANAGE ACCOUNT BLOCK ══ */}
+        <div className="dior-split-row">
+          <div className="dior-split-left">
+            <h2 className="dior-section-title">Manage Account</h2>
+          </div>
+          <div className="dior-split-right">
+            <div className="dior-manage-grid">
+              
+              <div className="dior-manage-col">
+                <h3 className="dior-manage-title">Profile</h3>
+                <p className="dior-manage-text">Update your personal registration details, password, and communications preferences.</p>
+                <Link href="/account/information" className="dior-text-link">Edit</Link>
+              </div>
+
+              <div className="dior-manage-col">
+                <h3 className="dior-manage-title">Addresses</h3>
+                <p className="dior-manage-text">Manage your verified billing and shipping address entries for swift acquisitions.</p>
+                <Link href="/account/addresses" className="dior-text-link">Edit</Link>
+              </div>
+
+              <div className="dior-manage-col">
+                <h3 className="dior-manage-title">Archive Room</h3>
+                <p className="dior-manage-text">Access your personal archive collection wishlist and review your registered garments.</p>
+                <Link href="/archive?tab=personal" className="dior-text-link">Explore</Link>
+              </div>
+
+              <div className="dior-manage-col">
+                <h3 className="dior-manage-title">Sourcing Concierge</h3>
+                <p className="dior-manage-text">Request sizes or pieces no longer available and track their status in real-time.</p>
+                <Link href="/archive?tab=requests" className="dior-text-link">Manage</Link>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        {/* ══ COMPONENT LEGAL FOOTER ══ */}
+        <footer className="dior-internal-footer">
+          <span className="dior-footer-link">PRIVACY POLICY</span>
+          <span className="dior-footer-link">LEGAL NOTICE</span>
+        </footer>
       </div>
 
       <style>{`
-        /* Light Theme overrides for the residence */
+        /* ══ DIOR LUXURY THEME STYLING ══ */
         html, body {
-          background: #ffffff !important;
+          background: #f4f3f1 !important;
+          color: #2d2a26 !important;
         }
 
-        .acc-space-wrap {
-          max-width: 1000px;
+        /* Tabs Nav */
+        .dior-tabs-nav {
+          background: #ffffff;
+          border-bottom: 1px solid #ddd8d2;
+          width: 100%;
+          position: sticky;
+          top: 80px;
+          z-index: 10;
+        }
+        .dior-tabs-container {
+          max-width: 1200px;
           margin: 0 auto;
-          padding: 140px 24px 100px;
-          font-family: var(--font-primary), sans-serif;
-          color: rgba(0, 0, 0, 0.85);
-          box-sizing: border-box;
-        }
-
-        /* ══ COLLECTOR SUMMARY HEADER ══ */
-        .acc-client-summary {
-          display: grid;
-          grid-template-columns: 1fr auto 1fr;
-          align-items: center;
-          border-top: 1px solid rgba(0, 0, 0, 0.08);
-          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-          padding: 18px 0;
-          margin-bottom: 56px;
-          font-size: 8px;
-          letter-spacing: 0.25em;
-          color: rgba(0, 0, 0, 0.45);
-        }
-        .acc-summary-item {
+          padding: 0 24px;
           display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-        .acc-summary-item:last-child {
-          align-items: flex-end;
-        }
-        .acc-summary-center {
+          justify-content: space-between;
           align-items: center;
-          color: rgba(0, 0, 0, 0.75);
+          height: 60px;
         }
-        .acc-summary-label {
-          font-weight: 300;
-          color: rgba(0, 0, 0, 0.3);
-        }
-        .acc-summary-val {
-          font-weight: 400;
-        }
-
-        /* ══ NAVIGATION TABS ══ */
-        .acc-nav-tabs {
+        .dior-tabs-list {
           display: flex;
-          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-          margin-bottom: 72px;
+          height: 100%;
           overflow-x: auto;
           scrollbar-width: none;
         }
-        .acc-nav-tabs::-webkit-scrollbar {
+        .dior-tabs-list::-webkit-scrollbar {
           display: none;
         }
-        .acc-nav-tab {
-          flex-shrink: 0;
-          padding: 14px 0;
-          margin-right: 44px;
+        .dior-tab {
+          font-family: var(--font-primary), sans-serif;
           font-size: 8.5px;
           font-weight: 300;
-          letter-spacing: 0.35em;
+          letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: rgba(0, 0, 0, 0.35);
+          color: #7c7872;
           text-decoration: none;
+          display: flex;
+          align-items: center;
+          padding: 0 16px;
+          height: 100%;
           border-bottom: 1px solid transparent;
           margin-bottom: -1px;
-          transition: color 0.4s, border-color 0.4s;
+          transition: color 0.3s, border-color 0.3s;
+          white-space: nowrap;
         }
-        .acc-nav-tab:hover {
-          color: rgba(0, 0, 0, 0.7);
+        .dior-tab:hover {
+          color: #2d2a26;
         }
-        .acc-nav-tab.active {
-          color: #000000;
-          border-bottom-color: rgba(0, 0, 0, 0.4);
-        }
-
-        /* ══ EDITORIAL WELCOME HEADER ══ */
-        .acc-editorial-header {
-          margin-bottom: 64px;
-          max-width: 720px;
-        }
-        .acc-main-title {
-          font-family: var(--font-brand), serif;
-          font-size: clamp(24px, 4.5vw, 38px);
-          font-weight: 300;
-          letter-spacing: 0.15em;
-          color: rgba(0, 0, 0, 0.85);
-          margin: 0 0 20px;
-        }
-        .acc-main-subtitle {
-          font-size: 11px;
-          font-weight: 300;
-          line-height: 2.1;
-          letter-spacing: 0.06em;
-          color: rgba(0, 0, 0, 0.45);
-          margin: 0;
-        }
-
-        /* ══ GRID CARDS ══ */
-        .acc-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 1px;
-          background: rgba(0, 0, 0, 0.06);
-          border: 1px solid rgba(0, 0, 0, 0.06);
-          margin-bottom: 64px;
-        }
-        .acc-card {
-          background: #ffffff;
-          padding: 44px;
-          min-height: 180px;
-          text-decoration: none;
-          color: inherit;
-          display: flex;
-          flex-direction: column;
-          transition: background 0.4s;
-          position: relative;
-        }
-        .acc-card:hover {
-          background: rgba(0, 0, 0, 0.01);
-        }
-        .acc-card-num {
-          font-size: 8px;
-          font-weight: 300;
-          color: rgba(0, 0, 0, 0.2);
-          letter-spacing: 0.05em;
-          margin-bottom: 24px;
-        }
-        .acc-card-title {
-          font-size: 10px;
+        .dior-tab.active {
+          color: #2d2a26;
           font-weight: 400;
-          text-transform: uppercase;
-          letter-spacing: 0.3em;
-          color: rgba(0, 0, 0, 0.65);
-          margin: 0 0 16px;
+          border-bottom-color: #2d2a26;
         }
-        .acc-card-desc {
-          font-size: 10px;
-          font-weight: 300;
-          letter-spacing: 0.04em;
-          color: rgba(0, 0, 0, 0.35);
-          line-height: 1.8;
-          margin: 0;
-        }
-
-        /* Previews inside cards */
-        .acc-preview-row {
-          display: flex;
-          gap: 18px;
-          align-items: center;
-          margin-top: auto;
-        }
-        .acc-preview-img {
-          width: 48px;
-          height: 64px;
-          object-fit: contain;
-          background: rgba(0, 0, 0, 0.015);
-          filter: grayscale(0.2);
-        }
-        .acc-preview-info {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-        .acc-preview-name {
-          font-size: 9px;
-          font-weight: 400;
-          letter-spacing: 0.12em;
-          color: rgba(0, 0, 0, 0.7);
-        }
-        .acc-preview-meta {
-          font-size: 9px;
-          font-weight: 300;
-          color: rgba(0, 0, 0, 0.45);
-          letter-spacing: 0.05em;
-        }
-
-        .acc-preview-gallery {
-          display: flex;
-          gap: 10px;
-          align-items: center;
-          margin-top: auto;
-        }
-        .acc-preview-thumb {
-          width: 40px;
-          height: 52px;
-          object-fit: contain;
-          background: rgba(0, 0, 0, 0.015);
-          filter: grayscale(0.2);
-        }
-        .acc-preview-more {
-          font-size: 10px;
-          font-weight: 300;
-          color: rgba(0, 0, 0, 0.35);
-          margin-left: 8px;
-        }
-
-        .acc-record-info {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-          margin-top: auto;
-        }
-        .acc-record-line {
-          font-size: 11px;
-          font-weight: 300;
-          letter-spacing: 0.06em;
-          color: rgba(0, 0, 0, 0.55);
-        }
-        .acc-record-email {
-          font-size: 9.5px;
-          font-weight: 300;
-          letter-spacing: 0.05em;
-          color: rgba(0, 0, 0, 0.35);
-        }
-
-        /* Logout button */
-        .acc-footer {
-          display: flex;
-          justify-content: flex-start;
-        }
-        .acc-logout-btn {
-          background: transparent;
-          border: 1px solid rgba(0, 0, 0, 0.12);
-          padding: 18px 48px;
+        .dior-logout-btn {
+          background: none;
+          border: none;
+          font-family: var(--font-primary), sans-serif;
           font-size: 8.5px;
           font-weight: 300;
-          font-family: inherit;
+          letter-spacing: 0.25em;
           text-transform: uppercase;
-          letter-spacing: 0.3em;
-          color: rgba(0, 0, 0, 0.45);
+          color: #7c7872;
           cursor: pointer;
-          transition: border-color 0.4s, color 0.4s;
+          transition: color 0.3s;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 0;
+        }
+        .dior-logout-btn:hover {
+          color: #2d2a26;
+        }
+        .dior-logout-arrow {
+          font-size: 10px;
+        }
+
+        /* Space Wrap */
+        .dior-space-wrap {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 60px 24px 100px;
+          box-sizing: border-box;
+          font-family: var(--font-primary), sans-serif;
+        }
+
+        /* Hero Banner */
+        .dior-hero-banner {
+          position: relative;
+          width: 100%;
+          height: 380px;
+          overflow: hidden;
+          margin-bottom: 72px;
+          background: #e4e3e1;
+        }
+        .dior-hero-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center 30%;
+          filter: contrast(0.95) brightness(1.02);
+        }
+        .dior-hero-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(244, 243, 241, 0.15);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .dior-hero-title {
+          font-family: var(--font-brand), serif;
+          font-size: clamp(20px, 4vw, 32px);
+          font-weight: 300;
+          letter-spacing: 0.08em;
+          color: #2d2a26;
+          text-align: center;
+          margin: 0;
+          background: rgba(244, 243, 241, 0.85);
+          padding: 24px 48px;
+          border: 1px solid #ddd8d2;
+        }
+
+        /* Split layouts */
+        .dior-split-row {
+          display: grid;
+          grid-template-columns: 4fr 6fr;
+          gap: 64px;
+          padding: 56px 0;
+          align-items: start;
+        }
+        .dior-split-row--bordered {
+          border-bottom: 1px solid #ddd8d2;
+          padding-top: 0;
+        }
+        .dior-split-left {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .dior-section-title {
+          font-family: var(--font-brand), serif;
+          font-size: 20px;
+          font-weight: 300;
+          letter-spacing: 0.08em;
+          color: #2d2a26;
+          margin: 0 0 18px;
+        }
+        .dior-section-desc {
+          font-size: 11px;
+          line-height: 2.1;
+          color: #7c7872;
+          letter-spacing: 0.05em;
+          margin: 0 0 32px;
+          max-width: 320px;
+        }
+
+        /* Buttons */
+        .dior-btn-dark {
+          background: #34383d;
+          color: #f7f5f0;
+          font-family: inherit;
+          font-size: 9px;
+          font-weight: 400;
+          letter-spacing: 0.25em;
+          text-transform: uppercase;
+          text-decoration: none;
+          padding: 15px 32px;
+          transition: opacity 0.3s;
+          display: inline-block;
           border-radius: 0;
         }
-        .acc-logout-btn:hover {
-          border-color: rgba(0, 0, 0, 0.5);
-          color: #000000;
+        .dior-btn-dark:hover {
+          opacity: 0.9;
+        }
+
+        /* Imagery Grid */
+        .dior-imagery-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 24px;
+        }
+        .dior-editorial-img {
+          width: 100%;
+          aspect-ratio: 4 / 3;
+          object-fit: cover;
+          border: 1px solid #ddd8d2;
+        }
+
+        /* Manage Grid */
+        .dior-manage-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 48px;
+        }
+        .dior-manage-col {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .dior-manage-title {
+          font-family: var(--font-brand), serif;
+          font-size: 13px;
+          font-weight: 300;
+          letter-spacing: 0.08em;
+          color: #2d2a26;
+          margin: 0 0 10px;
+        }
+        .dior-manage-text {
+          font-size: 10.5px;
+          line-height: 1.9;
+          color: #7c7872;
+          letter-spacing: 0.04em;
+          margin: 0 0 16px;
+        }
+        .dior-text-link {
+          font-size: 9px;
+          font-weight: 400;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: #2d2a26;
+          text-decoration: underline;
+          text-underline-offset: 4px;
+        }
+        .dior-text-link:hover {
+          color: #7c7872;
+        }
+
+        /* Legal Footer */
+        .dior-internal-footer {
+          display: flex;
+          justify-content: center;
+          gap: 40px;
+          padding: 60px 0 20px;
+          border-top: 1px solid #ddd8d2;
+          margin-top: 40px;
+          font-size: 8px;
+          letter-spacing: 0.25em;
+          color: #7c7872;
+        }
+        .dior-footer-link {
+          cursor: pointer;
+          transition: color 0.3s;
+        }
+        .dior-footer-link:hover {
+          color: #2d2a26;
+        }
+
+        @media (max-width: 991px) {
+          .dior-split-row {
+            grid-template-columns: 1fr;
+            gap: 40px;
+          }
+          .dior-section-desc {
+            max-width: 100%;
+          }
         }
 
         @media (max-width: 767px) {
-          .acc-space-wrap {
-            padding: 100px 16px 80px;
+          .dior-tabs-nav {
+            top: 70px;
           }
-          .acc-client-summary {
-            grid-template-columns: 1fr;
-            gap: 12px;
-            text-align: center;
-            margin-bottom: 48px;
+          .dior-space-wrap {
+            padding: 40px 16px 80px;
           }
-          .acc-summary-item:last-child {
-            align-items: center;
-          }
-          .acc-nav-tabs {
-            margin-bottom: 48px;
-          }
-          .acc-nav-tab {
-            margin-right: 28px;
-          }
-          .acc-editorial-header {
+          .dior-hero-banner {
+            height: 240px;
             margin-bottom: 40px;
           }
-          .acc-grid {
+          .dior-manage-grid {
             grid-template-columns: 1fr;
+            gap: 36px;
           }
-          .acc-card {
-            padding: 32px;
-            min-height: 140px;
+          .dior-imagery-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
           }
         }
       `}</style>

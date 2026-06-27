@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useWishlist, WishlistItem } from '@/context/WishlistContext';
+import { useWishlist } from '@/context/WishlistContext';
 import { useAuth } from '@/context/AuthContext';
 import { useLocale } from '@/context/LocaleContext';
 
-type Tab = 'personal' | 'acquisitions' | 'requests' | 'registry';
+type Tab = 'personal' | 'requests' | 'registry';
 
 interface AvailRequest {
   id: string;
@@ -31,21 +31,6 @@ interface Collection {
   lookbook: string[];
 }
 
-const LABELS = {
-  title: 'THE ARCHIVE ROOM',
-  subtitle: 'A private registry for collecting, tracking and sourcing selected pieces from the house of TONET TORRENTINNI.',
-  personalArchive: 'Personal Archive',
-  pastAcquisitions: 'Past Acquisitions',
-  availabilityRequests: 'Sourcing Requests',
-  collectionRegistry: 'Collection Registry',
-  recentlyArchived: 'Recently Archived',
-  requestAPiece: 'Sourcing Concierge',
-  registeredCollections: 'Collection Registry',
-  archiveDetail: 'Archive Detail',
-  noRequestsRegistered: 'No requests currently registered.',
-  notifyNotice: 'Our sourcing team will contact you if the piece becomes available.',
-};
-
 const COLLECTIONS: Collection[] = [
   {
     id: 'permanence',
@@ -58,76 +43,21 @@ const COLLECTIONS: Collection[] = [
     lookbook: [
       '/hero/ComfyUI-main_reference_00012_.png',
       '/hero/ComfyUI-main_reference_00018_.png',
-      '/hero/ComfyUI-main_reference_00028_.png',
+      '/hero/ComfyUI-main_reference_00021_.png'
     ]
   },
   {
-    id: 'ss26-vol1',
+    id: 'ss26',
     title: 'SS26 — VOL I',
-    season: 'SPRING/SUMMER 2026',
+    season: 'SPRING / SUMMER 2026',
     year: '2026',
-    pieceCount: 12,
-    coverImage: '/hero/ComfyUI-main_reference_00016_.png',
-    description: 'Initial ready-to-wear explorations in restrained tones. Inspired by coastal minerals, dust patterns, and the silent spaces of natural landscapes.',
-    lookbook: [
-      '/hero/ComfyUI-main_reference_00016_.png',
-      '/hero/ComfyUI-main_reference_00019_.png',
-      '/hero/ComfyUI-main_reference_00021_.png',
-    ]
-  },
-  {
-    id: 'fw25-vol2',
-    title: 'FW25 — VOL II',
-    season: 'AUTUMN/WINTER 2025',
-    year: '2025',
     pieceCount: 24,
-    coverImage: '/hero/ComfyUI-main_reference_00020_.png',
-    description: 'Heavyweight outerwear layerings and technical fabrications. Exploring utility closures, modular linings and insulated natural cotton blends.',
+    coverImage: '/hero/ComfyUI-main_reference_00028_.png',
+    description: 'Atelier tailorings met with modular utility. Fine raw wool construction blending traditional structure and contemporary relaxed silhouettes.',
     lookbook: [
+      '/hero/ComfyUI-main_reference_00028_.png',
       '/hero/ComfyUI-main_reference_00020_.png',
-      '/hero/ComfyUI-main_reference_00022_.png',
-      '/hero/ComfyUI-main_reference_00032_.png',
-    ]
-  }
-];
-
-const MOCK_ACQUISITIONS = [
-  {
-    id: 'TNT-ACQ-9821',
-    date: 1779344400000, // mock date in future/present 2026
-    total: 790.00,
-    currency: 'EUR',
-    status: 'delivered' as 'delivered' | 'shipped' | 'preparing',
-    payment: 'MASTERCARD **** 4892',
-    collection: 'SS26 — VOL I',
-    items: [
-      {
-        handle: 'heavyweight-raglan-zip-hoodie',
-        title: 'HEAVYWEIGHT RAGLAN ZIP HOODIE',
-        price: 790.00,
-        size: 'L',
-        color: 'CARBON BLACK',
-        imageUrl: '/hero/ComfyUI-main_reference_00028_.png'
-      }
-    ]
-  },
-  {
-    id: 'TNT-ACQ-9421',
-    date: 1776944400000,
-    total: 320.00,
-    currency: 'EUR',
-    status: 'delivered' as 'delivered' | 'shipped' | 'preparing',
-    payment: 'MASTERCARD **** 4892',
-    collection: 'PERMANENCE',
-    items: [
-      {
-        handle: 'essential-heavyweight-shorts',
-        title: 'ESSENTIAL HEAVYWEIGHT SHORTS',
-        price: 320.00,
-        size: 'M',
-        color: 'HUESO',
-        imageUrl: '/hero/ComfyUI-main_reference_00012_.png'
-      }
+      '/hero/ComfyUI-main_reference_00022_.png'
     ]
   }
 ];
@@ -161,8 +91,9 @@ export default function ArchiveClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { items, remove } = useWishlist();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { formatPrice } = useLocale();
+  const pathname = usePathname();
 
   const tabParam = searchParams.get('tab') as Tab | null;
   const [activeTab, setActiveTab] = useState<Tab>(tabParam ?? 'personal');
@@ -194,6 +125,14 @@ export default function ArchiveClient() {
     const iv = setInterval(() => setTick(t => t + 1), 60000);
     return () => clearInterval(iv);
   }, []);
+
+  // Sync tab if query parameter changes
+  useEffect(() => {
+    if (tabParam) {
+      setActiveTab(tabParam);
+      setSelectedCollection(null);
+    }
+  }, [tabParam]);
 
   if (!mounted) return null;
 
@@ -246,88 +185,89 @@ export default function ArchiveClient() {
 
   return (
     <>
-      <div className="ar-space-wrap">
-        {/* Collector Metadata Header */}
-        <div className="ar-client-summary">
-          <div className="ar-summary-item">
-            <span className="ar-summary-label">CLIENT REGISTRY</span>
-            <span className="ar-summary-val">
-              {user ? `TNT-${String(user.email.split('').reduce((a,c)=>a+c.charCodeAt(0),0) % 9000 + 1000)}` : 'GUEST COLLECTOR'}
-            </span>
+      {/* ══ HORIZONTAL MAISON NAVIGATION TABS ══ */}
+      <nav className="dior-tabs-nav">
+        <div className="dior-tabs-container">
+          <div className="dior-tabs-list">
+            <Link href="/account" className={`dior-tab ${pathname === '/account' ? 'active' : ''}`}>
+              Overview
+            </Link>
+            <Link href="/account/orders" className={`dior-tab ${pathname === '/account/orders' ? 'active' : ''}`}>
+              Past Acquisitions
+            </Link>
+            <Link href="/archive?tab=personal" className={`dior-tab ${activeTab === 'personal' ? 'active' : ''}`}>
+              Personal Archive
+            </Link>
+            <Link href="/account/information" className={`dior-tab ${pathname === '/account/information' ? 'active' : ''}`}>
+              Profile
+            </Link>
+            <Link href="/account/addresses" className={`dior-tab ${pathname === '/account/addresses' ? 'active' : ''}`}>
+              Addresses
+            </Link>
+            <Link href="/archive?tab=requests" className={`dior-tab ${activeTab === 'requests' ? 'active' : ''}`}>
+              Sourcing Requests
+            </Link>
+            <Link href="/archive?tab=registry" className={`dior-tab ${activeTab === 'registry' ? 'active' : ''}`}>
+              Collection Registry
+            </Link>
           </div>
-          <div className="ar-summary-item ar-summary-center">
-            <span className="ar-summary-label">MAISON ACCESS</span>
-            <span className="ar-summary-val">{user ? `${user.firstName.toUpperCase()} ${user.lastName.toUpperCase()}` : 'PRIVATE MODE'}</span>
-          </div>
-          <div className="ar-summary-item">
-            <span className="ar-summary-label">MEMBER STATUS</span>
-            <span className="ar-summary-val">{user ? 'VERIFIED RECORD' : 'ANONYMOUS'}</span>
-          </div>
+          <button onClick={logout} className="dior-logout-btn">
+            Sign out <span className="dior-logout-arrow">→</span>
+          </button>
         </div>
+      </nav>
 
-        {/* Editorial Title */}
-        <div className="ar-editor-header">
-          <h1 className="ar-main-title">{LABELS.title}</h1>
-          <p className="ar-main-subtitle">{LABELS.subtitle}</p>
-        </div>
-
-        {/* Main Workspace Layout */}
-        <div className="ar-workspace">
+      <div className="dior-space-wrap">
+        
+        {/* ══ SPLIT ROW LAYOUT (TITLE LEFT, CONTENT RIGHT) ══ */}
+        <div className="dior-split-row">
           
-          {/* Desktop Left Sidebar / Navigation */}
-          <aside className="ar-sidebar">
-            <nav className="ar-nav-links">
-              <button className={`ar-nav-item ${activeTab === 'personal' ? 'active' : ''}`} onClick={() => switchTab('personal')}>
-                <span className="ar-nav-num">01</span> {LABELS.personalArchive}
-              </button>
-              <button className={`ar-nav-item ${activeTab === 'acquisitions' ? 'active' : ''}`} onClick={() => switchTab('acquisitions')}>
-                <span className="ar-nav-num">02</span> {LABELS.pastAcquisitions}
-              </button>
-              <button className={`ar-nav-item ${activeTab === 'requests' ? 'active' : ''}`} onClick={() => switchTab('requests')}>
-                <span className="ar-nav-num">03</span> {LABELS.availabilityRequests}
-              </button>
-              <button className={`ar-nav-item ${activeTab === 'registry' ? 'active' : ''}`} onClick={() => switchTab('registry')}>
-                <span className="ar-nav-num">04</span> {LABELS.collectionRegistry}
-              </button>
-            </nav>
-
-            <div className="ar-sidebar-footer">
-              {user && (
-                <Link href="/account/information" className="ar-sidebar-link">
-                  House Record (Profile)
-                </Link>
-              )}
-              <Link href="/account" className="ar-sidebar-link">
-                Return to Residence
-              </Link>
-            </div>
-          </aside>
-
-          {/* Mobile Swiper Tabs */}
-          <div className="ar-mobile-tabs">
-            <button className={`ar-m-tab ${activeTab === 'personal' ? 'active' : ''}`} onClick={() => switchTab('personal')}>Archive</button>
-            <button className={`ar-m-tab ${activeTab === 'acquisitions' ? 'active' : ''}`} onClick={() => switchTab('acquisitions')}>Acquisitions</button>
-            <button className={`ar-m-tab ${activeTab === 'requests' ? 'active' : ''}`} onClick={() => switchTab('requests')}>Sourcing</button>
-            <button className={`ar-m-tab ${activeTab === 'registry' ? 'active' : ''}`} onClick={() => switchTab('registry')}>Collections</button>
+          {/* LEFT COLUMN: TITLE & INTRO */}
+          <div className="dior-split-left">
+            {activeTab === 'personal' && (
+              <>
+                <h1 className="dior-main-title">Personal Archive</h1>
+                <p className="dior-main-subtitle">
+                  Review garments currently saved to your personal vault. Garments are retained here for up to 48 hours to secure availability.
+                </p>
+              </>
+            )}
+            {activeTab === 'requests' && (
+              <>
+                <h1 className="dior-main-title">Sourcing Requests</h1>
+                <p className="dior-main-subtitle">
+                  Submit customized availability targets to our sourcing team. We will contact you immediately once the item becomes sourced.
+                </p>
+              </>
+            )}
+            {activeTab === 'registry' && (
+              <>
+                <h1 className="dior-main-title">Collection Registry</h1>
+                <p className="dior-main-subtitle">
+                  Cross-reference past collections lookbooks and verify registered garments in your personal wardrobe archive checklist.
+                </p>
+              </>
+            )}
           </div>
 
-          {/* Right Content Panel */}
-          <main className="ar-panel-content">
+          {/* RIGHT COLUMN: TABS CONTENT */}
+          <div className="dior-split-right">
             
             {/* 1. PERSONAL ARCHIVE TAB */}
             {activeTab === 'personal' && (
-              <div className="ar-fade-in">
-                {/* Recently Archived Section (Editorial spotlight) */}
+              <div className="dior-fade-in">
+                
+                {/* Spotlight "Recently Archived" */}
                 {recentlyArchived.length > 0 && (
-                  <div className="ar-spotlight">
-                    <h3 className="ar-section-eyebrow">{LABELS.recentlyArchived}</h3>
-                    <div className="ar-spotlight-row">
+                  <div className="dior-spotlight-section">
+                    <h3 className="dior-section-lbl">RECENTLY ARCHIVED</h3>
+                    <div className="dior-spotlight-list">
                       {recentlyArchived.map(item => (
-                        <div key={`spot-${item.handle}`} className="ar-spot-card">
-                          <img src={item.imageUrl} alt={item.title} className="ar-spot-img" />
-                          <div className="ar-spot-info">
-                            <span className="ar-spot-col">{item.collectionTitle?.toUpperCase()}</span>
-                            <span className="ar-spot-title">{item.title.toUpperCase()}</span>
+                        <div key={`spot-${item.handle}`} className="dior-spotlight-card">
+                          <img src={item.imageUrl} alt={item.title} className="dior-spotlight-thumb" />
+                          <div className="dior-spotlight-info">
+                            <span className="dior-spotlight-season">{item.collectionTitle?.toUpperCase()}</span>
+                            <h4 className="dior-spotlight-title">{item.title.toUpperCase()}</h4>
                           </div>
                         </div>
                       ))}
@@ -335,23 +275,22 @@ export default function ArchiveClient() {
                   </div>
                 )}
 
-                {/* Filter & View Switcher Bar */}
-                <div className="ar-filter-bar">
-                  <div className="ar-filters-group">
-                    <div className="ar-filter-select-wrap">
-                      <span className="ar-filter-lbl">Season:</span>
-                      <select className="ar-filter-select" value={seasonFilter} onChange={(e) => setSeasonFilter(e.target.value)}>
+                {/* Filter and View Toggles */}
+                <div className="dior-filters-bar">
+                  <div className="dior-filters-left">
+                    <div className="dior-filter-select-wrap">
+                      <span className="dior-filter-label">Season</span>
+                      <select className="dior-filter-select" value={seasonFilter} onChange={(e) => setSeasonFilter(e.target.value)}>
                         <option value="ALL">ALL SEASONS</option>
                         <option value="PERMANENCE">PERMANENCE</option>
                         <option value="SS26 — VOL I">SS26 — VOL I</option>
-                        <option value="FW25 — VOL II">FW25 — VOL II</option>
                       </select>
                     </div>
 
-                    <div className="ar-filter-select-wrap">
-                      <span className="ar-filter-lbl">Type:</span>
-                      <select className="ar-filter-select" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
-                        <option value="ALL">ALL PIECES</option>
+                    <div className="dior-filter-select-wrap">
+                      <span className="dior-filter-label">Category</span>
+                      <select className="dior-filter-select" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+                        <option value="ALL">ALL ITEMS</option>
                         <option value="HOODIE">HOODIES</option>
                         <option value="SHORTS">SHORTS</option>
                         <option value="TEE">TEES</option>
@@ -360,53 +299,52 @@ export default function ArchiveClient() {
                     </div>
                   </div>
 
-                  <div className="ar-view-toggle">
-                    <button className={`ar-view-btn ${viewMode === 'grid' ? 'active' : ''}`} onClick={() => setViewMode('grid')}>GRID</button>
-                    <button className={`ar-view-btn ${viewMode === 'list' ? 'active' : ''}`} onClick={() => setViewMode('list')}>LIST</button>
+                  <div className="dior-view-toggles">
+                    <button className={`dior-view-btn ${viewMode === 'grid' ? 'active' : ''}`} onClick={() => setViewMode('grid')}>GRID</button>
+                    <button className={`dior-view-btn ${viewMode === 'list' ? 'active' : ''}`} onClick={() => setViewMode('list')}>LIST</button>
                   </div>
                 </div>
 
-                {/* Entries Layout */}
+                {/* Products listing */}
                 {filteredItems.length === 0 ? (
-                  <div className="ar-editorial-empty">
-                    <h3 className="ar-empty-hed">THE ARCHIVE IS CURRENTLY EMPTY</h3>
-                    <p className="ar-empty-sub-text">
-                      Selected garments will be preserved here temporarily for future acquisition.
-                    </p>
-                    <Link href="/collection" className="ar-editorial-cta">Explore Collections</Link>
+                  <div className="dior-empty-state">
+                    <p className="dior-empty-text">No garments currently preserved in your Personal Archive.</p>
+                    <Link href="/collection" className="dior-btn-dark">Explore Collections</Link>
                   </div>
                 ) : viewMode === 'grid' ? (
+                  
                   /* GRID VIEW */
-                  <div className="ar-grid-layout">
+                  <div className="dior-editorial-grid">
                     {filteredItems.map(item => {
                       const id = archiveId(item.handle);
                       const { text: remText, percent, expired } = timeRemaining(item.addedAt);
                       return (
-                        <div key={item.handle} className={`ar-grid-card ${expired ? 'expired' : ''}`}>
-                          <Link href={`/product/${item.handle}`} className="ar-card-img-container">
-                            <img src={item.imageUrl} alt={item.title} className="ar-card-img" />
-                            {expired && <div className="ar-card-expired-overlay">EXPIRED</div>}
+                        <div key={item.handle} className={`dior-product-card ${expired ? 'expired' : ''}`}>
+                          <Link href={`/product/${item.handle}`} className="dior-card-media-wrap">
+                            <img src={item.imageUrl} alt={item.title} className="dior-card-img" />
+                            {expired && <div className="dior-expired-badge">EXPIRED</div>}
                           </Link>
-                          <div className="ar-card-body">
-                            <div className="ar-card-meta">
-                              <span className="ar-card-id">{id}</span>
-                              <span className="ar-card-season">{item.collectionTitle?.toUpperCase()}</span>
+                          
+                          <div className="dior-card-body">
+                            <div className="dior-card-metadata">
+                              <span className="dior-card-id">{id}</span>
+                              <span className="dior-card-season">{item.collectionTitle?.toUpperCase()}</span>
                             </div>
-                            <h4 className="ar-card-title">
+                            <h4 className="dior-card-title">
                               <Link href={`/product/${item.handle}`}>{item.title.toUpperCase()}</Link>
                             </h4>
-                            <div className="ar-card-price">{formatPrice(item.price, item.currencyCode)}</div>
+                            <div className="dior-card-price">{formatPrice(item.price, item.currencyCode)}</div>
                             
-                            {/* Visual Timeline duration bar */}
-                            <div className="ar-duration-bar-wrap">
-                              <div className="ar-duration-bar" style={{ width: `${percent}%` }} />
-                              <div className="ar-duration-labels">
+                            {/* Visual retention bar */}
+                            <div className="dior-retention-wrap">
+                              <div className="dior-retention-line" style={{ width: `${percent}%` }} />
+                              <div className="dior-retention-lbls">
                                 <span>RETENTION</span>
                                 <span className={expired ? 'expired-text' : ''}>{remText}</span>
                               </div>
                             </div>
 
-                            <button className="ar-card-remove-btn" onClick={() => remove(item.handle)}>
+                            <button className="dior-card-dismiss-btn" onClick={() => remove(item.handle)}>
                               DISMISS PIECE
                             </button>
                           </div>
@@ -414,243 +352,168 @@ export default function ArchiveClient() {
                       );
                     })}
                   </div>
+
                 ) : (
+
                   /* LIST VIEW */
-                  <div className="ar-list-layout">
+                  <div className="dior-list-view">
                     {filteredItems.map(item => {
                       const id = archiveId(item.handle);
                       const { text: remText, expired } = timeRemaining(item.addedAt);
                       return (
-                        <div key={`list-${item.handle}`} className={`ar-list-row ${expired ? 'expired' : ''}`}>
-                          <img src={item.imageUrl} alt={item.title} className="ar-list-img" />
-                          <div className="ar-list-details">
-                            <span className="ar-list-id">{id}</span>
-                            <h4 className="ar-list-title">
+                        <div key={`list-${item.handle}`} className={`dior-list-row ${expired ? 'expired' : ''}`}>
+                          <img src={item.imageUrl} alt={item.title} className="dior-list-img" />
+                          <div className="dior-list-details">
+                            <span className="dior-list-id">{id}</span>
+                            <h4 className="dior-list-title">
                               <Link href={`/product/${item.handle}`}>{item.title.toUpperCase()}</Link>
                             </h4>
-                            <span className="ar-list-season">{item.collectionTitle?.toUpperCase()}</span>
+                            <span className="dior-list-season">{item.collectionTitle?.toUpperCase()}</span>
                           </div>
-                          <div className="ar-list-duration">
-                            <span className="ar-list-label">RETENTION</span>
-                            <span className={`ar-list-val ${expired ? 'expired-text' : ''}`}>{remText}</span>
+                          <div className="dior-list-retention">
+                            <span className="dior-list-lbl">RETENTION</span>
+                            <span className={`dior-list-val ${expired ? 'expired-text' : ''}`}>{remText}</span>
                           </div>
-                          <div className="ar-list-price">{formatPrice(item.price, item.currencyCode)}</div>
-                          <button className="ar-list-remove-btn" onClick={() => remove(item.handle)}>
-                            DISMISS
+                          <div className="dior-list-price">{formatPrice(item.price, item.currencyCode)}</div>
+                          <button className="dior-list-dismiss" onClick={() => remove(item.handle)}>
+                            Dismiss
                           </button>
                         </div>
                       );
                     })}
                   </div>
+
                 )}
+
               </div>
             )}
 
-            {/* 2. PAST ACQUISITIONS TAB */}
-            {activeTab === 'acquisitions' && (
-              <div className="ar-fade-in">
-                {user ? (
-                  <div className="ar-acquisitions-panel">
-                    {/* Notable acquisitions spotlight */}
-                    <div className="ar-notable-acq">
-                      <h3 className="ar-section-eyebrow">NOTABLE ACQUISITION</h3>
-                      <div className="ar-notable-card">
-                        <img src="/hero/ComfyUI-main_reference_00028_.png" alt="Notable Piece" className="ar-notable-img" />
-                        <div className="ar-notable-details">
-                          <span className="ar-notable-label">SEASON HIGHLIGHT</span>
-                          <h2 className="ar-notable-title">HEAVYWEIGHT RAGLAN ZIP HOODIE</h2>
-                          <p className="ar-notable-desc">
-                            Selected from SS26 Ready-to-wear. A certified piece registered on your collection registry.
-                          </p>
-                          <span className="ar-notable-meta">REGISTERED IN WARDROBE ON 15 JUNE 2026</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Timeline List (no tables) */}
-                    <h3 className="ar-section-eyebrow">ACQUISITIONS REGISTRY</h3>
-                    <div className="ar-timeline">
-                      {MOCK_ACQUISITIONS.map(acq => (
-                        <div key={acq.id} className="ar-timeline-node">
-                          <div className="ar-node-header">
-                            <div className="ar-node-left">
-                              <span className="ar-node-date">{formatDate(acq.date)}</span>
-                              <span className="ar-node-id">{acq.id}</span>
-                            </div>
-                            <div className="ar-node-right">
-                              <span className="ar-node-total">Total: {formatPrice(acq.total, acq.currency)}</span>
-                              <span className={`ar-node-status ${acq.status}`}>● {acq.status.toUpperCase()}</span>
-                            </div>
-                          </div>
-
-                          <div className="ar-node-body">
-                            {acq.items.map(item => (
-                              <div key={item.handle} className="ar-node-item">
-                                <img src={item.imageUrl} alt={item.title} className="ar-node-item-img" />
-                                <div className="ar-node-item-details">
-                                  <h4 className="ar-node-item-title">{item.title}</h4>
-                                  <span className="ar-node-item-meta">SIZE: {item.size} / COLOR: {item.color}</span>
-                                  <span className="ar-node-item-price">{formatPrice(item.price, acq.currency)}</span>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-
-                          <div className="ar-node-footer">
-                            <span className="ar-node-payment">{acq.payment}</span>
-                            <div className="ar-node-actions">
-                              <a href="#" onClick={(e) => { e.preventDefault(); alert("Invoice downloaded successfully (Mock PDF)."); }} className="ar-node-link">
-                                Download Invoice (PDF)
-                              </a>
-                              <Link href={`/product/${acq.items[0].handle}`} className="ar-node-link">
-                                Reorder Piece
-                              </Link>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="ar-editorial-empty">
-                    <h3 className="ar-empty-hed">AUTHENTICATION REQUIRED</h3>
-                    <p className="ar-empty-sub-text">
-                      Please access your client record to view your acquisitions history.
-                    </p>
-                    <Link href="/login" className="ar-editorial-cta">Access Account</Link>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* 3. AVAILABILITY REQUESTS TAB */}
+            {/* 2. SOURCING REQUESTS TAB */}
             {activeTab === 'requests' && (
-              <div className="ar-fade-in">
-                {/* Request Sourcing Form */}
-                <div className="ar-sourcing-section">
-                  <div className="ar-sourcing-intro">
-                    <h3 className="ar-section-eyebrow">{LABELS.requestAPiece}</h3>
-                    <p className="ar-sourcing-intro-text">
-                      If a piece or specific size is currently unavailable, submit a request below. 
-                      Our sourcing concierge team will review the request and contact you directly via email.
-                    </p>
-                  </div>
-
-                  <form className="ar-sourcing-form" onSubmit={handleSourcingSubmit}>
-                    <div className="ar-form-row">
-                      <div className="ar-form-group">
-                        <label className="ar-form-label">Garment / Piece Name</label>
-                        <input
-                          type="text"
-                          required
-                          className="ar-form-input"
-                          placeholder="e.g. HEAVYWEIGHT RAGLAN ZIP HOODIE"
-                          value={sourcePiece}
-                          onChange={(e) => setSourcePiece(e.target.value)}
-                        />
-                      </div>
+              <div className="dior-fade-in">
+                
+                {/* Availability Concierge Form */}
+                <div className="dior-sourcing-panel">
+                  <h3 className="dior-section-lbl">SOURCING CONCIERGE</h3>
+                  <form className="dior-sourcing-form" onSubmit={handleSourcingSubmit}>
+                    
+                    <div className="dior-form-group">
+                      <label className="dior-form-label" htmlFor="piece-name">Garment / Piece Name *</label>
+                      <input
+                        id="piece-name"
+                        type="text"
+                        required
+                        className="dior-input"
+                        placeholder="e.g. HEAVYWEIGHT RAGLAN ZIP HOODIE"
+                        value={sourcePiece}
+                        onChange={(e) => setSourcePiece(e.target.value)}
+                      />
                     </div>
 
-                    <div className="ar-form-grid">
-                      <div className="ar-form-group">
-                        <label className="ar-form-label">Requested Size</label>
-                        <select className="ar-form-select" value={sourceSize} onChange={(e) => setSourceSize(e.target.value)}>
+                    <div className="dior-form-grid">
+                      <div className="dior-form-group">
+                        <label className="dior-form-label">Requested Size</label>
+                        <select className="dior-select" value={sourceSize} onChange={(e) => setSourceSize(e.target.value)}>
                           <option value="S">S / SMALL</option>
                           <option value="M">M / MEDIUM</option>
                           <option value="L">L / LARGE</option>
                           <option value="XL">XL / EXTRA LARGE</option>
-                          <option value="OS">OS / ONE SIZE</option>
                         </select>
                       </div>
 
-                      <div className="ar-form-group">
-                        <label className="ar-form-label">Desired Color / Wash</label>
-                        <select className="ar-form-select" value={sourceColor} onChange={(e) => setSourceColor(e.target.value)}>
+                      <div className="dior-form-group">
+                        <label className="dior-form-label">Desired Color / Wash</label>
+                        <select className="dior-select" value={sourceColor} onChange={(e) => setSourceColor(e.target.value)}>
                           <option value="CARBON BLACK">CARBON BLACK</option>
                           <option value="ASH GRAY">ASH GRAY</option>
                           <option value="HUESO / OFF-WHITE">HUESO / OFF-WHITE</option>
-                          <option value="DUST WARM GRAY">DUST WARM GRAY</option>
                         </select>
                       </div>
                     </div>
 
-                    <div className="ar-form-row">
-                      <div className="ar-form-group">
-                        <label className="ar-form-label">Collector Notes (Optional specifications)</label>
-                        <textarea
-                          className="ar-form-textarea"
-                          placeholder="Specify custom lengths, collection versions or vintage requests..."
-                          value={sourceNotes}
-                          onChange={(e) => setSourceNotes(e.target.value)}
-                        />
-                      </div>
+                    <div className="dior-form-group">
+                      <label className="dior-form-label" htmlFor="concierge-notes">Collector Specifications (Optional)</label>
+                      <textarea
+                        id="concierge-notes"
+                        className="dior-textarea"
+                        placeholder="Specify custom lengths, collection versions or vintage requests..."
+                        value={sourceNotes}
+                        onChange={(e) => setSourceNotes(e.target.value)}
+                      />
                     </div>
 
                     {formSuccess && (
-                      <p className="ar-form-success">Sourcing request recorded. A concierge agent is reviewing it.</p>
+                      <p className="dior-form-success-msg">CONCIERGE REQUEST SUBMITTED SUCCESSFULLY</p>
                     )}
 
-                    <button type="submit" className="ar-form-submit-btn">
-                      SUBMIT SOURCING REQUEST
+                    <button type="submit" className="dior-btn-dark">
+                      Submit sourcing request
                     </button>
                   </form>
                 </div>
 
                 {/* Sourcing History */}
-                <h3 className="ar-section-eyebrow">SUBMITTED REQUESTS</h3>
-                {availRequests.length === 0 ? (
-                  <div className="ar-sourcing-empty-state">
-                    <span className="ar-sourcing-empty-text">{LABELS.noRequestsRegistered}</span>
-                    <p className="ar-sourcing-empty-sub">{LABELS.notifyNotice}</p>
-                  </div>
-                ) : (
-                  <div className="ar-sourcing-list">
-                    {availRequests.map(req => (
-                      <div key={req.id} className="ar-sourcing-card">
-                        <div className="ar-sourcing-card-header">
-                          <span className="ar-sourcing-card-id">{req.id}</span>
-                          <span className={`ar-sourcing-badge ${req.status}`}>
-                            {req.status.replace('_', ' ').toUpperCase()}
-                          </span>
-                        </div>
-                        <h4 className="ar-sourcing-card-title">{req.title}</h4>
-                        <div className="ar-sourcing-card-details">
-                          <span>SIZE: {req.size}</span>
-                          <span>COLOR: {req.color}</span>
-                          <span>REQUESTED: {formatDate(req.submittedAt)}</span>
-                        </div>
-                        {req.notes && (
-                          <div className="ar-sourcing-card-notes">
-                            <strong>Notes:</strong> "{req.notes}"
+                <div className="dior-sourcing-history">
+                  <h3 className="dior-section-lbl">SUBMITTED REQUESTS</h3>
+                  
+                  {availRequests.length === 0 ? (
+                    <div className="dior-empty-state">
+                      <p className="dior-empty-text">No requests registered. You will be notified should availability change.</p>
+                    </div>
+                  ) : (
+                    <div className="dior-requests-list">
+                      {availRequests.map(req => (
+                        <div key={req.id} className="dior-request-card">
+                          <div className="dior-request-header">
+                            <span className="dior-request-id">{req.id}</span>
+                            <span className={`dior-request-badge ${req.status}`}>
+                              {req.status.replace('_', ' ').toUpperCase()}
+                            </span>
                           </div>
-                        )}
-                        <button className="ar-sourcing-card-dismiss-btn" onClick={() => removeRequest(req.id)}>
-                          DISMISS
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                          
+                          <h4 className="dior-request-title">{req.title}</h4>
+                          
+                          <div className="dior-request-details">
+                            <span>SIZE: {req.size}</span>
+                            <span>COLOR: {req.color}</span>
+                            <span>DATE: {formatDate(req.submittedAt)}</span>
+                          </div>
+
+                          {req.notes && (
+                            <p className="dior-request-notes">“{req.notes}”</p>
+                          )}
+
+                          <button className="dior-request-dismiss" onClick={() => removeRequest(req.id)}>
+                            Dismiss request
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                </div>
+
               </div>
             )}
 
-            {/* 4. COLLECTION REGISTRY TAB */}
+            {/* 3. COLLECTION REGISTRY TAB */}
             {activeTab === 'registry' && (
-              <div className="ar-fade-in">
+              <div className="dior-fade-in">
+                
                 {!selectedCollection ? (
                   /* COLLECTIONS GRID */
-                  <div className="ar-collections-grid-wrap">
-                    <h3 className="ar-section-eyebrow">{LABELS.registeredCollections}</h3>
-                    <div className="ar-collections-grid">
+                  <div className="dior-collections-panel">
+                    <h3 className="dior-section-lbl">REGISTERED COLLECTIONS</h3>
+                    <div className="dior-collections-grid">
                       {COLLECTIONS.map(col => (
-                        <div key={col.id} className="ar-collection-card" onClick={() => setSelectedCollection(col)}>
-                          <div className="ar-col-card-img-wrap">
-                            <img src={col.coverImage} alt={col.title} className="ar-col-card-img" />
+                        <div key={col.id} className="dior-collection-card" onClick={() => setSelectedCollection(col)}>
+                          <div className="dior-collection-img-wrap">
+                            <img src={col.coverImage} alt={col.title} className="dior-collection-img" />
                           </div>
-                          <div className="ar-col-card-body">
-                            <span className="ar-col-card-season">{col.season}</span>
-                            <h3 className="ar-col-card-title">{col.title}</h3>
-                            <div className="ar-col-card-meta">
+                          <div className="dior-collection-body">
+                            <span className="dior-collection-season">{col.season}</span>
+                            <h4 className="dior-collection-title">{col.title}</h4>
+                            <div className="dior-collection-meta">
                               <span>YEAR: {col.year}</span>
                               <span>{col.pieceCount} PIECES REGISTERED</span>
                             </div>
@@ -660,1351 +523,969 @@ export default function ArchiveClient() {
                     </div>
                   </div>
                 ) : (
-                  /* COLLECTION DETAIL VIEW */
-                  <div className="ar-collection-detail-view">
-                    <button className="ar-detail-back-btn" onClick={() => setSelectedCollection(null)}>
-                      ← RETURN TO REGISTRY
+                  /* COLLECTION DETAIL LOOKBOOK VIEW */
+                  <div className="dior-detail-view">
+                    <button className="dior-back-btn" onClick={() => setSelectedCollection(null)}>
+                      ← Return to collections
                     </button>
-                    
-                    <div className="ar-detail-hero">
-                      <div className="ar-detail-hero-left">
-                        <span className="ar-detail-eyebrow">{selectedCollection.season}</span>
-                        <h1 className="ar-detail-title">{selectedCollection.title}</h1>
-                        <p className="ar-detail-desc">{selectedCollection.description}</p>
+
+                    <div className="dior-detail-hero">
+                      <div className="dior-detail-hero-info">
+                        <span className="dior-detail-season">{selectedCollection.season}</span>
+                        <h2 className="dior-detail-title">{selectedCollection.title}</h2>
+                        <p className="dior-detail-desc">{selectedCollection.description}</p>
                       </div>
-                      <img src={selectedCollection.coverImage} alt={selectedCollection.title} className="ar-detail-hero-img" />
+                      <img src={selectedCollection.coverImage} alt={selectedCollection.title} className="dior-detail-img" />
                     </div>
 
-                    {/* Lookbook Row */}
-                    <div className="ar-detail-lookbook">
-                      <h3 className="ar-section-eyebrow">EDITORIAL LOOKBOOK</h3>
-                      <div className="ar-lookbook-row">
+                    {/* Editorial lookbook images */}
+                    <div className="dior-detail-lookbook-section">
+                      <h3 className="dior-section-lbl">EDITORIAL LOOKBOOK</h3>
+                      <div className="dior-lookbook-grid">
                         {selectedCollection.lookbook.map((img, idx) => (
-                          <div key={`${selectedCollection.id}-look-${idx}`} className="ar-lookbook-img-wrap">
-                            <img src={img} alt={`Look ${idx + 1}`} className="ar-lookbook-img" />
+                          <div key={idx} className="dior-lookbook-img-wrap">
+                            <img src={img} alt={`Look ${idx + 1}`} className="dior-lookbook-img" />
                           </div>
                         ))}
                       </div>
                     </div>
 
-                    {/* Wardrobe registry checklist */}
-                    <div className="ar-detail-checklist">
-                      <h3 className="ar-section-eyebrow">PIECES CHECKLIST & REGISTER</h3>
-                      <div className="ar-checklist-list">
+                    {/* Wardrobe Checklist */}
+                    <div className="dior-detail-checklist">
+                      <h3 className="dior-section-lbl">GARMENT ARCHIVE CHECKLIST</h3>
+                      
+                      <div className="dior-checklist-list">
                         
-                        <div className="ar-checklist-item">
-                          <div className="ar-checklist-left">
-                            <span className="ar-checklist-name">HEAVYWEIGHT RAGLAN ZIP HOODIE</span>
-                            <span className="ar-checklist-status active">IN WARDROBE</span>
+                        <div className="dior-checklist-item">
+                          <div className="dior-checklist-info">
+                            <span className="dior-checklist-name">HEAVYWEIGHT RAGLAN ZIP HOODIE</span>
+                            <span className="dior-checklist-status active">IN WARDROBE</span>
                           </div>
-                          <Link href="/product/heavyweight-raglan-zip-hoodie" className="ar-checklist-action">VIEW PIECE</Link>
+                          <Link href="/product/heavyweight-raglan-zip-hoodie" className="dior-checklist-link">
+                            View piece
+                          </Link>
                         </div>
 
-                        <div className="ar-checklist-item">
-                          <div className="ar-checklist-left">
-                            <span className="ar-checklist-name">ESSENTIAL HEAVYWEIGHT SHORTS</span>
-                            <span className="ar-checklist-status active">IN WARDROBE</span>
+                        <div className="dior-checklist-item">
+                          <div className="dior-checklist-info">
+                            <span className="dior-checklist-name">ESSENTIAL HEAVYWEIGHT SHORTS</span>
+                            <span className="dior-checklist-status active">IN WARDROBE</span>
                           </div>
-                          <Link href="/product/essential-heavyweight-shorts" className="ar-checklist-action">VIEW PIECE</Link>
+                          <Link href="/product/essential-heavyweight-shorts" className="dior-checklist-link">
+                            View piece
+                          </Link>
                         </div>
 
-                        <div className="ar-checklist-item">
-                          <div className="ar-checklist-left">
-                            <span className="ar-checklist-name">UNISEX SUNFADE WAFFLE BOXY TEE</span>
-                            <span className="ar-checklist-status inactive">UNREGISTERED</span>
+                        <div className="dior-checklist-item">
+                          <div className="dior-checklist-info">
+                            <span className="dior-checklist-name">UNISEX SUNFADE WAFFLE BOXY TEE</span>
+                            <span className="dior-checklist-status inactive">UNREGISTERED</span>
                           </div>
-                          <Link href="/product/unisex-sunfade-waffle-boxy-tee" className="ar-checklist-action">EXPLORE PIECE</Link>
-                        </div>
-
-                        <div className="ar-checklist-item">
-                          <div className="ar-checklist-left">
-                            <span className="ar-checklist-name">CORE CARGO PANTS</span>
-                            <span className="ar-checklist-status inactive">UNREGISTERED</span>
-                          </div>
-                          <Link href="/product/core-cargo-pants" className="ar-checklist-action">EXPLORE PIECE</Link>
+                          <Link href="/product/unisex-sunfade-waffle-boxy-tee" className="dior-checklist-link">
+                            Explore
+                          </Link>
                         </div>
 
                       </div>
                     </div>
+
                   </div>
                 )}
+
               </div>
             )}
 
-          </main>
+          </div>
+
         </div>
+
+        {/* ══ COMPONENT LEGAL FOOTER ══ */}
+        <footer className="dior-internal-footer">
+          <span className="dior-footer-link">PRIVACY POLICY</span>
+          <span className="dior-footer-link">LEGAL NOTICE</span>
+        </footer>
       </div>
 
       <style>{`
-        /* Light luxury space overrides */
+        /* ══ DIOR LUXURY THEME STYLING ══ */
         html, body {
-          background: #ffffff !important;
+          background: #f4f3f1 !important;
+          color: #2d2a26 !important;
         }
 
-        .ar-space-wrap {
+        /* Tabs Nav */
+        .dior-tabs-nav {
+          background: #ffffff;
+          border-bottom: 1px solid #ddd8d2;
+          width: 100%;
+          position: sticky;
+          top: 80px;
+          z-index: 10;
+        }
+        .dior-tabs-container {
           max-width: 1200px;
           margin: 0 auto;
-          padding: 140px 24px 100px;
+          padding: 0 24px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          height: 60px;
+        }
+        .dior-tabs-list {
+          display: flex;
+          height: 100%;
+          overflow-x: auto;
+          scrollbar-width: none;
+        }
+        .dior-tabs-list::-webkit-scrollbar {
+          display: none;
+        }
+        .dior-tab {
           font-family: var(--font-primary), sans-serif;
-          color: rgba(0, 0, 0, 0.85);
-          box-sizing: border-box;
-        }
-
-        /* ══ COLLECTOR SUMMARY HEADER ══ */
-        .ar-client-summary {
-          display: grid;
-          grid-template-columns: 1fr auto 1fr;
-          align-items: center;
-          border-top: 1px solid rgba(0, 0, 0, 0.08);
-          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-          padding: 18px 0;
-          margin-bottom: 72px;
-          font-size: 8px;
+          font-size: 8.5px;
+          font-weight: 300;
           letter-spacing: 0.25em;
-          color: rgba(0, 0, 0, 0.45);
-        }
-        .ar-summary-item {
+          text-transform: uppercase;
+          color: #7c7872;
+          text-decoration: none;
           display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-        .ar-summary-item:last-child {
-          align-items: flex-end;
-        }
-        .ar-summary-center {
           align-items: center;
-          color: rgba(0, 0, 0, 0.75);
+          padding: 0 16px;
+          height: 100%;
+          border-bottom: 1px solid transparent;
+          margin-bottom: -1px;
+          transition: color 0.3s, border-color 0.3s;
+          white-space: nowrap;
         }
-        .ar-summary-label {
-          font-weight: 300;
-          color: rgba(0, 0, 0, 0.3);
+        .dior-tab:hover {
+          color: #2d2a26;
         }
-        .ar-summary-val {
+        .dior-tab.active {
+          color: #2d2a26;
           font-weight: 400;
+          border-bottom-color: #2d2a26;
         }
-
-        /* ══ EDITOR HEADER ══ */
-        .ar-editor-header {
-          text-align: center;
-          margin-bottom: 80px;
-        }
-        .ar-main-title {
-          font-family: var(--font-brand), serif;
-          font-size: clamp(28px, 5vw, 48px);
-          font-weight: 300;
-          letter-spacing: 0.18em;
-          color: rgba(0, 0, 0, 0.85);
-          margin: 0 0 20px;
-        }
-        .ar-main-subtitle {
-          font-size: 11px;
-          font-weight: 300;
-          line-height: 2.1;
-          letter-spacing: 0.08em;
-          color: rgba(0, 0, 0, 0.45);
-          max-width: 520px;
-          margin: 0 auto;
-        }
-
-        /* ══ WORKSPACE LAYOUT ══ */
-        .ar-workspace {
-          display: grid;
-          grid-template-columns: 240px 1fr;
-          gap: 64px;
-          align-items: start;
-        }
-
-        /* Sidebar navigation */
-        .ar-sidebar {
-          position: sticky;
-          top: 120px;
-          display: flex;
-          flex-direction: column;
-          gap: 80px;
-        }
-        .ar-nav-links {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 24px;
-        }
-        .ar-nav-item {
+        .dior-logout-btn {
           background: none;
           border: none;
           font-family: var(--font-primary), sans-serif;
-          font-size: 10px;
-          font-weight: 300;
-          letter-spacing: 0.3em;
-          text-transform: uppercase;
-          color: rgba(0, 0, 0, 0.35);
-          cursor: pointer;
-          padding: 8px 0;
-          display: flex;
-          align-items: center;
-          gap: 16px;
-          transition: color 0.4s, padding-left 0.4s;
-          border-left: 2px solid transparent;
-        }
-        .ar-nav-item:hover {
-          color: rgba(0, 0, 0, 0.7);
-          padding-left: 6px;
-        }
-        .ar-nav-item.active {
-          color: #000000;
-          font-weight: 400;
-          border-left-color: rgba(0, 0, 0, 0.5);
-          padding-left: 12px;
-        }
-        .ar-nav-num {
-          font-size: 8px;
-          font-weight: 300;
-          color: rgba(0, 0, 0, 0.2);
-          letter-spacing: 0.05em;
-        }
-        .ar-sidebar-footer {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-          border-top: 1px solid rgba(0, 0, 0, 0.06);
-          padding-top: 24px;
-        }
-        .ar-sidebar-link {
-          font-size: 8px;
+          font-size: 8.5px;
           font-weight: 300;
           letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: rgba(0, 0, 0, 0.45);
-          text-decoration: none;
+          color: #7c7872;
+          cursor: pointer;
           transition: color 0.3s;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 0;
         }
-        .ar-sidebar-link:hover {
-          color: #000000;
+        .dior-logout-btn:hover {
+          color: #2d2a26;
         }
-
-        /* Mobile swiper tabs - hidden on desktop */
-        .ar-mobile-tabs {
-          display: none;
-        }
-
-        /* Panel content wrapper */
-        .ar-panel-content {
-          min-height: 500px;
+        .dior-logout-arrow {
+          font-size: 10px;
         }
 
-        /* Fade-in transitions */
-        .ar-fade-in {
-          animation: arFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        @keyframes arFadeIn {
-          from { opacity: 0; transform: translateY(15px); }
-          to { opacity: 1; transform: translateY(0); }
+        /* Space Wrap */
+        .dior-space-wrap {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 60px 24px 100px;
+          box-sizing: border-box;
+          font-family: var(--font-primary), sans-serif;
         }
 
-        .ar-section-eyebrow {
+        /* Split layouts */
+        .dior-split-row {
+          display: grid;
+          grid-template-columns: 4fr 6fr;
+          gap: 84px;
+          padding: 32px 0;
+          align-items: start;
+        }
+        .dior-split-left {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          position: sticky;
+          top: 180px;
+        }
+        .dior-main-title {
+          font-family: var(--font-brand), serif;
+          font-size: 26px;
+          font-weight: 300;
+          letter-spacing: 0.08em;
+          color: #2d2a26;
+          margin: 0 0 20px;
+        }
+        .dior-main-subtitle {
+          font-size: 11px;
+          line-height: 2.1;
+          color: #7c7872;
+          letter-spacing: 0.05em;
+          margin: 0;
+        }
+
+        /* Section Subheaders */
+        .dior-section-lbl {
           font-size: 8px;
           font-weight: 400;
-          letter-spacing: 0.44em;
+          letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: rgba(0, 0, 0, 0.35);
-          margin: 0 0 28px;
+          color: #7c7872;
+          margin: 0 0 20px;
         }
 
-        /* ══ PORTFOLIO SPOTLIGHT ══ */
-        .ar-spotlight {
-          margin-bottom: 64px;
-          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        /* Spotlight List (Recently Archived) */
+        .dior-spotlight-section {
+          margin-bottom: 48px;
           padding-bottom: 40px;
+          border-bottom: 1px solid #ddd8d2;
         }
-        .ar-spotlight-row {
+        .dior-spotlight-list {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 24px;
+          gap: 20px;
         }
-        .ar-spot-card {
+        .dior-spotlight-card {
           display: flex;
           align-items: center;
           gap: 16px;
-          background: #fafafa;
-          border: 1px solid rgba(0, 0, 0, 0.04);
+          background: #ffffff;
+          border: 1px solid #ddd8d2;
           padding: 16px;
         }
-        .ar-spot-img {
-          width: 48px;
-          height: 64px;
+        .dior-spotlight-thumb {
+          width: 44px;
+          height: 56px;
           object-fit: contain;
           background: rgba(0, 0, 0, 0.015);
           filter: grayscale(0.2);
         }
-        .ar-spot-info {
+        .dior-spotlight-info {
           display: flex;
           flex-direction: column;
-          gap: 6px;
+          gap: 4px;
         }
-        .ar-spot-col {
+        .dior-spotlight-season {
           font-size: 7px;
-          font-weight: 300;
-          letter-spacing: 0.3em;
-          color: rgba(0, 0, 0, 0.35);
+          letter-spacing: 0.2em;
+          color: #7c7872;
         }
-        .ar-spot-title {
-          font-size: 9px;
+        .dior-spotlight-title {
+          font-size: 8.5px;
           font-weight: 400;
-          letter-spacing: 0.12em;
-          color: rgba(0, 0, 0, 0.75);
+          letter-spacing: 0.1em;
+          color: #2d2a26;
         }
 
-        /* ══ FILTER & VIEW SWITCH BAR ══ */
-        .ar-filter-bar {
+        /* Filters Bar */
+        .dior-filters-bar {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-          padding-bottom: 18px;
-          margin-bottom: 44px;
+          border-bottom: 1px solid #ddd8d2;
+          padding-bottom: 16px;
+          margin-bottom: 40px;
         }
-        .ar-filters-group {
+        .dior-filters-left {
           display: flex;
           gap: 32px;
         }
-        .ar-filter-select-wrap {
+        .dior-filter-select-wrap {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 12px;
         }
-        .ar-filter-lbl {
-          font-size: 8px;
-          font-weight: 300;
+        .dior-filter-label {
+          font-size: 8.5px;
           letter-spacing: 0.2em;
-          color: rgba(0, 0, 0, 0.35);
           text-transform: uppercase;
+          color: #7c7872;
         }
-        .ar-filter-select {
+        .dior-filter-select {
           background: transparent;
           border: none;
-          color: rgba(0, 0, 0, 0.7);
           font-family: inherit;
-          font-size: 8px;
-          font-weight: 400;
-          letter-spacing: 0.22em;
+          font-size: 8.5px;
+          letter-spacing: 0.2em;
           text-transform: uppercase;
+          color: #2d2a26;
           outline: none;
           cursor: pointer;
         }
-        .ar-filter-select option {
+        .dior-filter-select option {
           background: #ffffff;
-          color: rgba(0, 0, 0, 0.85);
+          color: #2d2a26;
         }
-        .ar-view-toggle {
+        .dior-view-toggles {
           display: flex;
           gap: 16px;
         }
-        .ar-view-btn {
+        .dior-view-btn {
           background: none;
           border: none;
           font-family: inherit;
           font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.25em;
-          color: rgba(0, 0, 0, 0.35);
+          letter-spacing: 0.2em;
+          color: #7c7872;
           cursor: pointer;
-          transition: color 0.3s;
           padding: 4px;
+          transition: color 0.3s;
         }
-        .ar-view-btn:hover,
-        .ar-view-btn.active {
-          color: #000000;
+        .dior-view-btn.active,
+        .dior-view-btn:hover {
+          color: #2d2a26;
         }
 
-        /* ══ GRID CARDS LAYOUT ══ */
-        .ar-grid-layout {
+        /* Editorial Grid cards */
+        .dior-editorial-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
           gap: 40px;
         }
-        .ar-grid-card {
+        .dior-product-card {
+          background: #ffffff;
+          border: 1px solid #ddd8d2;
           display: flex;
           flex-direction: column;
-          background: #ffffff;
-          border: 1px solid rgba(0, 0, 0, 0.04);
-          transition: border-color 0.4s;
         }
-        .ar-grid-card:hover {
-          border-color: rgba(0, 0, 0, 0.12);
-        }
-        .ar-card-img-container {
-          position: relative;
+        .dior-card-media-wrap {
           width: 100%;
           aspect-ratio: 3 / 4;
           background: rgba(0, 0, 0, 0.015);
           overflow: hidden;
+          position: relative;
           display: block;
         }
-        .ar-card-img {
+        .dior-card-img {
           width: 100%;
           height: 100%;
           object-fit: contain;
           filter: grayscale(1) contrast(1.02);
-          transition: filter 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: filter 0.5s, transform 0.5s;
           padding: 24px;
           box-sizing: border-box;
         }
-        .ar-grid-card:hover .ar-card-img {
+        .dior-product-card:hover .dior-card-img {
           filter: grayscale(0) contrast(1);
-          transform: scale(1.018);
+          transform: scale(1.015);
         }
-        .ar-card-expired-overlay {
+        .dior-expired-badge {
           position: absolute;
           inset: 0;
-          background: rgba(255, 255, 255, 0.45);
+          background: rgba(244, 243, 241, 0.5);
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 10px;
-          letter-spacing: 0.4em;
-          color: rgba(0, 0, 0, 0.6);
-          backdrop-filter: blur(2px);
+          font-size: 9px;
+          letter-spacing: 0.3em;
+          color: #2d2a26;
+          backdrop-filter: blur(1.5px);
         }
-        .ar-card-body {
-          padding: 32px;
+        .dior-card-body {
+          padding: 28px;
           display: flex;
           flex-direction: column;
         }
-        .ar-card-meta {
+        .dior-card-metadata {
           display: flex;
           justify-content: space-between;
           margin-bottom: 12px;
         }
-        .ar-card-id {
+        .dior-card-id {
           font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.3em;
-          color: rgba(0, 0, 0, 0.3);
+          letter-spacing: 0.25em;
+          color: #7c7872;
         }
-        .ar-card-season {
-          font-size: 7px;
-          font-weight: 300;
-          letter-spacing: 0.3em;
-          color: rgba(0, 0, 0, 0.45);
+        .dior-card-season {
+          font-size: 7.5px;
+          letter-spacing: 0.25em;
+          color: #7c7872;
         }
-        .ar-card-title {
+        .dior-card-title {
           font-family: var(--font-brand), serif;
           font-size: 13px;
           font-weight: 300;
-          letter-spacing: 0.15em;
+          letter-spacing: 0.08em;
           margin: 0 0 10px;
         }
-        .ar-card-title a {
-          color: rgba(0, 0, 0, 0.85);
-          transition: color 0.3s;
+        .dior-card-title a {
+          color: #2d2a26;
+          text-decoration: none;
         }
-        .ar-card-title a:hover {
-          color: #000000;
-        }
-        .ar-card-price {
-          font-size: 10px;
-          font-weight: 300;
-          color: rgba(0, 0, 0, 0.5);
-          margin-bottom: 28px;
+        .dior-card-price {
+          font-size: 9.5px;
+          color: #7c7872;
+          margin-bottom: 24px;
           letter-spacing: 0.05em;
         }
-        
-        /* Duration timeline bar */
-        .ar-duration-bar-wrap {
+        .dior-retention-wrap {
           display: flex;
           flex-direction: column;
           gap: 8px;
-          margin-bottom: 32px;
+          margin-bottom: 28px;
         }
-        .ar-duration-bar-wrap::before {
+        .dior-retention-wrap::before {
           content: "";
           height: 1px;
-          background: rgba(0, 0, 0, 0.06);
+          background: #ddd8d2;
           width: 100%;
         }
-        .ar-duration-bar {
-          height: 2px;
-          background: rgba(0, 0, 0, 0.65);
-          transition: width 0.4s;
+        .dior-retention-line {
+          height: 1px;
+          background: #2d2a26;
         }
-        .ar-grid-card.expired .ar-duration-bar {
-          background: rgba(0, 0, 0, 0.1);
+        .dior-product-card.expired .dior-retention-line {
+          background: rgba(0, 0, 0, 0.08);
         }
-        .ar-duration-labels {
+        .dior-retention-lbls {
           display: flex;
           justify-content: space-between;
-          font-size: 7px;
-          letter-spacing: 0.25em;
-          color: rgba(0, 0, 0, 0.3);
-          font-weight: 300;
+          font-size: 7.5px;
+          letter-spacing: 0.2em;
+          color: #7c7872;
         }
-        .ar-duration-labels .expired-text {
-          color: rgba(0, 0, 0, 0.15);
-        }
-
-        .ar-card-remove-btn {
+        .dior-card-dismiss-btn {
           background: transparent;
-          border: 1px solid rgba(0, 0, 0, 0.12);
-          color: rgba(0, 0, 0, 0.5);
+          border: 1px solid #ddd8d2;
+          color: #2d2a26;
           font-family: inherit;
-          font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.3em;
+          font-size: 8.5px;
+          letter-spacing: 0.2em;
           padding: 12px;
           cursor: pointer;
-          transition: border-color 0.4s, color 0.4s;
+          transition: border-color 0.3s, color 0.3s;
           border-radius: 0;
+          text-transform: uppercase;
         }
-        .ar-card-remove-btn:hover {
-          border-color: rgba(0, 0, 0, 0.5);
-          color: #000000;
+        .dior-card-dismiss-btn:hover {
+          border-color: #2d2a26;
         }
 
-        /* ══ LIST VIEW LAYOUT ══ */
-        .ar-list-layout {
+        /* List View */
+        .dior-list-view {
           display: flex;
           flex-direction: column;
           gap: 16px;
         }
-        .ar-list-row {
+        .dior-list-row {
           display: grid;
           grid-template-columns: 64px 2fr 1.5fr 1fr auto;
           align-items: center;
           gap: 40px;
           background: #ffffff;
-          border: 1px solid rgba(0, 0, 0, 0.04);
+          border: 1px solid #ddd8d2;
           padding: 16px 24px;
         }
-        .ar-list-img {
+        .dior-list-img {
           width: 64px;
           height: 80px;
           object-fit: contain;
           background: rgba(0, 0, 0, 0.015);
           padding: 8px;
           box-sizing: border-box;
-          filter: grayscale(0.8);
+          filter: grayscale(0.5);
         }
-        .ar-list-row:hover .ar-list-img {
+        .dior-list-row:hover .dior-list-img {
           filter: grayscale(0);
         }
-        .ar-list-details {
+        .dior-list-details {
           display: flex;
           flex-direction: column;
           gap: 4px;
         }
-        .ar-list-id {
+        .dior-list-id {
           font-size: 8px;
-          color: rgba(0, 0, 0, 0.3);
-          letter-spacing: 0.2em;
-        }
-        .ar-list-title {
-          font-family: var(--font-brand), serif;
-          font-size: 12px;
-          font-weight: 300;
-          letter-spacing: 0.1em;
-          margin: 0;
-        }
-        .ar-list-title a { color: inherit; }
-        .ar-list-season {
-          font-size: 8px;
-          color: rgba(0, 0, 0, 0.45);
-          letter-spacing: 0.15em;
-        }
-        .ar-list-duration {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-        }
-        .ar-list-label {
-          font-size: 7px;
-          color: rgba(0, 0, 0, 0.25);
+          color: #7c7872;
           letter-spacing: 0.25em;
         }
-        .ar-list-val {
-          font-size: 9px;
-          color: rgba(0, 0, 0, 0.6);
+        .dior-list-title {
+          font-family: var(--font-brand), serif;
+          font-size: 12.5px;
+          font-weight: 300;
+          letter-spacing: 0.08em;
+          margin: 0;
+        }
+        .dior-list-title a { color: inherit; text-decoration: none; }
+        .dior-list-season {
+          font-size: 8px;
+          color: #7c7872;
+          letter-spacing: 0.15em;
+        }
+        .dior-list-retention {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+        .dior-list-lbl {
+          font-size: 7.5px;
+          color: #7c7872;
+          letter-spacing: 0.2em;
+        }
+        .dior-list-val {
+          font-size: 8.5px;
+          color: #2d2a26;
+          letter-spacing: 0.1em;
+        }
+        .dior-list-price {
+          font-size: 9.5px;
+          color: #2d2a26;
           letter-spacing: 0.05em;
         }
-        .ar-list-val.expired-text {
-          color: rgba(0, 0, 0, 0.2);
-        }
-        .ar-list-price {
-          font-size: 10px;
-          color: rgba(0, 0, 0, 0.65);
-          letter-spacing: 0.05em;
-        }
-        .ar-list-remove-btn {
+        .dior-list-dismiss {
           background: none;
           border: none;
-          color: rgba(0, 0, 0, 0.35);
+          color: #7c7872;
           font-family: inherit;
-          font-size: 8px;
-          letter-spacing: 0.25em;
+          font-size: 8.5px;
+          letter-spacing: 0.2em;
+          text-decoration: underline;
+          text-underline-offset: 4px;
           cursor: pointer;
-          text-decoration: underline;
-          text-underline-offset: 3px;
-          transition: color 0.3s;
-        }
-        .ar-list-remove-btn:hover {
-          color: #000000;
-        }
-
-        /* ══ EDITORIAL EMPTY STATE ══ */
-        .ar-editorial-empty {
-          text-align: center;
-          padding: 100px 0;
-          border: 1px dashed rgba(0, 0, 0, 0.06);
-        }
-        .ar-empty-hed {
-          font-family: var(--font-brand), serif;
-          font-size: 16px;
-          font-weight: 300;
-          letter-spacing: 0.25em;
-          color: rgba(0, 0, 0, 0.5);
-          margin: 0 0 16px;
-        }
-        .ar-empty-sub-text {
-          font-size: 11px;
-          color: rgba(0, 0, 0, 0.35);
-          letter-spacing: 0.05em;
-          margin: 0 0 36px;
-        }
-        .ar-editorial-cta {
-          display: inline-block;
-          font-size: 9px;
-          font-weight: 300;
-          letter-spacing: 0.35em;
           text-transform: uppercase;
-          color: #000000;
-          border: 1px solid #000000;
-          padding: 14px 28px;
-          text-decoration: none;
-          transition: background 0.4s, color 0.4s;
         }
-        .ar-editorial-cta:hover {
-          background: #000000;
-          color: #ffffff;
+        .dior-list-dismiss:hover {
+          color: #2d2a26;
         }
 
-        /* ══ PAST ACQUISITIONS TIMELINE ══ */
-        .ar-acquisitions-panel {
-          display: flex;
-          flex-direction: column;
-          gap: 60px;
-        }
-        .ar-notable-acq {
-          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-          padding-bottom: 48px;
-        }
-        .ar-notable-card {
-          display: grid;
-          grid-template-columns: 140px 1fr;
-          gap: 40px;
-          background: #fafafa;
-          border: 1px solid rgba(0, 0, 0, 0.04);
-          padding: 32px;
-          align-items: center;
-        }
-        .ar-notable-img {
-          width: 140px;
-          aspect-ratio: 3 / 4;
-          object-fit: contain;
-          background: rgba(0, 0, 0, 0.015);
-          padding: 12px;
-          box-sizing: border-box;
-          filter: grayscale(0.2);
-        }
-        .ar-notable-details {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-        .ar-notable-label {
-          font-size: 7px;
-          font-weight: 300;
-          letter-spacing: 0.35em;
-          color: rgba(0, 0, 0, 0.35);
-        }
-        .ar-notable-title {
-          font-family: var(--font-brand), serif;
-          font-size: 16px;
-          font-weight: 300;
-          letter-spacing: 0.2em;
-          margin: 0;
-        }
-        .ar-notable-desc {
-          font-size: 11px;
-          line-height: 1.9;
-          letter-spacing: 0.04em;
-          color: rgba(0, 0, 0, 0.45);
-          margin: 0;
-          max-width: 480px;
-        }
-        .ar-notable-meta {
-          font-size: 8px;
-          color: rgba(0, 0, 0, 0.3);
-          letter-spacing: 0.15em;
-          font-weight: 300;
-        }
-
-        .ar-timeline {
-          display: flex;
-          flex-direction: column;
-          gap: 40px;
-        }
-        .ar-timeline-node {
-          border: 1px solid rgba(0, 0, 0, 0.04);
+        /* Sourcing Panel */
+        .dior-sourcing-panel {
           background: #ffffff;
-          padding: 32px;
+          border: 1px solid #ddd8d2;
+          padding: 44px;
+          margin-bottom: 48px;
         }
-        .ar-node-header {
-          display: flex;
-          justify-content: space-between;
-          border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-          padding-bottom: 18px;
-          margin-bottom: 24px;
-        }
-        .ar-node-left {
-          display: flex;
-          gap: 24px;
-          align-items: center;
-        }
-        .ar-node-date {
-          font-size: 10px;
-          font-weight: 400;
-          letter-spacing: 0.18em;
-          color: rgba(0, 0, 0, 0.85);
-        }
-        .ar-node-id {
-          font-size: 8px;
-          letter-spacing: 0.25em;
-          color: rgba(0, 0, 0, 0.3);
-        }
-        .ar-node-right {
-          display: flex;
-          gap: 24px;
-          align-items: center;
-        }
-        .ar-node-total {
-          font-size: 10px;
-          letter-spacing: 0.1em;
-          color: rgba(0, 0, 0, 0.6);
-        }
-        .ar-node-status {
-          font-size: 8px;
-          letter-spacing: 0.22em;
-          font-weight: 400;
-        }
-        .ar-node-status.delivered { color: #555555; }
-
-        .ar-node-body {
+        .dior-sourcing-form {
           display: flex;
           flex-direction: column;
-          gap: 16px;
-          margin-bottom: 24px;
+          gap: 32px;
+          margin-top: 24px;
         }
-        .ar-node-item {
-          display: flex;
-          gap: 20px;
-          align-items: center;
-        }
-        .ar-node-item-img {
-          width: 52px;
-          height: 68px;
-          object-fit: contain;
-          background: rgba(0, 0, 0, 0.015);
-          padding: 6px;
-          box-sizing: border-box;
-          filter: grayscale(0.2);
-        }
-        .ar-node-item-details {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-        .ar-node-item-title {
-          font-family: var(--font-brand), serif;
-          font-size: 12px;
-          font-weight: 300;
-          letter-spacing: 0.15em;
-          margin: 0;
-        }
-        .ar-node-item-meta {
-          font-size: 8px;
-          color: rgba(0, 0, 0, 0.3);
-          letter-spacing: 0.15em;
-        }
-        .ar-node-item-price {
-          font-size: 9px;
-          color: rgba(0, 0, 0, 0.5);
-          letter-spacing: 0.05em;
-        }
-
-        .ar-node-footer {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          border-top: 1px solid rgba(0, 0, 0, 0.04);
-          padding-top: 18px;
-        }
-        .ar-node-payment {
-          font-size: 8px;
-          letter-spacing: 0.2em;
-          color: rgba(0, 0, 0, 0.25);
-        }
-        .ar-node-actions {
-          display: flex;
-          gap: 24px;
-        }
-        .ar-node-link {
-          font-size: 8px;
-          letter-spacing: 0.25em;
-          text-transform: uppercase;
-          color: rgba(0, 0, 0, 0.45);
-          text-decoration: underline;
-          text-underline-offset: 3px;
-          transition: color 0.3s;
-        }
-        .ar-node-link:hover {
-          color: #000000;
-        }
-
-        /* ══ SOURCING REQUESTS TAB ══ */
-        .ar-sourcing-section {
-          background: #ffffff;
-          border: 1px solid rgba(0, 0, 0, 0.04);
-          padding: 40px;
-          margin-bottom: 60px;
-        }
-        .ar-sourcing-intro {
-          margin-bottom: 36px;
-        }
-        .ar-sourcing-intro-text {
-          font-size: 11px;
-          line-height: 2.1;
-          letter-spacing: 0.05em;
-          color: rgba(0, 0, 0, 0.45);
-          max-width: 580px;
-          margin: 0;
-        }
-
-        .ar-sourcing-form {
-          display: flex;
-          flex-direction: column;
-          gap: 28px;
-        }
-        .ar-form-row {
-          width: 100%;
-        }
-        .ar-form-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 28px;
-        }
-        .ar-form-group {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-        }
-        .ar-form-label {
-          font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.3em;
-          text-transform: uppercase;
-          color: rgba(0, 0, 0, 0.35);
-        }
-        .ar-form-input,
-        .ar-form-select,
-        .ar-form-textarea {
+        .dior-textarea {
           background: transparent;
           border: none;
-          border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-          color: rgba(0, 0, 0, 0.85);
+          border-bottom: 1px solid #ddd8d2;
+          color: #2d2a26;
           font-family: inherit;
-          font-size: 11px;
+          font-size: 11.5px;
           font-weight: 300;
-          letter-spacing: 0.15em;
-          padding: 12px 0;
+          letter-spacing: 0.12em;
+          padding: 10px 0;
           outline: none;
           border-radius: 0;
           transition: border-color 0.4s;
-        }
-        .ar-form-input:focus,
-        .ar-form-select:focus,
-        .ar-form-textarea:focus {
-          border-color: #000000;
-        }
-        .ar-form-select option {
-          background: #ffffff;
-          color: #000000;
-        }
-        .ar-form-textarea {
-          min-height: 90px;
+          min-height: 80px;
           resize: vertical;
         }
-        .ar-form-success {
-          font-size: 10px;
-          letter-spacing: 0.1em;
-          color: #555555;
-          margin: 0;
+        .dior-textarea:focus {
+          border-color: #2d2a26;
         }
-        .ar-form-submit-btn {
-          background: #000000;
-          color: #ffffff;
-          font-family: inherit;
-          font-size: 9px;
-          font-weight: 400;
-          letter-spacing: 0.35em;
+        .dior-select {
+          background: transparent;
           border: none;
-          padding: 18px;
-          cursor: pointer;
-          transition: opacity 0.3s;
+          border-bottom: 1px solid #ddd8d2;
+          color: #2d2a26;
+          font-family: inherit;
+          font-size: 11px;
+          font-weight: 300;
+          letter-spacing: 0.15em;
+          padding: 10px 0;
+          outline: none;
           border-radius: 0;
-          margin-top: 12px;
+          cursor: pointer;
         }
-        .ar-form-submit-btn:hover {
-          opacity: 0.85;
+        .dior-select option {
+          background: #ffffff;
+          color: #2d2a26;
         }
-
-        .ar-sourcing-empty-state {
-          border: 1px solid rgba(0, 0, 0, 0.04);
-          padding: 44px;
-          text-align: center;
-        }
-        .ar-sourcing-empty-text {
-          font-size: 10px;
-          letter-spacing: 0.25em;
-          color: rgba(0, 0, 0, 0.4);
+        .dior-form-success-msg {
+          font-size: 9px;
+          letter-spacing: 0.15em;
+          color: #2d2a26;
           text-transform: uppercase;
-          margin-bottom: 8px;
-          display: block;
-        }
-        .ar-sourcing-empty-sub {
-          font-size: 10px;
-          color: rgba(0, 0, 0, 0.25);
-          letter-spacing: 0.05em;
           margin: 0;
         }
 
-        .ar-sourcing-list {
+        /* Sourcing history requests list */
+        .dior-requests-list {
           display: flex;
           flex-direction: column;
-          gap: 20px;
+          gap: 16px;
         }
-        .ar-sourcing-card {
-          border: 1px solid rgba(0, 0, 0, 0.04);
+        .dior-request-card {
           background: #ffffff;
+          border: 1px solid #ddd8d2;
           padding: 28px;
           display: flex;
           flex-direction: column;
+          gap: 14px;
         }
-        .ar-sourcing-card-header {
+        .dior-request-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 16px;
         }
-        .ar-sourcing-card-id {
-          font-size: 8px;
+        .dior-request-id {
+          font-size: 8.5px;
           letter-spacing: 0.25em;
-          color: rgba(0, 0, 0, 0.3);
+          color: #7c7872;
         }
-        .ar-sourcing-badge {
-          font-size: 7px;
-          font-weight: 400;
-          letter-spacing: 0.22em;
+        .dior-request-badge {
+          font-size: 7.5px;
+          letter-spacing: 0.2em;
+          border: 1px solid #ddd8d2;
           padding: 4px 8px;
-          border: 1px solid transparent;
+          color: #2d2a26;
         }
-        .ar-sourcing-badge.submitted {
-          border-color: rgba(0, 0, 0, 0.15);
-          color: rgba(0, 0, 0, 0.45);
-        }
-        .ar-sourcing-badge.under_review {
-          border-color: rgba(0, 0, 0, 0.35);
-          color: rgba(0, 0, 0, 0.75);
-        }
-        .ar-sourcing-card-title {
+        .dior-request-title {
           font-family: var(--font-brand), serif;
           font-size: 13px;
           font-weight: 300;
-          letter-spacing: 0.18em;
-          margin: 0 0 12px;
+          letter-spacing: 0.08em;
+          margin: 0;
         }
-        .ar-sourcing-card-details {
+        .dior-request-details {
           display: flex;
           gap: 24px;
           font-size: 8px;
           letter-spacing: 0.2em;
-          color: rgba(0, 0, 0, 0.4);
-          margin-bottom: 16px;
+          color: #7c7872;
         }
-        .ar-sourcing-card-notes {
+        .dior-request-notes {
           font-size: 9.5px;
           font-style: italic;
-          color: rgba(0, 0, 0, 0.45);
-          border-left: 1px solid rgba(0, 0, 0, 0.08);
+          color: #7c7872;
+          margin: 0;
+          border-left: 1px solid #ddd8d2;
           padding-left: 12px;
-          margin-bottom: 20px;
         }
-        .ar-sourcing-card-dismiss-btn {
-          align-self: flex-start;
+        .dior-request-dismiss {
           background: none;
           border: none;
-          color: rgba(0, 0, 0, 0.25);
           font-family: inherit;
-          font-size: 8px;
-          letter-spacing: 0.25em;
-          cursor: pointer;
+          font-size: 8.5px;
+          letter-spacing: 0.2em;
           text-decoration: underline;
-          text-underline-offset: 3px;
+          text-underline-offset: 4px;
+          color: #7c7872;
+          cursor: pointer;
+          align-self: flex-start;
           padding: 0;
-          transition: color 0.3s;
+          text-transform: uppercase;
         }
-        .ar-sourcing-card-dismiss-btn:hover {
-          color: rgba(0, 0, 0, 0.5);
+        .dior-request-dismiss:hover {
+          color: #2d2a26;
         }
 
-        /* ══ COLLECTION REGISTRY TAB ══ */
-        .ar-collections-grid-wrap {
+        /* Collections tab listing */
+        .dior-collections-panel {
           display: flex;
           flex-direction: column;
         }
-        .ar-collections-grid {
+        .dior-collections-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
           gap: 40px;
         }
-        .ar-collection-card {
+        .dior-collection-card {
           background: #ffffff;
-          border: 1px solid rgba(0, 0, 0, 0.03);
+          border: 1px solid #ddd8d2;
           cursor: pointer;
-          transition: border-color 0.4s;
         }
-        .ar-collection-card:hover {
-          border-color: rgba(0, 0, 0, 0.08);
-        }
-        .ar-col-card-img-wrap {
+        .dior-collection-img-wrap {
           width: 100%;
           aspect-ratio: 4 / 3;
           background: rgba(0, 0, 0, 0.015);
           overflow: hidden;
         }
-        .ar-col-card-img {
+        .dior-collection-img {
           width: 100%;
           height: 100%;
           object-fit: cover;
           filter: grayscale(0.5);
-          transition: filter 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: filter 0.5s, transform 0.5s;
         }
-        .ar-collection-card:hover .ar-col-card-img {
+        .dior-collection-card:hover .dior-collection-img {
           filter: grayscale(0);
-          transform: scale(1.01);
+          transform: scale(1.015);
         }
-        .ar-col-card-body {
-          padding: 28px;
+        .dior-collection-body {
+          padding: 24px;
         }
-        .ar-col-card-season {
+        .dior-collection-season {
           font-size: 7px;
-          font-weight: 300;
-          letter-spacing: 0.35em;
-          color: rgba(0, 0, 0, 0.4);
-          text-transform: uppercase;
-          margin-bottom: 8px;
+          letter-spacing: 0.3em;
+          color: #7c7872;
           display: block;
+          margin-bottom: 6px;
         }
-        .ar-col-card-title {
+        .dior-collection-title {
           font-family: var(--font-brand), serif;
-          font-size: 15px;
+          font-size: 14px;
           font-weight: 300;
-          letter-spacing: 0.18em;
+          letter-spacing: 0.08em;
+          color: #2d2a26;
           margin: 0 0 14px;
         }
-        .ar-col-card-meta {
+        .dior-collection-meta {
           display: flex;
           justify-content: space-between;
           font-size: 8px;
           letter-spacing: 0.2em;
-          color: rgba(0, 0, 0, 0.3);
+          color: #7c7872;
         }
 
-        /* ══ COLLECTION DETAIL VIEW ══ */
-        .ar-collection-detail-view {
+        /* Collections detail view lookbook */
+        .dior-detail-view {
           display: flex;
           flex-direction: column;
-          gap: 60px;
+          gap: 56px;
         }
-        .ar-detail-back-btn {
+        .dior-back-btn {
           align-self: flex-start;
           background: none;
           border: none;
           font-family: inherit;
-          font-size: 8px;
-          letter-spacing: 0.35em;
-          color: rgba(0, 0, 0, 0.4);
+          font-size: 8.5px;
+          letter-spacing: 0.25em;
+          color: #7c7872;
           cursor: pointer;
           transition: color 0.3s;
-          padding: 8px 0;
+          padding: 4px 0;
+          text-transform: uppercase;
         }
-        .ar-detail-back-btn:hover {
-          color: #000000;
+        .dior-back-btn:hover {
+          color: #2d2a26;
         }
-        .ar-detail-hero {
+        .dior-detail-hero {
           display: grid;
           grid-template-columns: 1.2fr 1fr;
           gap: 40px;
           align-items: center;
-          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-          padding-bottom: 48px;
+          border-bottom: 1px solid #ddd8d2;
+          padding-bottom: 40px;
         }
-        .ar-detail-hero-left {
+        .dior-detail-hero-info {
           display: flex;
           flex-direction: column;
         }
-        .ar-detail-eyebrow {
+        .dior-detail-season {
           font-size: 8px;
-          letter-spacing: 0.35em;
-          color: rgba(0, 0, 0, 0.45);
-          margin-bottom: 12px;
+          letter-spacing: 0.3em;
+          color: #7c7872;
+          margin-bottom: 10px;
         }
-        .ar-detail-title {
+        .dior-detail-title {
           font-family: var(--font-brand), serif;
-          font-size: 26px;
+          font-size: 24px;
           font-weight: 300;
-          letter-spacing: 0.22em;
+          letter-spacing: 0.1em;
           margin: 0 0 20px;
         }
-        .ar-detail-desc {
-          font-size: 11.5px;
+        .dior-detail-desc {
+          font-size: 11px;
           line-height: 2.1;
+          color: #7c7872;
           letter-spacing: 0.05em;
-          color: rgba(0, 0, 0, 0.45);
           margin: 0;
-          max-width: 440px;
+          max-width: 380px;
         }
-        .ar-detail-hero-img {
+        .dior-detail-img {
           width: 100%;
-          aspect-ratio: 4/3;
+          aspect-ratio: 4 / 3;
           object-fit: cover;
-          background: rgba(0, 0, 0, 0.015);
-          filter: grayscale(0.2);
+          border: 1px solid #ddd8d2;
         }
 
-        .ar-detail-lookbook {
+        .dior-detail-lookbook-section {
           display: flex;
           flex-direction: column;
         }
-        .ar-lookbook-row {
+        .dior-lookbook-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 20px;
         }
-        .ar-lookbook-img-wrap {
+        .dior-lookbook-img-wrap {
           width: 100%;
           aspect-ratio: 3 / 4;
           overflow: hidden;
-          background: rgba(0, 0, 0, 0.02);
+          background: rgba(0,0,0,0.015);
+          border: 1px solid #ddd8d2;
         }
-        .ar-lookbook-img {
+        .dior-lookbook-img {
           width: 100%;
           height: 100%;
           object-fit: cover;
           filter: grayscale(0.5);
           transition: filter 0.4s;
         }
-        .ar-lookbook-img-wrap:hover .ar-lookbook-img {
+        .dior-lookbook-img-wrap:hover .dior-lookbook-img {
           filter: grayscale(0);
         }
 
-        /* Checklist */
-        .ar-detail-checklist {
-          border-top: 1px solid rgba(0, 0, 0, 0.06);
-          padding-top: 48px;
+        /* Wardrobe checklist */
+        .dior-detail-checklist {
+          border-top: 1px solid #ddd8d2;
+          padding-top: 40px;
         }
-        .ar-checklist-list {
+        .dior-checklist-list {
           display: flex;
           flex-direction: column;
-          border: 1px solid rgba(0, 0, 0, 0.04);
+          border: 1px solid #ddd8d2;
         }
-        .ar-checklist-item {
+        .dior-checklist-item {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 24px 32px;
+          padding: 20px 28px;
           background: #ffffff;
         }
-        .ar-checklist-item:not(:last-child) {
-          border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        .dior-checklist-item:not(:last-child) {
+          border-bottom: 1px solid #ddd8d2;
         }
-        .ar-checklist-left {
+        .dior-checklist-info {
           display: flex;
-          gap: 32px;
+          gap: 28px;
           align-items: center;
         }
-        .ar-checklist-name {
+        .dior-checklist-name {
           font-family: var(--font-brand), serif;
-          font-size: 11.5px;
+          font-size: 11px;
           font-weight: 300;
-          letter-spacing: 0.15em;
-          color: rgba(0, 0, 0, 0.8);
+          letter-spacing: 0.08em;
+          color: #2d2a26;
         }
-        .ar-checklist-status {
-          font-size: 7px;
-          letter-spacing: 0.22em;
-          font-weight: 400;
+        .dior-checklist-status {
+          font-size: 7.5px;
+          letter-spacing: 0.2em;
         }
-        .ar-checklist-status.active {
-          color: #666666;
+        .dior-checklist-status.active {
+          color: #7c7872;
         }
-        .ar-checklist-status.inactive {
-          color: rgba(0, 0, 0, 0.25);
+        .dior-checklist-status.inactive {
+          color: rgba(0,0,0,0.18);
         }
-        .ar-checklist-action {
-          font-size: 8px;
-          letter-spacing: 0.25em;
-          color: rgba(0, 0, 0, 0.45);
+        .dior-checklist-link {
+          font-size: 8.5px;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: #2d2a26;
           text-decoration: underline;
-          text-underline-offset: 3px;
-          transition: color 0.3s;
+          text-underline-offset: 4px;
         }
-        .ar-checklist-action:hover {
-          color: #000000;
+        .dior-checklist-link:hover {
+          color: #7c7872;
         }
 
-        /* ══ RESPONSIVE OVERRIDES ══ */
+        /* Empty State */
+        .dior-empty-state {
+          text-align: center;
+          padding: 64px;
+          border: 1px dashed #ddd8d2;
+          background: #ffffff;
+        }
+        .dior-empty-text {
+          font-size: 11px;
+          color: #7c7872;
+          letter-spacing: 0.08em;
+          margin-bottom: 24px;
+        }
+
+        /* Legal Footer */
+        .dior-internal-footer {
+          display: flex;
+          justify-content: center;
+          gap: 40px;
+          padding: 60px 0 20px;
+          border-top: 1px solid #ddd8d2;
+          margin-top: 40px;
+          font-size: 8px;
+          letter-spacing: 0.25em;
+          color: #7c7872;
+        }
+        .dior-footer-link {
+          cursor: pointer;
+          transition: color 0.3s;
+        }
+        .dior-footer-link:hover {
+          color: #2d2a26;
+        }
+
         @media (max-width: 991px) {
-          .ar-workspace {
-            grid-template-columns: 200px 1fr;
+          .dior-split-row {
+            grid-template-columns: 1fr;
             gap: 40px;
           }
-          .ar-grid-layout {
-            grid-template-columns: 1fr;
+          .dior-split-left {
+            position: static;
           }
-          .ar-notable-card {
-            grid-template-columns: 1fr;
-            gap: 24px;
-          }
-          .ar-detail-hero {
+          .dior-detail-hero {
             grid-template-columns: 1fr;
           }
         }
 
         @media (max-width: 767px) {
-          .ar-space-wrap {
-            padding: 100px 16px 80px;
+          .dior-tabs-nav {
+            top: 70px;
           }
-          .ar-client-summary {
-            grid-template-columns: 1fr;
-            gap: 12px;
-            text-align: center;
-            margin-bottom: 48px;
+          .dior-space-wrap {
+            padding: 40px 16px 80px;
           }
-          .ar-summary-item:last-child {
-            align-items: center;
-          }
-          .ar-editor-header {
-            margin-bottom: 48px;
-          }
-          .ar-workspace {
-            grid-template-columns: 1fr;
-          }
-          .ar-sidebar {
-            display: none;
-          }
-
-          /* Show mobile tab bar */
-          .ar-mobile-tabs {
-            display: flex;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-            margin-bottom: 40px;
-            overflow-x: auto;
-            scrollbar-width: none;
-          }
-          .ar-mobile-tabs::-webkit-scrollbar {
-            display: none;
-          }
-          .ar-m-tab {
-            flex-shrink: 0;
-            background: none;
-            border: none;
-            padding: 14px 0;
-            margin-right: 28px;
-            font-family: var(--font-primary), sans-serif;
-            font-size: 8px;
-            font-weight: 300;
-            letter-spacing: 0.35em;
-            text-transform: uppercase;
-            color: rgba(0, 0, 0, 0.35);
-            cursor: pointer;
-            border-bottom: 1px solid transparent;
-            margin-bottom: -1px;
-            transition: color 0.3s;
-          }
-          .ar-m-tab.active {
-            color: #000000;
-            border-bottom-color: rgba(0, 0, 0, 0.4);
-          }
-
-          .ar-spotlight-row {
+          .dior-spotlight-list {
             grid-template-columns: 1fr;
             gap: 16px;
           }
-          .ar-filter-bar {
+          .dior-filters-bar {
             flex-direction: column;
             align-items: flex-start;
-            gap: 18px;
+            gap: 20px;
           }
-          .ar-view-toggle {
-            display: none; /* Hide grid/list toggle on mobile */
+          .dior-view-toggles {
+            display: none;
           }
-          .ar-list-row {
+          .dior-editorial-grid {
+            grid-template-columns: 1fr;
+          }
+          .dior-list-row {
             grid-template-columns: 48px 1fr;
             gap: 16px;
             padding: 16px;
           }
-          .ar-list-img {
+          .dior-list-img {
             width: 48px;
             height: 60px;
           }
-          .ar-list-duration,
-          .ar-list-price {
-            display: none; /* Hide secondary list fields on mobile */
+          .dior-list-retention,
+          .dior-list-price {
+            display: none;
           }
-          
-          .ar-node-header {
-            flex-direction: column;
-            gap: 12px;
-            align-items: flex-start;
+          .dior-sourcing-panel {
+            padding: 24px;
           }
-          .ar-node-right {
-            justify-content: space-between;
-            width: 100%;
-          }
-          .ar-node-footer {
-            flex-direction: column;
-            gap: 16px;
-            align-items: flex-start;
-          }
-          .ar-node-actions {
-            width: 100%;
-            justify-content: space-between;
-          }
-
-          .ar-form-grid {
+          .dior-form-grid {
             grid-template-columns: 1fr;
             gap: 20px;
           }
-
-          .ar-collections-grid {
+          .dior-collections-grid {
             grid-template-columns: 1fr;
           }
-          .ar-lookbook-row {
+          .dior-lookbook-grid {
             grid-template-columns: 1fr;
           }
-          .ar-checklist-item {
+          .dior-checklist-item {
             flex-direction: column;
             align-items: flex-start;
             gap: 12px;
             padding: 20px;
+          }
+          .dior-checklist-info {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
           }
         }
       `}</style>
