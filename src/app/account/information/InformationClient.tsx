@@ -268,8 +268,13 @@ export default function InformationClient() {
           border-bottom: 1px solid #ddd8d2;
           width: 100%;
           position: sticky;
-          top: 80px;
+          top: 64px;
           z-index: 10;
+        }
+        @media (max-width: 767px) {
+          .dior-tabs-nav {
+            top: 54px;
+          }
         }
         .dior-tabs-container {
           max-width: 1200px;
@@ -593,7 +598,7 @@ export default function InformationClient() {
 
         @media (max-width: 767px) {
           .dior-tabs-nav {
-            top: 70px;
+            top: 54px;
           }
           .dior-space-wrap {
             padding: 40px 16px 80px;

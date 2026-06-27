@@ -136,8 +136,13 @@ export default function AccountClient() {
           border-bottom: 1px solid #ddd8d2;
           width: 100%;
           position: sticky;
-          top: 80px;
+          top: 64px;
           z-index: 10;
+        }
+        @media (max-width: 767px) {
+          .dior-tabs-nav {
+            top: 54px;
+          }
         }
         .dior-tabs-container {
           max-width: 1200px;
@@ -220,8 +225,14 @@ export default function AccountClient() {
           width: 100%;
           height: 520px;
           overflow: hidden;
-          margin-top: 80px;
+          margin-top: 48px;
           background: #e4e3e1;
+        }
+        @media (max-width: 767px) {
+          .dior-hero-banner {
+            margin-top: 38px;
+            height: 360px;
+          }
         }
         .dior-hero-img {
           width: 100%;
