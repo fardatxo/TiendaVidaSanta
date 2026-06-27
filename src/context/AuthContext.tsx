@@ -76,12 +76,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
         if (!active) return;
         clearTimeout(safetyTimeout);
+        console.log('[AuthContext] onAuthStateChange event:', event, 'user email:', session?.user?.email);
         try {
           if (session?.user) {
+            console.log('[AuthContext] Session user found, fetching profile...');
             let profile = await authService.getUserById(session.user.id);
+            console.log('[AuthContext] Profile fetch result:', profile);
 
             if (!profile && active) {
-              // Google OAuth or Email signup fallback creation
+              console.log('[AuthContext] Profile not found, creating fallback profile...');
               const parts = (session.user.user_metadata?.full_name || '').split(' ');
               const mockUser: User = {
                 id: session.user.id,
@@ -94,7 +97,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 createdAt: new Date().toISOString(),
               };
               try {
-                await supabase.from('profiles').upsert(mockUser);
+                const upsertRes = await supabase.from('profiles').upsert(mockUser);
+                console.log('[AuthContext] Profile upsert response:', upsertRes);
               } catch (upsertErr) {
                 console.error('[AuthContext] upsert profile failed:', upsertErr);
               }
@@ -102,22 +106,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
 
             if (profile && active) {
+              console.log('[AuthContext] Setting user state to:', profile);
               setUser(profile);
 
               // Clean OAuth access token hash and redirect to /account
-              if (event === 'SIGNED_IN' && typeof window !== 'undefined' && window.location.hash.includes('access_token')) {
+              const hasAccessToken = typeof window !== 'undefined' && window.location.hash.includes('access_token');
+              console.log('[AuthContext] hasAccessToken:', hasAccessToken, 'event:', event);
+              if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && hasAccessToken) {
+                console.log('[AuthContext] Access token detected in URL hash. Cleaning hash and redirecting to /account...');
                 window.history.replaceState(null, '', window.location.pathname);
                 const target = !profile.onboardingComplete ? '/account/welcome' : '/account';
                 router.push(target);
               }
             }
           } else {
+            console.log('[AuthContext] No session user found. Checking logged out status...');
             await checkLoggedOut();
           }
         } catch (callbackErr) {
           console.error('[AuthContext] Error in onAuthStateChange callback:', callbackErr);
         } finally {
-          if (active) setIsLoading(false);
+          if (active) {
+            console.log('[AuthContext] Setting isLoading to false');
+            setIsLoading(false);
+          }
         }
       });
 
@@ -187,9 +199,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loginWithGoogleFn = useCallback(async (): Promise<string | null> => {
     const result = await authService.loginWithGoogle();
     if (!result.success) return result.error ?? 'Google sign-in failed';
-    handlePostLogin(result.user!, result.isNew);
     return null;
-  }, [handlePostLogin]);
+  }, []);
 
   const updateProfileFn = useCallback(async (
     updates: Partial<Omit<User, 'id' | 'email' | 'provider' | 'createdAt'>>
