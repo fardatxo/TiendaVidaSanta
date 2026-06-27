@@ -28,6 +28,11 @@ export default function AccountDrawer() {
   const [trackingEmail, setTrackingEmail] = useState("");
   const [trackingResult, setTrackingResult] = useState<'idle' | 'loading' | 'not_found'>('idle');
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Lock body scroll when open
   useEffect(() => {
     document.body.style.overflow = isAccountOpen ? "hidden" : "";
@@ -124,6 +129,8 @@ export default function AccountDrawer() {
     closeAccount();
     router.push(href);
   };
+
+  if (!mounted) return null;
 
   return (
     <>
