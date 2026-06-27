@@ -1,0 +1,150 @@
+/* ══ COOKIE BANNER (Amiri-style) ══ */
+
+.ck-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: #1a1a1a;
+  animation: ck-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes ck-rise {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes ck-fall {
+  from { transform: translateY(0);    opacity: 1; }
+  to   { transform: translateY(100%); opacity: 0; }
+}
+
+.ck-bar.ck-dismissing {
+  animation: ck-fall 0.8s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+}
+
+.ck-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 18px 24px;
+}
+
+.ck-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.ck-body {
+  font-family: var(--font-primary), sans-serif;
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.ck-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* Base button style */
+.ck-btn {
+  font-family: var(--font-primary), sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  padding: 10px 20px;
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+  white-space: nowrap;
+}
+
+/* "Cookies Settings" — outlined */
+.ck-btn--settings {
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+.ck-btn--settings:hover {
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+/* "Reject All" — outlined */
+.ck-btn--decline {
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+.ck-btn--decline:hover {
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+/* "Accept All Cookies" — filled white */
+.ck-btn--accept {
+  color: #000000;
+  background: #ffffff;
+  border: 1px solid #ffffff;
+}
+.ck-btn--accept:hover {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(255, 255, 255, 0.85);
+}
+
+/* Close X button */
+.ck-close {
+  background: none !important;
+  border: none !important;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.3s;
+}
+.ck-close:hover {
+  color: #ffffff;
+}
+
+/* ══ RESPONSIVE ══ */
+@media (max-width: 767px) {
+  .ck-inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 20px 20px 24px;
+  }
+
+  .ck-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .ck-btn {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    font-size: 10px;
+    padding: 10px 12px;
+  }
+
+  .ck-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+  }
+
+  .ck-bar {
+    position: fixed;
+  }
+}
