@@ -202,7 +202,7 @@ export default function Navbar() {
                   </button>
 
                   {/* Wishlist icon (Bookmark ribbon style) */}
-                  <Link href="/wishlist" className="acne-right-icon acne-wishlist-icon" aria-label="Wishlist">
+                  <Link href="/archive?tab=personal" className="acne-right-icon acne-wishlist-icon" aria-label="Wishlist">
                     <div className="wishlist-icon-wrap">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>

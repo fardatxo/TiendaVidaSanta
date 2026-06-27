@@ -1,7 +1,5 @@
-import WishlistClient from './WishlistClient';
-
-export const metadata = { title: 'Personal Archive — TONET' };
+import { redirect } from 'next/navigation';
 
 export default function WishlistPage() {
-  return <WishlistClient />;
+  redirect('/archive?tab=personal');
 }

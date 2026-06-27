@@ -214,7 +214,7 @@ export default function AccountDrawer() {
                 </div>
 
                 {/* Wishlist */}
-                <div className="ad-option-row" onClick={() => handleNavigation("/wishlist")}>
+                <div className="ad-option-row" onClick={() => handleNavigation("/archive?tab=personal")}>
                   <div className="ad-radio-circle">
                     <span className="ad-radio-dot" />
                   </div>
