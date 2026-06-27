@@ -51,29 +51,29 @@ export default function InformationClient() {
         <div className="dior-tabs-container">
           <div className="dior-tabs-list">
             <Link href="/account" className={`dior-tab ${pathname === '/account' ? 'active' : ''}`}>
-              Overview
+              Resumen
             </Link>
             <Link href="/account/orders" className={`dior-tab ${pathname === '/account/orders' ? 'active' : ''}`}>
-              Past Acquisitions
+              Pedidos
             </Link>
-            <Link href="/archive?tab=personal" className={`dior-tab ${pathname === '/archive' ? 'active' : ''}`}>
-              Personal Archive
+            <Link href="/archive?tab=personal" className="dior-tab">
+              Lista de deseos
             </Link>
             <Link href="/account/information" className={`dior-tab ${pathname === '/account/information' ? 'active' : ''}`}>
-              Profile
+              Perfil
             </Link>
             <Link href="/account/addresses" className={`dior-tab ${pathname === '/account/addresses' ? 'active' : ''}`}>
-              Addresses
+              Direcciones
             </Link>
-            <Link href="/archive?tab=requests" className={`dior-tab`}>
-              Sourcing Requests
+            <Link href="/archive?tab=requests" className="dior-tab">
+              Solicitudes de disponibilidad
             </Link>
-            <Link href="/archive?tab=registry" className={`dior-tab`}>
-              Collection Registry
+            <Link href="/archive?tab=registry" className="dior-tab">
+              Registro de colecciones
             </Link>
           </div>
           <button onClick={logout} className="dior-logout-btn">
-            Sign out <span className="dior-logout-arrow">→</span>
+            Cerrar sesión <span className="dior-logout-arrow">→</span>
           </button>
         </div>
       </nav>
@@ -291,10 +291,10 @@ export default function InformationClient() {
         }
         .dior-tab {
           font-family: var(--font-primary), sans-serif;
-          font-size: 8.5px;
-          font-weight: 300;
-          letter-spacing: 0.25em;
-          text-transform: uppercase;
+          font-size: 11.5px;
+          font-weight: 400;
+          letter-spacing: 0.02em;
+          text-transform: none;
           color: #7c7872;
           text-decoration: none;
           display: flex;
@@ -318,10 +318,10 @@ export default function InformationClient() {
           background: none;
           border: none;
           font-family: var(--font-primary), sans-serif;
-          font-size: 8.5px;
-          font-weight: 300;
-          letter-spacing: 0.25em;
-          text-transform: uppercase;
+          font-size: 11.5px;
+          font-weight: 400;
+          letter-spacing: 0.02em;
+          text-transform: none;
           color: #7c7872;
           cursor: pointer;
           transition: color 0.3s;
