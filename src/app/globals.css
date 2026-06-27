@@ -346,9 +346,6 @@ img {
 .hc-img,
 .amiri-ctl-card img {
   will-change: transform, opacity;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform-style: preserve-3d;
 }
 
 /* Luxury Image Fade-In */

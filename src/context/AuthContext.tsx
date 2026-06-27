@@ -49,60 +49,86 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Listen to Supabase auth state and unified Firestore profiles
   useEffect(() => {
     let active = true;
+    let unsubscribe: { unsubscribe: () => void } | null = null;
 
     const checkLoggedOut = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session && active) {
-        setUser(null);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session && active) {
+          setUser(null);
+        }
+      } catch (err) {
+        console.error('[AuthContext] checkLoggedOut failed:', err);
+        if (active) setUser(null);
       }
     };
 
-    // Listen only to Supabase Auth state
-    const { data: { subscription: unsubscribeSupabase } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!active) return;
-      if (session?.user) {
+    try {
+      // Listen only to Supabase Auth state
+      const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (!active) return;
         try {
-          let profile = await authService.getUserById(session.user.id);
+          if (session?.user) {
+            let profile = await authService.getUserById(session.user.id);
 
-          if (!profile && active) {
-            // Google OAuth or Email signup fallback creation
-            const parts = (session.user.user_metadata?.full_name || '').split(' ');
-            const mockUser: User = {
-              id: session.user.id,
-              email: session.user.email ?? '',
-              firstName: session.user.user_metadata?.given_name || parts[0] || '',
-              lastName: session.user.user_metadata?.family_name || parts.slice(1).join(' ') || '',
-              newsletter: false,
-              onboardingComplete: false,
-              provider: session.user.app_metadata?.provider === 'google' ? 'google' : 'email',
-              createdAt: new Date().toISOString(),
-            };
-            await supabase.from('profiles').upsert(mockUser);
-            profile = mockUser;
-          }
-
-          if (profile && active) {
-            setUser(profile);
-
-            // Clean OAuth access token hash and redirect to /account
-            if (event === 'SIGNED_IN' && typeof window !== 'undefined' && window.location.hash.includes('access_token')) {
-              window.history.replaceState(null, '', window.location.pathname);
-              const target = !profile.onboardingComplete ? '/account/welcome' : '/account';
-              router.push(target);
+            if (!profile && active) {
+              // Google OAuth or Email signup fallback creation
+              const parts = (session.user.user_metadata?.full_name || '').split(' ');
+              const mockUser: User = {
+                id: session.user.id,
+                email: session.user.email ?? '',
+                firstName: session.user.user_metadata?.given_name || parts[0] || '',
+                lastName: session.user.user_metadata?.family_name || parts.slice(1).join(' ') || '',
+                newsletter: false,
+                onboardingComplete: false,
+                provider: session.user.app_metadata?.provider === 'google' ? 'google' : 'email',
+                createdAt: new Date().toISOString(),
+              };
+              try {
+                await supabase.from('profiles').upsert(mockUser);
+              } catch (upsertErr) {
+                console.error('[AuthContext] upsert profile failed:', upsertErr);
+              }
+              profile = mockUser;
             }
+
+            if (profile && active) {
+              setUser(profile);
+
+              // Clean OAuth access token hash and redirect to /account
+              if (event === 'SIGNED_IN' && typeof window !== 'undefined' && window.location.hash.includes('access_token')) {
+                window.history.replaceState(null, '', window.location.pathname);
+                const target = !profile.onboardingComplete ? '/account/welcome' : '/account';
+                router.push(target);
+              }
+            }
+          } else {
+            await checkLoggedOut();
           }
-        } catch (error) {
-          console.error('[AuthContext] failed to fetch Supabase user profile:', error);
+        } catch (callbackErr) {
+          console.error('[AuthContext] Error in onAuthStateChange callback:', callbackErr);
+        } finally {
+          if (active) setIsLoading(false);
         }
-      } else {
-        await checkLoggedOut();
+      });
+
+      if (data && data.subscription) {
+        unsubscribe = data.subscription;
       }
-      setIsLoading(false);
-    });
+    } catch (err) {
+      console.error('[AuthContext] onAuthStateChange subscription failed:', err);
+      if (active) setIsLoading(false);
+    }
 
     return () => {
       active = false;
-      unsubscribeSupabase.unsubscribe();
+      if (unsubscribe) {
+        try {
+          unsubscribe.unsubscribe();
+        } catch (unsubErr) {
+          console.error('[AuthContext] unsubscribe failed:', unsubErr);
+        }
+      }
     };
   }, [router]);
 
