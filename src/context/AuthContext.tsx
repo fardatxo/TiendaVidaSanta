@@ -51,6 +51,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let active = true;
     let unsubscribe: { unsubscribe: () => void } | null = null;
 
+    // Safety timeout: force loading to false if Supabase fails silently or is misconfigured
+    const safetyTimeout = setTimeout(() => {
+      if (active) {
+        console.warn('[AuthContext] Safety timeout triggered. Forcing isLoading to false.');
+        setIsLoading(false);
+      }
+    }, 2500);
+
     const checkLoggedOut = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -67,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Listen only to Supabase Auth state
       const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
         if (!active) return;
+        clearTimeout(safetyTimeout);
         try {
           if (session?.user) {
             let profile = await authService.getUserById(session.user.id);
@@ -117,11 +126,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (err) {
       console.error('[AuthContext] onAuthStateChange subscription failed:', err);
+      clearTimeout(safetyTimeout);
       if (active) setIsLoading(false);
     }
 
     return () => {
       active = false;
+      clearTimeout(safetyTimeout);
       if (unsubscribe) {
         try {
           unsubscribe.unsubscribe();
