@@ -15,6 +15,18 @@ export default function AccountClient() {
 
   return (
     <>
+      {/* ══ HERO BANNER AREA ══ */}
+      <div className="dior-hero-banner">
+        <img 
+          src="/hero/ComfyUI-main_reference_00016_.png" 
+          alt="Maison Atelier" 
+          className="dior-hero-img"
+        />
+        <div className="dior-hero-overlay">
+          <h1 className="dior-hero-title">Welcome, {fullName}</h1>
+        </div>
+      </div>
+
       {/* ══ HORIZONTAL MAISON NAVIGATION TABS ══ */}
       <nav className="dior-tabs-nav">
         <div className="dior-tabs-container">
@@ -48,17 +60,6 @@ export default function AccountClient() {
       </nav>
 
       <div className="dior-space-wrap">
-        {/* ══ HERO BANNER AREA ══ */}
-        <div className="dior-hero-banner">
-          <img 
-            src="/hero/ComfyUI-main_reference_00016_.png" 
-            alt="Maison Atelier" 
-            className="dior-hero-img"
-          />
-          <div className="dior-hero-overlay">
-            <h1 className="dior-hero-title">Welcome, {fullName}</h1>
-          </div>
-        </div>
 
         {/* ══ CONTENT SPLIT GRID (LEFT LABEL, RIGHT CONTENT) ══ */}
         <div className="dior-split-row dior-split-row--bordered">
@@ -208,7 +209,7 @@ export default function AccountClient() {
         .dior-space-wrap {
           max-width: 1200px;
           margin: 0 auto;
-          padding: 60px 24px 100px;
+          padding: 12px 24px 100px;
           box-sizing: border-box;
           font-family: var(--font-primary), sans-serif;
         }
@@ -217,9 +218,9 @@ export default function AccountClient() {
         .dior-hero-banner {
           position: relative;
           width: 100%;
-          height: 380px;
+          height: 520px;
           overflow: hidden;
-          margin-bottom: 72px;
+          margin-top: 80px;
           background: #e4e3e1;
         }
         .dior-hero-img {
@@ -232,22 +233,19 @@ export default function AccountClient() {
         .dior-hero-overlay {
           position: absolute;
           inset: 0;
-          background: rgba(244, 243, 241, 0.15);
+          background: rgba(244, 243, 241, 0.1);
           display: flex;
           align-items: center;
           justify-content: center;
         }
         .dior-hero-title {
           font-family: var(--font-brand), serif;
-          font-size: clamp(20px, 4vw, 32px);
+          font-size: 26px;
           font-weight: 300;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.05em;
           color: #2d2a26;
           text-align: center;
           margin: 0;
-          background: rgba(244, 243, 241, 0.85);
-          padding: 24px 48px;
-          border: 1px solid #ddd8d2;
         }
 
         /* Split layouts */
