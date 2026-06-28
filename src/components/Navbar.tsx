@@ -140,6 +140,18 @@ export default function Navbar() {
     return () => { body.style.paddingTop = "48px"; };
   }, [BANNER_H, isHome, isProduct, headerHeight]);
 
+  useEffect(() => {
+    document.documentElement.style.setProperty('--banner-height', `${BANNER_H}px`);
+  }, [BANNER_H]);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--header-height', `${headerHeight}px`);
+  }, [headerHeight]);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--nav-top', `${navTop}px`);
+  }, [navTop]);
+
   return (
     <>
       <div 

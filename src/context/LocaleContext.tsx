@@ -62,6 +62,23 @@ export function LocaleProvider({ children }: ProviderProps) {
       setRegion(savedRegion);
       setLanguage(savedLang);
       setHasPreference(true);
+
+      // Ensure Google Translate cookie is synced
+      if (typeof document !== 'undefined') {
+        const currentGoogTrans = getCookie('googtrans');
+        const expectedGoogTrans = savedLang === 'en' ? '' : `/en/${savedLang}`;
+        
+        if (expectedGoogTrans && currentGoogTrans !== expectedGoogTrans) {
+          document.cookie = `googtrans=${expectedGoogTrans}; path=/`;
+          const hostParts = window.location.hostname.split('.');
+          if (hostParts.length > 1) {
+            const domain = '.' + hostParts.slice(-2).join('.');
+            document.cookie = `googtrans=${expectedGoogTrans}; path=/; domain=${domain}`;
+          }
+          // Reload to apply translation since it was missing
+          window.location.reload();
+        }
+      }
     } else {
       const suggested = detectSuggestedLocale();
       setRegion(suggested.region);
@@ -102,6 +119,26 @@ export function LocaleProvider({ children }: ProviderProps) {
         localStorage.removeItem('tonet_locale_region');
         localStorage.removeItem('tonet_locale_lang');
       }
+    }
+
+    // Set Google Translate cookie
+    if (typeof document !== 'undefined') {
+      if (pref.language === 'en') {
+        document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        document.cookie = 'googtrans=; path=/; domain=' + window.location.hostname + '; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      } else {
+        document.cookie = `googtrans=/en/${pref.language}; path=/`;
+        const hostParts = window.location.hostname.split('.');
+        if (hostParts.length > 1) {
+          const domain = '.' + hostParts.slice(-2).join('.');
+          document.cookie = `googtrans=/en/${pref.language}; path=/; domain=${domain}`;
+        }
+      }
+    }
+
+    // Reload page to apply translation and regional settings immediately
+    if (typeof window !== 'undefined') {
+      window.location.reload();
     }
   }, []);
 

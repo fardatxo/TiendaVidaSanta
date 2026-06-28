@@ -18,6 +18,7 @@ import SearchDrawer from "@/components/SearchDrawer";
 import CookieBanner from "@/components/CookieBanner";
 import TransitionProvider from "@/components/TransitionProvider";
 import LocaleSelectorModal from "@/components/LocaleSelectorModal";
+import GoogleTranslator from "@/components/GoogleTranslator";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -64,6 +65,7 @@ export default function RootLayout({
                 <main>{children}</main>
                 <Footer />
                 <CookieBanner />
+                <GoogleTranslator />
                 <Analytics />
               </WishlistProvider>
               </AuthProvider>

@@ -6,11 +6,13 @@ import { useUI } from "@/context/UIContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, X } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 import "./AccountDrawer.css";
 
 type Step = 'select' | 'login' | 'register' | 'tracking';
 
 export default function AccountDrawer() {
+  const { t } = useTranslation();
   const { login, register, loginWithGoogle, logout, user } = useAuth();
   const { isAccountOpen, closeAccount, openCart, openSearch } = useUI();
   const { items: wishlistItems } = useWishlist();
@@ -77,11 +79,11 @@ export default function AccountDrawer() {
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!firstName.trim() || !lastName.trim() || !email.trim() || !password.trim()) {
-      setError('Todos los campos son obligatorios.');
+      setError(t('accountDrawer.errorFields'));
       return;
     }
     if (password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres.');
+      setError(t('accountDrawer.errorPassword'));
       return;
     }
     setLoading(true);
@@ -107,7 +109,7 @@ export default function AccountDrawer() {
         closeAccount();
       }
     } catch (e: any) {
-      setError(e?.message ?? 'Error inesperado al conectar con Google.');
+      setError(e?.message ?? t('accountDrawer.googleError', 'Unexpected error connecting with Google.'));
       setLoading(false);
     }
   };
@@ -147,18 +149,18 @@ export default function AccountDrawer() {
         className={`ad-drawer ${isAccountOpen ? "open" : ""}`}
         role="dialog"
         aria-modal="true"
-        aria-label="Acceso a la cuenta"
+        aria-label={t('accountDrawer.signIn')}
       >
         {/* HEADER */}
         <div className="ad-header">
           <button className="ad-close-btn" onClick={closeAccount}>
             <X size={14} strokeWidth={1.5} />
-            <span>cerrar</span>
+            <span>{t('accountDrawer.close')}</span>
           </button>
 
           <div className="ad-header-icons">
             {/* Account (Active state link/indicator) */}
-            <span className="ad-icon-btn active" aria-label="Cuenta">
+            <span className="ad-icon-btn active" aria-label={t('account.overview')}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                 <circle cx="12" cy="7" r="4"/>
@@ -173,7 +175,7 @@ export default function AccountDrawer() {
           {user ? (
             <div className="ad-welcome-view">
               <div className="ad-welcome-block">
-                <h1 className="ad-welcome-title">Bienvenido a TONET</h1>
+                <h1 className="ad-welcome-title">{t('accountDrawer.welcome')}</h1>
                 <p className="ad-welcome-sub">
                   {user.firstName} {user.lastName} — {user.email}
                 </p>
@@ -186,8 +188,8 @@ export default function AccountDrawer() {
                     <span className="ad-radio-dot" />
                   </div>
                   <div className="ad-option-content">
-                    <h3 className="ad-option-title">The Residence</h3>
-                    <p className="ad-option-desc">Ver tu panel general de la residencia.</p>
+                    <h3 className="ad-option-title">{t('accountDrawer.theResidence')}</h3>
+                    <p className="ad-option-desc">{t('accountDrawer.theResidenceDesc')}</p>
                   </div>
                 </div>
 
@@ -197,8 +199,8 @@ export default function AccountDrawer() {
                     <span className="ad-radio-dot" />
                   </div>
                   <div className="ad-option-content">
-                    <h3 className="ad-option-title">Mis adquisiciones</h3>
-                    <p className="ad-option-desc">Historial de tus compras y pedidos realizados.</p>
+                    <h3 className="ad-option-title">{t('accountDrawer.myAcquisitions')}</h3>
+                    <p className="ad-option-desc">{t('accountDrawer.myAcquisitionsDesc')}</p>
                   </div>
                 </div>
 
@@ -208,8 +210,8 @@ export default function AccountDrawer() {
                     <span className="ad-radio-dot" />
                   </div>
                   <div className="ad-option-content">
-                    <h3 className="ad-option-title">House Record</h3>
-                    <p className="ad-option-desc">Gestiona tus datos de facturación y perfil.</p>
+                    <h3 className="ad-option-title">{t('accountDrawer.houseRecord')}</h3>
+                    <p className="ad-option-desc">{t('accountDrawer.houseRecordDesc')}</p>
                   </div>
                 </div>
 
@@ -219,8 +221,8 @@ export default function AccountDrawer() {
                     <span className="ad-radio-dot" />
                   </div>
                   <div className="ad-option-content">
-                    <h3 className="ad-option-title">Garments Archivados</h3>
-                    <p className="ad-option-desc">Consulta las prendas guardadas en tu archivo.</p>
+                    <h3 className="ad-option-title">{t('accountDrawer.archivedGarments')}</h3>
+                    <p className="ad-option-desc">{t('accountDrawer.archivedGarmentsDesc')}</p>
                   </div>
                 </div>
 
@@ -230,8 +232,8 @@ export default function AccountDrawer() {
                     <span className="ad-radio-dot" />
                   </div>
                   <div className="ad-option-content">
-                    <h3 className="ad-option-title">Salir de la casa</h3>
-                    <p className="ad-option-desc">Cerrar sesión de forma segura.</p>
+                    <h3 className="ad-option-title">{t('accountDrawer.leaveHouse')}</h3>
+                    <p className="ad-option-desc">{t('accountDrawer.leaveHouseDesc')}</p>
                   </div>
                 </div>
               </div>
@@ -243,9 +245,9 @@ export default function AccountDrawer() {
               {step === 'select' && (
                 <>
                   <div className="ad-welcome-block">
-                    <h1 className="ad-welcome-title">Bienvenido a TONET</h1>
+                    <h1 className="ad-welcome-title">{t('accountDrawer.welcome')}</h1>
                     <p className="ad-welcome-sub">
-                      Inicia sesión, crea una cuenta o consulta el estado de tus pedidos.
+                      {t('accountDrawer.welcomeSub')}
                     </p>
                   </div>
 
@@ -256,8 +258,8 @@ export default function AccountDrawer() {
                         <span className="ad-radio-dot" />
                       </div>
                       <div className="ad-option-content">
-                        <h3 className="ad-option-title">Iniciar sesión</h3>
-                        <p className="ad-option-desc">Accede a tu cuenta.</p>
+                        <h3 className="ad-option-title">{t('accountDrawer.signIn')}</h3>
+                        <p className="ad-option-desc">{t('accountDrawer.signInDesc')}</p>
                       </div>
                     </div>
 
@@ -267,8 +269,8 @@ export default function AccountDrawer() {
                         <span className="ad-radio-dot" />
                       </div>
                       <div className="ad-option-content">
-                        <h3 className="ad-option-title">Crear una cuenta</h3>
-                        <p className="ad-option-desc">Guarda tus pedidos, favoritos y datos de compra.</p>
+                        <h3 className="ad-option-title">{t('accountDrawer.createAccount')}</h3>
+                        <p className="ad-option-desc">{t('accountDrawer.createAccountDesc')}</p>
                       </div>
                     </div>
 
@@ -278,8 +280,8 @@ export default function AccountDrawer() {
                         <span className="ad-radio-dot" />
                       </div>
                       <div className="ad-option-content">
-                        <h3 className="ad-option-title">Seguimiento de mi pedido</h3>
-                        <p className="ad-option-desc">Consulta el estado y las últimas actualizaciones de tu pedido.</p>
+                        <h3 className="ad-option-title">{t('accountDrawer.trackOrder')}</h3>
+                        <p className="ad-option-desc">{t('accountDrawer.trackOrderDesc')}</p>
                       </div>
                     </div>
                   </div>
@@ -291,19 +293,19 @@ export default function AccountDrawer() {
                 <div className="ad-flow-view">
                   <button className="ad-flow-back" onClick={handleBackToSelect}>
                     <ArrowLeft size={12} strokeWidth={1.5} />
-                    <span>volver</span>
+                    <span>{t('accountDrawer.back')}</span>
                   </button>
 
                   <div className="ad-flow-container">
-                    <h2 className="ad-flow-title">Iniciar sesión</h2>
-                    <p className="ad-flow-sub">Introduce tus datos para acceder a tu cuenta.</p>
+                    <h2 className="ad-flow-title">{t('accountDrawer.loginTitle')}</h2>
+                    <p className="ad-flow-sub">{t('accountDrawer.loginSub')}</p>
 
                     <form onSubmit={handleLoginSubmit} className="ad-form-layout">
                       <div className="ad-input-group">
                         <input
                           type="email"
                           required
-                          placeholder="correo electrónico"
+                          placeholder={t('accountDrawer.email')}
                           className="ad-flow-input"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
@@ -313,7 +315,7 @@ export default function AccountDrawer() {
                         <input
                           type="password"
                           required
-                          placeholder="contraseña"
+                          placeholder={t('accountDrawer.password')}
                           className="ad-flow-input"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
@@ -323,12 +325,12 @@ export default function AccountDrawer() {
                       {error && <p className="ad-flow-error">{error}</p>}
 
                       <button type="submit" className="ad-flow-btn" disabled={loading}>
-                        {loading ? "iniciando sesión…" : "acceder"}
+                        {loading ? t('accountDrawer.loggingIn') : t('accountDrawer.loginBtn')}
                       </button>
                     </form>
 
                     <div className="ad-social-divider">
-                      <span>o</span>
+                      <span>{t('accountDrawer.or')}</span>
                     </div>
 
                     <button type="button" className="ad-social-btn" onClick={handleGoogleSubmit} disabled={loading}>
@@ -338,7 +340,7 @@ export default function AccountDrawer() {
                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#000"/>
                         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#000"/>
                       </svg>
-                      <span>continuar con google</span>
+                      <span>{t('accountDrawer.continueGoogle')}</span>
                     </button>
                   </div>
                 </div>
@@ -349,19 +351,19 @@ export default function AccountDrawer() {
                 <div className="ad-flow-view">
                   <button className="ad-flow-back" onClick={handleBackToSelect}>
                     <ArrowLeft size={12} strokeWidth={1.5} />
-                    <span>volver</span>
+                    <span>{t('accountDrawer.back')}</span>
                   </button>
 
                   <div className="ad-flow-container">
-                    <h2 className="ad-flow-title">Crear una cuenta</h2>
-                    <p className="ad-flow-sub">Regístrate para guardar tus pedidos y gestionar tus datos.</p>
+                    <h2 className="ad-flow-title">{t('accountDrawer.registerTitle')}</h2>
+                    <p className="ad-flow-sub">{t('accountDrawer.registerSub')}</p>
 
                     <form onSubmit={handleRegisterSubmit} className="ad-form-layout">
                       <div className="ad-input-group">
                         <input
                           type="text"
                           required
-                          placeholder="nombre"
+                          placeholder={t('accountDrawer.firstName')}
                           className="ad-flow-input"
                           value={firstName}
                           onChange={(e) => setFirstName(e.target.value)}
@@ -371,7 +373,7 @@ export default function AccountDrawer() {
                         <input
                           type="text"
                           required
-                          placeholder="apellidos"
+                          placeholder={t('accountDrawer.lastName')}
                           className="ad-flow-input"
                           value={lastName}
                           onChange={(e) => setLastName(e.target.value)}
@@ -381,7 +383,7 @@ export default function AccountDrawer() {
                         <input
                           type="email"
                           required
-                          placeholder="correo electrónico"
+                          placeholder={t('accountDrawer.email')}
                           className="ad-flow-input"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
@@ -391,7 +393,7 @@ export default function AccountDrawer() {
                         <input
                           type="password"
                           required
-                          placeholder="contraseña (mínimo 6 caracteres)"
+                          placeholder={t('accountDrawer.passwordMin')}
                           className="ad-flow-input"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
@@ -401,12 +403,12 @@ export default function AccountDrawer() {
                       {error && <p className="ad-flow-error">{error}</p>}
 
                       <button type="submit" className="ad-flow-btn" disabled={loading}>
-                        {loading ? "creando cuenta…" : "crear cuenta"}
+                        {loading ? t('accountDrawer.registering') : t('accountDrawer.registerBtn')}
                       </button>
                     </form>
 
                     <div className="ad-social-divider">
-                      <span>o</span>
+                      <span>{t('accountDrawer.or')}</span>
                     </div>
 
                     <button type="button" className="ad-social-btn" onClick={handleGoogleSubmit} disabled={loading}>
@@ -416,7 +418,7 @@ export default function AccountDrawer() {
                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#000"/>
                         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#000"/>
                       </svg>
-                      <span>continuar con google</span>
+                      <span>{t('accountDrawer.continueGoogle')}</span>
                     </button>
                   </div>
                 </div>
@@ -427,19 +429,19 @@ export default function AccountDrawer() {
                 <div className="ad-flow-view">
                   <button className="ad-flow-back" onClick={handleBackToSelect}>
                     <ArrowLeft size={12} strokeWidth={1.5} />
-                    <span>volver</span>
+                    <span>{t('accountDrawer.back')}</span>
                   </button>
 
                   <div className="ad-flow-container">
-                    <h2 className="ad-flow-title">Seguimiento de pedido</h2>
-                    <p className="ad-flow-sub">Introduce los datos de tu compra para ver el estado de tu envío.</p>
+                    <h2 className="ad-flow-title">{t('accountDrawer.trackingTitle')}</h2>
+                    <p className="ad-flow-sub">{t('accountDrawer.trackingSub')}</p>
 
                     <form onSubmit={handleTrackingSubmit} className="ad-form-layout">
                       <div className="ad-input-group">
                         <input
                           type="text"
                           required
-                          placeholder="número de pedido (ej: #1001)"
+                          placeholder={t('accountDrawer.orderNum')}
                           className="ad-flow-input"
                           value={trackingOrder}
                           onChange={(e) => setTrackingOrder(e.target.value)}
@@ -449,7 +451,7 @@ export default function AccountDrawer() {
                         <input
                           type="email"
                           required
-                          placeholder="correo electrónico de facturación"
+                          placeholder={t('accountDrawer.billingEmail')}
                           className="ad-flow-input"
                           value={trackingEmail}
                           onChange={(e) => setTrackingEmail(e.target.value)}
@@ -458,12 +460,12 @@ export default function AccountDrawer() {
 
                       {trackingResult === 'not_found' && (
                         <p className="ad-flow-error">
-                          No se ha encontrado ningún pedido con la información facilitada. Por favor, compruebe los datos e inténtelo de nuevo.
+                          {t('accountDrawer.notFound')}
                         </p>
                       )}
 
                       <button type="submit" className="ad-flow-btn" disabled={trackingResult === 'loading'}>
-                        {trackingResult === 'loading' ? "buscando pedido…" : "consultar estado"}
+                        {trackingResult === 'loading' ? t('accountDrawer.searching') : t('accountDrawer.checkStatus')}
                       </button>
                     </form>
                   </div>

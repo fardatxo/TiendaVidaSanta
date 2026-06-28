@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useWishlist } from '@/context/WishlistContext';
 import { useAuth } from '@/context/AuthContext';
 import { useLocale } from '@/context/LocaleContext';
+import { useTranslation } from '@/lib/i18n';
 
 type Tab = 'personal' | 'requests' | 'registry';
 
@@ -94,6 +95,7 @@ export default function ArchiveClient() {
   const { user, logout } = useAuth();
   const { formatPrice } = useLocale();
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   const tabParam = searchParams.get('tab') as Tab | null;
   const [activeTab, setActiveTab] = useState<Tab>(tabParam ?? 'personal');
@@ -190,29 +192,29 @@ export default function ArchiveClient() {
         <div className="dior-tabs-container">
           <div className="dior-tabs-list">
             <Link href="/account" className={`dior-tab ${pathname === '/account' ? 'active' : ''}`}>
-              Resumen
+              {t('account.overviewTab')}
             </Link>
             <Link href="/account/orders" className={`dior-tab ${pathname === '/account/orders' ? 'active' : ''}`}>
-              Pedidos
+              {t('account.ordersTab')}
             </Link>
             <Link href="/archive?tab=personal" className={`dior-tab ${activeTab === 'personal' ? 'active' : ''}`}>
-              Lista de deseos
+              {t('account.wishlistTab')}
             </Link>
             <Link href="/account/information" className={`dior-tab ${pathname === '/account/information' ? 'active' : ''}`}>
-              Perfil
+              {t('account.profileTab')}
             </Link>
             <Link href="/account/addresses" className={`dior-tab ${pathname === '/account/addresses' ? 'active' : ''}`}>
-              Direcciones
+              {t('account.addressesTab')}
             </Link>
             <Link href="/archive?tab=requests" className={`dior-tab ${activeTab === 'requests' ? 'active' : ''}`}>
-              Solicitudes de disponibilidad
+              {t('account.requestsTab')}
             </Link>
             <Link href="/archive?tab=registry" className={`dior-tab ${activeTab === 'registry' ? 'active' : ''}`}>
-              Registro de colecciones
+              {t('account.registryTab')}
             </Link>
           </div>
           <button onClick={logout} className="dior-logout-btn">
-            Cerrar sesión <span className="dior-logout-arrow">→</span>
+            {t('account.logoutTab')} <span className="dior-logout-arrow">→</span>
           </button>
         </div>
       </nav>
@@ -619,7 +621,7 @@ export default function ArchiveClient() {
           border-bottom: 1px solid #ddd8d2;
           width: 100%;
           position: sticky;
-          top: 64px;
+          top: calc(var(--header-height, 64px) + var(--nav-top, 0px));
           z-index: 10;
         }
         .dior-tabs-container {
@@ -1429,9 +1431,6 @@ export default function ArchiveClient() {
         }
 
         @media (max-width: 767px) {
-          .dior-tabs-nav {
-            top: 54px;
-          }
           .dior-space-wrap {
             padding: 40px 16px 80px;
           }

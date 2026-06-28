@@ -3,11 +3,13 @@
 import Link from 'next/link';
 import { useRequireAuth, useAuth } from '@/context/AuthContext';
 import { usePathname } from 'next/navigation';
+import { useTranslation } from '@/lib/i18n';
 
 export default function AccountClient() {
   const { user, isLoading } = useRequireAuth();
   const { logout } = useAuth();
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   if (isLoading || !user) return null;
 
@@ -18,12 +20,15 @@ export default function AccountClient() {
       {/* ══ HERO BANNER AREA ══ */}
       <div className="dior-hero-banner">
         <img 
-          src="/AMIRI_WEB_Account-Page_Banner_1558x520_1-50.webp" 
-          alt="Maison Atelier" 
-          className="dior-hero-img"
+          src="/hero/ComfyUI-main_reference_00007_.png" 
+          alt="Amiri Campaign Model" 
+          className="dior-banner-img"
         />
-        <div className="dior-hero-overlay">
-          <h1 className="dior-hero-title">Welcome, {fullName}</h1>
+        <div className="dior-banner-overlay">
+          <div className="dior-banner-text">
+            <span className="dior-banner-sub">THE HOUSE OF TONET</span>
+            <h1 className="dior-banner-title">WELCOME, {fullName}</h1>
+          </div>
         </div>
       </div>
 
@@ -32,29 +37,29 @@ export default function AccountClient() {
         <div className="dior-tabs-container">
           <div className="dior-tabs-list">
             <Link href="/account" className={`dior-tab ${pathname === '/account' ? 'active' : ''}`}>
-              Resumen
+              {t('account.overviewTab')}
             </Link>
             <Link href="/account/orders" className={`dior-tab ${pathname === '/account/orders' ? 'active' : ''}`}>
-              Pedidos
+              {t('account.ordersTab')}
             </Link>
             <Link href="/archive?tab=personal" className="dior-tab">
-              Lista de deseos
+              {t('account.wishlistTab')}
             </Link>
             <Link href="/account/information" className={`dior-tab ${pathname === '/account/information' ? 'active' : ''}`}>
-              Perfil
+              {t('account.profileTab')}
             </Link>
             <Link href="/account/addresses" className={`dior-tab ${pathname === '/account/addresses' ? 'active' : ''}`}>
-              Direcciones
+              {t('account.addressesTab')}
             </Link>
             <Link href="/archive?tab=requests" className="dior-tab">
-              Solicitudes de disponibilidad
+              {t('account.requestsTab')}
             </Link>
             <Link href="/archive?tab=registry" className="dior-tab">
-              Registro de colecciones
+              {t('account.registryTab')}
             </Link>
           </div>
           <button onClick={logout} className="dior-logout-btn">
-            Cerrar sesión <span className="dior-logout-arrow">→</span>
+            {t('account.logoutTab')} <span className="dior-logout-arrow">→</span>
           </button>
         </div>
       </nav>
@@ -136,13 +141,8 @@ export default function AccountClient() {
           border-bottom: 1px solid #ddd8d2;
           width: 100%;
           position: sticky;
-          top: 64px;
+          top: calc(var(--header-height, 64px) + var(--nav-top, 0px));
           z-index: 10;
-        }
-        @media (max-width: 767px) {
-          .dior-tabs-nav {
-            top: 54px;
-          }
         }
         .dior-tabs-container {
           max-width: 1200px;
@@ -225,12 +225,12 @@ export default function AccountClient() {
           width: 100%;
           height: 520px;
           overflow: hidden;
-          margin-top: 48px;
+          margin-top: 0;
           background: #e4e3e1;
         }
         @media (max-width: 767px) {
           .dior-hero-banner {
-            margin-top: 38px;
+            margin-top: 0;
             height: 360px;
           }
         }
@@ -395,9 +395,6 @@ export default function AccountClient() {
         }
 
         @media (max-width: 767px) {
-          .dior-tabs-nav {
-            top: 70px;
-          }
           .dior-space-wrap {
             padding: 40px 16px 80px;
           }
