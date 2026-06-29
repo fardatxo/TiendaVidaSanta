@@ -25,9 +25,13 @@ interface ProviderProps {
 
 function getCookie(name: string): string | undefined {
   if (typeof document === 'undefined') return undefined;
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(';').shift();
+  const cookies = document.cookie.split(';');
+  for (let i = 0; i < cookies.length; i++) {
+    const cookie = cookies[i].trim();
+    if (cookie.startsWith(name + '=')) {
+      return cookie.substring(name.length + 1);
+    }
+  }
   return undefined;
 }
 
@@ -67,16 +71,33 @@ export function LocaleProvider({ children }: ProviderProps) {
       if (typeof document !== 'undefined') {
         const currentGoogTrans = getCookie('googtrans');
         const expectedGoogTrans = savedLang === 'en' ? '' : `/en/${savedLang}`;
+        const normalizedCurrent = currentGoogTrans || '';
         
-        if (expectedGoogTrans && currentGoogTrans !== expectedGoogTrans) {
-          document.cookie = `googtrans=${expectedGoogTrans}; path=/`;
-          const hostParts = window.location.hostname.split('.');
-          if (hostParts.length > 1) {
-            const domain = '.' + hostParts.slice(-2).join('.');
-            document.cookie = `googtrans=${expectedGoogTrans}; path=/; domain=${domain}`;
+        if (normalizedCurrent !== expectedGoogTrans) {
+          if (expectedGoogTrans === '') {
+            document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            document.cookie = 'googtrans=; path=/; domain=' + window.location.hostname + '; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            const hostParts = window.location.hostname.split('.');
+            if (hostParts.length > 1) {
+              const domain = '.' + hostParts.slice(-2).join('.');
+              document.cookie = `googtrans=; path=/; domain=${domain}; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+            }
+          } else {
+            document.cookie = `googtrans=${expectedGoogTrans}; path=/`;
+            const hostParts = window.location.hostname.split('.');
+            if (hostParts.length > 1) {
+              const domain = '.' + hostParts.slice(-2).join('.');
+              document.cookie = `googtrans=${expectedGoogTrans}; path=/; domain=${domain}`;
+            }
           }
-          // Reload to apply translation since it was missing
-          window.location.reload();
+          
+          // Verify if the cookie was successfully written/cleared before reloading
+          const verifiedGoogTrans = getCookie('googtrans') || '';
+          if (verifiedGoogTrans === expectedGoogTrans) {
+            window.location.reload();
+          } else {
+            console.warn('Google Translate cookie sync failed or was blocked. Skipping reload to avoid infinite loop.');
+          }
         }
       }
     } else {
