@@ -46,9 +46,8 @@ export default function GoogleTranslator() {
         .goog-te-menu-frame,
         .goog-te-spinner-pos,
         .goog-te-spinner,
-        .VIpgJd-ZVi9od-ORHb-OEVmcd,
-        .VIpgJd-ZVi9od-l4eHX-hSRGPd,
-        .VIpgJd-yAWNEb-L7lbkb {
+        .goog-te-gadget-icon,
+        [class*="VIpgJd-ZVi9od"] {
           display: none !important;
           visibility: hidden !important;
           opacity: 0 !important;
