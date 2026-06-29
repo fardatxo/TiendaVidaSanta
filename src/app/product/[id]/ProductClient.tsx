@@ -6,7 +6,7 @@ import { useUI } from '@/context/UIContext';
 import { useCart } from '@/context/CartContext';
 import { useTranslation } from '@/lib/i18n';
 import { useLocale } from '@/context/LocaleContext';
-import { Product, ShopifyVariant, RecommendedProduct } from '@/lib/shopify';
+import { Product, ShopifyVariant, RecommendedProduct, getOptimizedImageUrl } from '@/lib/shopify';
 import { useTranslatedText } from '@/hooks/useTranslatedText';
 import RecommendedCard from '@/components/RecommendedCard';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -672,7 +672,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                 {images.map((img, i) => (
                   <div key={i} className="tonet-mobile-slide">
                     <img 
-                      src={img} 
+                      src={getOptimizedImageUrl(img, 1000)} 
                       alt={`${product.title} - ${i}`} 
                       className="tonet-pdp-img amiri-fade-in" 
                       loading={i === 0 ? "eager" : "lazy"}
@@ -704,7 +704,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
               {images.map((img, i) => (
                 <div key={i} className="tonet-desktop-img-wrapper">
                   <img 
-                    src={img} 
+                    src={getOptimizedImageUrl(img, 1600)} 
                     alt={`${product.title} - ${i}`} 
                     className="tonet-pdp-img amiri-fade-in" 
                     loading={i === 0 ? "eager" : "lazy"}
@@ -1156,7 +1156,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             <div className="tonet-ceremony-split">
               <div className="tonet-ceremony-image">
                 {product.imageUrl && (
-                  <img src={product.imageUrl} alt={product.title} className="ac-tonet-img" />
+                  <img src={getOptimizedImageUrl(product.imageUrl, 800)} alt={product.title} className="ac-tonet-img" />
                 )}
               </div>
 
@@ -1236,7 +1236,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           <div className="tonet-sticky-buy-left">
             {product.imageUrl && (
               <div className="tonet-sticky-buy-thumb">
-                <img src={product.imageUrl} alt={product.title} />
+                <img src={getOptimizedImageUrl(product.imageUrl, 200)} alt={product.title} />
               </div>
             )}
             <span className="tonet-sticky-buy-price">{priceFormatted}</span>

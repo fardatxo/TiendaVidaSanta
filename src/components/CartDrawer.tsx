@@ -5,6 +5,7 @@ import { useCart, CartLine } from "@/context/CartContext";
 import { useEffect } from "react";
 import { useLocale } from "@/context/LocaleContext";
 import { X, Plus, Minus } from "lucide-react";
+import { getOptimizedImageUrl } from "@/lib/shopify";
 
 interface CartItem {
   id: string;
@@ -93,7 +94,7 @@ export default function CartDrawer() {
             items.map((item) => (
               <div key={item.id} className="cd-item">
                 <div className="cd-item-img">
-                  {item.image && <img src={item.image} alt={item.name} draggable={false} />}
+                  {item.image && <img src={getOptimizedImageUrl(item.image, 200)} alt={item.name} draggable={false} />}
                 </div>
                 <div className="cd-item-info">
                   <span className="cd-item-name">{item.name}</span>

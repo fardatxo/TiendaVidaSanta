@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Product } from '@/lib/shopify';
+import { Product, getOptimizedImageUrl } from '@/lib/shopify';
 
 interface HomeCollectionProps {
   products: Product[];
@@ -85,7 +85,7 @@ export default function HomeCollection({ products }: HomeCollectionProps) {
               <div className="hc-img-wrap">
                 {product.imageUrl && (
                   <img
-                    src={product.imageUrl}
+                    src={getOptimizedImageUrl(product.imageUrl, 700)}
                     alt={product.title}
                     className="hc-img"
                     loading="lazy"

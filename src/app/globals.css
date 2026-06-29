@@ -135,9 +135,12 @@ input, textarea, [contenteditable] {
   user-select: text;
 }
 
-/* Prevent image and link native drag */
+/* Prevent image and link native drag & enhance image rendering contrast */
 img, video {
   -webkit-user-drag: none;
+}
+img {
+  image-rendering: -webkit-optimize-contrast;
 }
 
 /* Hide scrollbar globally */

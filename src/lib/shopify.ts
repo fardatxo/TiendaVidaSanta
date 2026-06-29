@@ -440,3 +440,17 @@ export async function getProduct(handle: string): Promise<Product | null> {
   );
   return data.productByHandle ? normalizeProduct(data.productByHandle) : null;
 }
+
+export function getOptimizedImageUrl(url: string, width: number = 800): string {
+  if (!url) return '';
+  if (!url.includes('cdn.shopify.com')) return url;
+  try {
+    const urlObj = new URL(url);
+    urlObj.searchParams.set('width', width.toString());
+    urlObj.searchParams.set('format', 'webp');
+    urlObj.searchParams.set('quality', '90');
+    return urlObj.toString();
+  } catch (e) {
+    return url;
+  }
+}

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { getOptimizedImageUrl } from '@/lib/shopify';
 import type { RecommendedProduct } from '@/lib/shopify';
 
 interface Props {
@@ -15,7 +16,8 @@ const getArchiveRef = (handle: string) => {
 
 export default function RecommendedCard({ product }: Props) {
   const displayHref = `/product/${product.handle}`;
-  const secondImage = product.siblings.length > 0 ? product.siblings[0].imageUrl : null;
+  const primaryImage = getOptimizedImageUrl(product.imageUrl, 600);
+  const secondImage = product.siblings.length > 0 ? getOptimizedImageUrl(product.siblings[0].imageUrl, 600) : null;
 
   return (
     <div className="tonet-house-carousel__card-wrap">
@@ -23,7 +25,7 @@ export default function RecommendedCard({ product }: Props) {
         <div className="tonet-house-carousel__image-wrap">
           {product.imageUrl && (
             <img 
-              src={product.imageUrl} 
+              src={primaryImage} 
               alt={product.title} 
               className="tonet-house-carousel__image tonet-house-carousel__image--primary" 
             />

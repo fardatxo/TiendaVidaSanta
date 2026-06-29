@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Plus, Minus, X } from 'lucide-react';
 import type { CollectionDetail, Product } from '@/lib/shopify';
+import { getOptimizedImageUrl } from '@/lib/shopify';
 import { useLocale } from '@/context/LocaleContext';
 import Link from 'next/link';
 
@@ -452,7 +453,7 @@ export default function CollectionClient({ collection }: { collection: Collectio
                       <div className="amiri-product-img-wrap">
                         {p.imageUrl && (
                           <img
-                            src={p.imageUrl}
+                            src={getOptimizedImageUrl(p.imageUrl, 800)}
                             alt={p.title}
                             className={`amiri-product-img amiri-product-img--primary amiri-fade-in ${imageClass}`}
                             loading="lazy"
@@ -465,7 +466,7 @@ export default function CollectionClient({ collection }: { collection: Collectio
                         )}
                         {p.images && p.images.length > 1 && (
                           <img
-                            src={p.images[1]}
+                            src={getOptimizedImageUrl(p.images[1], 800)}
                             alt={p.title}
                             className={`amiri-product-img amiri-product-img--secondary ${imageClass}`}
                             loading="lazy"

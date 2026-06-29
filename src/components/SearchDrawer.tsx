@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUI } from "@/context/UIContext";
 import { useLocale } from "@/context/LocaleContext";
-import { getProducts, searchProducts } from "@/lib/shopify";
+import { getProducts, searchProducts, getOptimizedImageUrl } from "@/lib/shopify";
 
 export default function SearchDrawer() {
   const { isSearchOpen, closeSearch } = useUI();
@@ -257,7 +257,7 @@ export default function SearchDrawer() {
                         <div className="sd-suggested-img-wrap">
                           {image && (
                             <img 
-                              src={image} 
+                              src={getOptimizedImageUrl(image, 250)} 
                               alt={p.title} 
                               className="sd-suggested-img" 
                             />
