@@ -244,6 +244,7 @@
     "searching": "buscando pedido…",
     "checkStatus": "consultar estado",
     "errorFields": "Todos los campos son obligatorios.",
-    "errorPassword": "La contraseña debe tener al menos 6 caracteres."
+    "errorPassword": "La contraseña debe tener al menos 6 caracteres.",
+    "googleError": "Error inesperado al conectar con Google."
   }
 }

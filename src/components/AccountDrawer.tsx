@@ -109,7 +109,7 @@ export default function AccountDrawer() {
         closeAccount();
       }
     } catch (e: any) {
-      setError(e?.message ?? t('accountDrawer.googleError', 'Unexpected error connecting with Google.'));
+      setError(e?.message ?? t('accountDrawer.googleError'));
       setLoading(false);
     }
   };

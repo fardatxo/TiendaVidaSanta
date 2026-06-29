@@ -244,6 +244,7 @@
     "searching": "searching order...",
     "checkStatus": "check status",
     "errorFields": "All fields are required.",
-    "errorPassword": "Password must be at least 6 characters."
+    "errorPassword": "Password must be at least 6 characters.",
+    "googleError": "Unexpected error connecting with Google."
   }
 }

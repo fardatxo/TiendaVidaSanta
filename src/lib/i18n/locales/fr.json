@@ -244,6 +244,7 @@
     "searching": "recherche en cours...",
     "checkStatus": "vérifier l'état",
     "errorFields": "Tous les champs sont obligatoires.",
-    "errorPassword": "Le mot de passe doit contenir au moins 6 caractères."
+    "errorPassword": "Le mot de passe doit contenir au moins 6 caractères.",
+    "googleError": "Erreur inattendue lors de la connexion avec Google."
   }
 }
