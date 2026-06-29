@@ -103,7 +103,11 @@ export default function LoginPage() {
       {/* ══ TOP LOGO HEADER ══ */}
       <header className="auth-header">
         <Link href="/" className="auth-logo">
-          TONET TORRENTINNI
+          <img 
+            src="/icon.png" 
+            alt="TONET TORRENTINNI" 
+            className="auth-logo-img"
+          />
         </Link>
       </header>
 
@@ -265,11 +269,17 @@ export default function LoginPage() {
           background: #ffffff;
         }
         .auth-logo {
-          font-family: 'Saint Carell', sans-serif;
-          font-size: 20px;
-          letter-spacing: 0.15em;
           text-decoration: none;
-          color: #2d2a26;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .auth-logo-img {
+          height: 38px;
+          width: auto;
+          object-fit: contain;
+          filter: invert(1);
+          mix-blend-mode: multiply;
         }
 
         /* Portal grid layout */

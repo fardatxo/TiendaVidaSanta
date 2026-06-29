@@ -186,18 +186,11 @@ export default function Navbar() {
 
           {/* CENTER: Logo */}
           <Link href="/" className="acne-logo">
-            <span 
-              className="acne-logo-text acne-logo-desktop"
-              style={{ fontFamily: "'Saint Carell', sans-serif", fontWeight: 'normal' }}
-            >
-              TONET TORRENTINNI
-            </span>
-            <span 
-              className="acne-logo-text acne-logo-mobile"
-              style={{ fontFamily: "'Saint Carell', sans-serif", fontWeight: 'normal' }}
-            >
-              TONET
-            </span>
+            <img 
+              src="/icon.png" 
+              alt="TONET TORRENTINNI" 
+              className="acne-logo-img"
+            />
           </Link>
 
           {/* RIGHT: Utility Icons (Account, Wishlist, Cart) */}
@@ -593,26 +586,16 @@ export default function Navbar() {
           align-items: center;
           justify-content: center;
         }
-        .acne-logo-text {
-          font-family: 'Coolvetica Condensed', var(--font-brand), sans-serif;
-          font-size: 26px;
-          font-weight: normal;
-          letter-spacing: 0.03em;
-          padding-right: 0;
-          color: rgba(0, 0, 0, 0.95);
-          text-transform: uppercase;
-          line-height: 1;
+        .acne-logo-img {
+          height: 38px;
+          width: auto;
+          object-fit: contain;
+          filter: invert(1);
+          mix-blend-mode: multiply;
           transition: opacity 0.3s ease;
-          display: inline-flex;
-          align-items: center;
-          transform: translateY(-2px); /* Baseline adjustment for Saint Carell font */
         }
-        .acne-logo:hover .acne-logo-text { opacity: 0.6; }
-        .acne-logo-desktop {
-          display: inline-block;
-        }
-        .acne-logo-mobile {
-          display: none;
+        .acne-logo:hover .acne-logo-img {
+          opacity: 0.6;
         }
 
         /* ══ LEFT NAV ══ */
@@ -934,16 +917,12 @@ export default function Navbar() {
             grid-template-columns: 1fr auto 1fr; 
             align-items: stretch; 
           }
-          .acne-logo-text { font-size: 24px; letter-spacing: 0.03em; font-weight: normal; padding-right: 0; }
+          .acne-logo-img {
+            height: 30px;
+          }
           .acne-mob-icon { width: 32px; height: 54px; }
           .acne-right-icon { width: 32px; height: 54px; }
           .acne-wishlist-icon { display: none !important; }
-          .acne-logo-desktop {
-            display: none;
-          }
-          .acne-logo-mobile {
-            display: inline-block;
-          }
           
           /* Active states */
           .acne-mob-icon:active,
