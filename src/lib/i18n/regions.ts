@@ -170,11 +170,7 @@ export function getLanguageLabel(language: LanguageCode, displayLang: LanguageCo
 }
 
 export function getAvailableLanguages(region: RegionCode): LanguageCode[] {
-  // Combine region specific languages with our 20 main languages to allow flexibility,
-  // prioritizing region default languages first.
-  const regionLangs = REGIONS[region]?.languages ?? ['en'];
-  const allOtherLangs = LANGUAGE_CODES.filter(l => !regionLangs.includes(l));
-  return [...regionLangs, ...allOtherLangs];
+  return ['en'];
 }
 
 export function isLanguageAvailable(region: RegionCode, lang: LanguageCode): boolean {
@@ -214,5 +210,5 @@ export function detectSuggestedLocale(): { region: RegionCode; language: Languag
     else finalRegion = 'US';
   }
 
-  return { region: finalRegion, language: finalLang };
+  return { region: finalRegion, language: 'en' };
 }

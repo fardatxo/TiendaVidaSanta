@@ -54,56 +54,17 @@ export function LocaleProvider({ children }: ProviderProps) {
     setIsMounted(true);
 
     const cookieRegion = getCookie('tonet_locale_region') as RegionCode | undefined;
-    const cookieLang = getCookie('tonet_locale_lang') as LanguageCode | undefined;
-
     const localRegion = typeof window !== 'undefined' ? localStorage.getItem('tonet_locale_region') as RegionCode | null : null;
-    const localLang = typeof window !== 'undefined' ? localStorage.getItem('tonet_locale_lang') as LanguageCode | null : null;
-
     const savedRegion = cookieRegion || localRegion;
-    const savedLang = cookieLang || localLang;
 
-    if (savedRegion && savedLang) {
+    if (savedRegion) {
       setRegion(savedRegion);
-      setLanguage(savedLang);
+      setLanguage('en');
       setHasPreference(true);
-
-      // Ensure Google Translate cookie is synced
-      if (typeof document !== 'undefined') {
-        const currentGoogTrans = getCookie('googtrans');
-        const expectedGoogTrans = savedLang === 'en' ? '' : `/en/${savedLang}`;
-        const normalizedCurrent = currentGoogTrans || '';
-        
-        if (normalizedCurrent !== expectedGoogTrans) {
-          if (expectedGoogTrans === '') {
-            document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            document.cookie = 'googtrans=; path=/; domain=' + window.location.hostname + '; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            const hostParts = window.location.hostname.split('.');
-            if (hostParts.length > 1) {
-              const domain = '.' + hostParts.slice(-2).join('.');
-              document.cookie = `googtrans=; path=/; domain=${domain}; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
-            }
-          } else {
-            document.cookie = `googtrans=${expectedGoogTrans}; path=/`;
-            const hostParts = window.location.hostname.split('.');
-            if (hostParts.length > 1) {
-              const domain = '.' + hostParts.slice(-2).join('.');
-              document.cookie = `googtrans=${expectedGoogTrans}; path=/; domain=${domain}`;
-            }
-          }
-          
-          // Verify if the cookie was successfully written/cleared before reloading
-          const verifiedGoogTrans = getCookie('googtrans') || '';
-          if (verifiedGoogTrans === expectedGoogTrans) {
-            window.location.reload();
-          } else {
-            console.warn('Google Translate cookie sync failed or was blocked. Skipping reload to avoid infinite loop.');
-          }
-        }
-      }
     } else {
       const suggested = detectSuggestedLocale();
       setRegion(suggested.region);
-      setLanguage(suggested.language);
+      setLanguage('en');
       setHasPreference(false);
       setSelectorOpen(true);
     }
@@ -121,17 +82,17 @@ export function LocaleProvider({ children }: ProviderProps) {
 
   const setLocale = useCallback((pref: { region: RegionCode; language: LanguageCode; remember: boolean }) => {
     setRegion(pref.region);
-    setLanguage(pref.language);
+    setLanguage('en');
     setRemember(pref.remember);
     setHasPreference(true);
     setSelectorOpen(false);
 
     if (pref.remember) {
       setCookie('tonet_locale_region', pref.region);
-      setCookie('tonet_locale_lang', pref.language);
+      setCookie('tonet_locale_lang', 'en');
       if (typeof window !== 'undefined') {
         localStorage.setItem('tonet_locale_region', pref.region);
-        localStorage.setItem('tonet_locale_lang', pref.language);
+        localStorage.setItem('tonet_locale_lang', 'en');
       }
     } else {
       setCookie('tonet_locale_region', '', -1);
@@ -142,22 +103,18 @@ export function LocaleProvider({ children }: ProviderProps) {
       }
     }
 
-    // Set Google Translate cookie
+    // Force clear googtrans cookie if any exists to prevent browser translations
     if (typeof document !== 'undefined') {
-      if (pref.language === 'en') {
-        document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-        document.cookie = 'googtrans=; path=/; domain=' + window.location.hostname + '; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-      } else {
-        document.cookie = `googtrans=/en/${pref.language}; path=/`;
-        const hostParts = window.location.hostname.split('.');
-        if (hostParts.length > 1) {
-          const domain = '.' + hostParts.slice(-2).join('.');
-          document.cookie = `googtrans=/en/${pref.language}; path=/; domain=${domain}`;
-        }
+      document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      document.cookie = 'googtrans=; path=/; domain=' + window.location.hostname + '; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      const hostParts = window.location.hostname.split('.');
+      if (hostParts.length > 1) {
+        const domain = '.' + hostParts.slice(-2).join('.');
+        document.cookie = `googtrans=; path=/; domain=${domain}; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
       }
     }
 
-    // Reload page to apply translation and regional settings immediately
+    // Reload page to apply regional settings immediately
     if (typeof window !== 'undefined') {
       window.location.reload();
     }
