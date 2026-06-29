@@ -186,11 +186,12 @@ export default function Navbar() {
 
           {/* CENTER: Logo */}
           <Link href="/" className="acne-logo">
-            <img 
-              src="/icon.png" 
-              alt="TONET TORRENTINNI" 
-              className="acne-logo-img"
-            />
+            <span 
+              className="acne-logo-text"
+              style={{ fontFamily: "'Saint Carell', sans-serif", fontWeight: 'normal' }}
+            >
+              TONET
+            </span>
           </Link>
 
           {/* RIGHT: Utility Icons (Account, Wishlist, Cart) */}
@@ -586,17 +587,21 @@ export default function Navbar() {
           align-items: center;
           justify-content: center;
         }
-        .acne-logo-img {
-          height: 85px;
-          width: auto;
-          object-fit: contain;
-          filter: invert(1);
-          mix-blend-mode: multiply;
+        .acne-logo-text {
+          font-family: 'Coolvetica Condensed', var(--font-brand), sans-serif;
+          font-size: 32px;
+          font-weight: normal;
+          letter-spacing: 0.03em;
+          padding-right: 0;
+          color: rgba(0, 0, 0, 0.95);
+          text-transform: uppercase;
+          line-height: 1;
           transition: opacity 0.3s ease;
+          display: inline-flex;
+          align-items: center;
+          transform: translateY(-2px); /* Baseline adjustment for Saint Carell font */
         }
-        .acne-logo:hover .acne-logo-img {
-          opacity: 0.6;
-        }
+        .acne-logo:hover .acne-logo-text { opacity: 0.6; }
 
         /* ══ LEFT NAV ══ */
         .acne-nav-left {
@@ -917,9 +922,7 @@ export default function Navbar() {
             grid-template-columns: 1fr auto 1fr; 
             align-items: stretch; 
           }
-          .acne-logo-img {
-            height: 68px;
-          }
+          .acne-logo-text { font-size: 26px; letter-spacing: 0.03em; font-weight: normal; padding-right: 0; }
           .acne-mob-icon { width: 32px; height: 54px; }
           .acne-right-icon { width: 32px; height: 54px; }
           .acne-wishlist-icon { display: none !important; }
