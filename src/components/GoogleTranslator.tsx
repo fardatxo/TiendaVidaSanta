@@ -44,7 +44,11 @@ export default function GoogleTranslator() {
         .goog-te-balloon-frame,
         .goog-te-menu-value,
         .goog-te-menu-frame,
-        .goog-te-spinner-pos {
+        .goog-te-spinner-pos,
+        .goog-te-spinner,
+        .VIpgJd-ZVi9od-ORHb-OEVmcd,
+        .VIpgJd-ZVi9od-l4eHX-hSRGPd,
+        .VIpgJd-yAWNEb-L7lbkb {
           display: none !important;
           visibility: hidden !important;
           opacity: 0 !important;
