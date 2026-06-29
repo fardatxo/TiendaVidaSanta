@@ -587,7 +587,7 @@ export default function Navbar() {
           justify-content: center;
         }
         .acne-logo-img {
-          height: 52px;
+          height: 70px;
           width: auto;
           object-fit: contain;
           filter: invert(1);
@@ -918,7 +918,7 @@ export default function Navbar() {
             align-items: stretch; 
           }
           .acne-logo-img {
-            height: 44px;
+            height: 56px;
           }
           .acne-mob-icon { width: 32px; height: 54px; }
           .acne-right-icon { width: 32px; height: 54px; }
