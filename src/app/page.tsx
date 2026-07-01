@@ -19,13 +19,11 @@ export default async function Home() {
       {/* 1. HERO CAMPAIGN BANNER: PRE-FALL 2026 */}
       <section className="am-hero">
         <div className="am-hero-media">
-          <div className="am-hero-logo-wrap">
-            <img 
-              src="/icon.png" 
-              alt="Logo" 
-              className="am-hero-logo"
-            />
-          </div>
+          <img 
+            src="/qu_eel_logo_este_como_202606301722.jpg" 
+            alt="Hero Background" 
+            className="am-hero-img" 
+          />
         </div>
         <div className="am-hero-overlay">
           <Link href="/collection/summer" className="am-hero-feeling-block">
@@ -37,16 +35,18 @@ export default async function Home() {
       {/* 2. SHOP COLLECTIONS */}
       <section className="am-split-grid" style={{ "--cols": collections.length || 2 } as React.CSSProperties}>
         {collections.map((col, cIdx) => {
+          const isPrivateCapsule = col.title.toLowerCase().includes("private capsule") || col.handle.includes("private-capsule");
+          const imageUrl = isPrivateCapsule ? "/photo_2026-07-01_20-52-47.jpg" : col.imageUrl;
           return (
             <div key={col.id} className="am-split-col">
               <div className="am-split-media">
-                <div className="am-hero-logo-wrap am-split-logo-wrap">
+                {imageUrl && (
                   <img 
-                    src="/icon.png" 
-                    alt="Logo" 
-                    className="am-hero-logo am-split-logo"
+                    src={imageUrl} 
+                    alt={col.title} 
+                    className="am-split-img" 
                   />
-                </div>
+                )}
               </div>
               <div className="am-split-content">
                 <h3 className="am-split-title">{col.title}</h3>
@@ -62,7 +62,11 @@ export default async function Home() {
       {/* 4. LANDSCAPE HIGHLIGHT: SNEAKER MA-94 */}
       <section className="am-landscape">
         <div className="am-landscape-media">
-          {/* Background color is styled via CSS */}
+          <img 
+            src="/photo_2026-06-30_18-27-24.jpg" 
+            alt="New Arrivals Highlight" 
+            className="am-landscape-img" 
+          />
         </div>
         <div className="am-landscape-overlay">
           <div className="am-landscape-content">
@@ -103,7 +107,12 @@ export default async function Home() {
             </div>
           </div>
           <div className="am-world-tonet-col">
-            <div className="am-world-tonet-media" style={{ backgroundColor: '#131e4b' }}>
+            <div className="am-world-tonet-media">
+              <img 
+                src="/cambia_esta_ienda_a_tonert_202606291414.jpg" 
+                alt="Stores" 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+              />
             </div>
             <div className="am-world-tonet-overlay">
               <div className="am-world-tonet-hover-content">
@@ -172,6 +181,8 @@ export default async function Home() {
         /* Grid styles removed */
         .am-hero-img,
         .am-hero-video {
+          position: absolute;
+          inset: 0;
           width: 100%;
           height: 100%;
           object-fit: cover;
@@ -291,6 +302,8 @@ export default async function Home() {
           height: 80px;
         }
         .am-split-img {
+          position: absolute;
+          inset: 0;
           width: 100%;
           height: 100%;
           object-fit: cover;
