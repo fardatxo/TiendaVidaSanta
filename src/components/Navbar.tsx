@@ -188,9 +188,9 @@ export default function Navbar() {
           <Link href="/" className="acne-logo">
             <span 
               className="acne-logo-text"
-              style={{ fontFamily: "'Saint Carell', sans-serif", fontWeight: 'normal' }}
+              style={{ fontFamily: "'Big Noodle Titling', sans-serif", fontWeight: 'normal' }}
             >
-              TONET
+              tonet torrentinni
             </span>
           </Link>
 
