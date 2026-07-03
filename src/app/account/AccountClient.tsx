@@ -20,7 +20,7 @@ export default function AccountClient() {
       {/* ══ HERO BANNER AREA ══ */}
       <div className="dior-hero-banner">
         <img 
-          src="/hero/ComfyUI-main_reference_00007_.png" 
+          src="/AMIRI_WEB_Account-Page_Banner_1558x520_1-50.webp" 
           alt="Amiri Campaign Model" 
           className="dior-banner-img"
         />
