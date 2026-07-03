@@ -234,29 +234,54 @@ export default function AccountClient() {
             height: 360px;
           }
         }
-        .dior-hero-img {
+        .dior-banner-img {
           width: 100%;
           height: 100%;
           object-fit: cover;
           object-position: center 30%;
           filter: contrast(0.95) brightness(1.02);
         }
-        .dior-hero-overlay {
+        .dior-banner-overlay {
           position: absolute;
           inset: 0;
-          background: rgba(244, 243, 241, 0.1);
+          background: rgba(0, 0, 0, 0.35);
           display: flex;
           align-items: center;
           justify-content: center;
-        }
-        .dior-hero-title {
-          font-family: var(--font-brand), serif;
-          font-size: 26px;
-          font-weight: 300;
-          letter-spacing: 0.05em;
-          color: #2d2a26;
           text-align: center;
+        }
+        .dior-banner-text {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          padding: 0 20px;
+        }
+        .dior-banner-sub {
+          font-family: 'Big Noodle Titling', sans-serif;
+          font-size: 22px;
+          letter-spacing: 0.15em;
+          color: #ffffff;
           margin: 0;
+          text-transform: uppercase;
+        }
+        .dior-banner-title {
+          font-family: 'Big Noodle Titling', sans-serif;
+          font-size: 56px;
+          font-weight: normal;
+          letter-spacing: 0.05em;
+          color: #ffffff;
+          margin: 0;
+          text-transform: uppercase;
+        }
+        @media (max-width: 767px) {
+          .dior-banner-sub {
+            font-size: 16px;
+            letter-spacing: 0.1em;
+          }
+          .dior-banner-title {
+            font-size: 36px;
+          }
         }
 
         /* Split layouts */
