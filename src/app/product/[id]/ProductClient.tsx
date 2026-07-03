@@ -567,13 +567,32 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
     );
   }
 
-  function handleSizeSelectInDrawer(sizeValue: string) {
+  async function handleSizeSelectInDrawer(sizeValue: string) {
     setSelectedSize(sizeValue);
+    let targetVariant = selectedVariant;
     if (sizeOptionName) {
       const updated = { ...selectedOptionsState, [sizeOptionName]: sizeValue };
       setSelectedOptionsState(updated);
       const next = findVariantByOptions(updated);
-      if (next) setSelectedVariant(next);
+      if (next) {
+        setSelectedVariant(next);
+        targetVariant = next;
+      }
+    }
+
+    setSizeDropdownOpen(false);
+    setStickyDropdownOpen(false);
+
+    if (targetVariant?.id && !adding) {
+      setAdding(true);
+      try {
+        await addToCart(targetVariant.id, 1);
+        openCart();
+      } catch (err) {
+        console.error("Error adding to cart:", err);
+      } finally {
+        setAdding(false);
+      }
     }
   }
 
