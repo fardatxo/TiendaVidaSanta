@@ -2090,7 +2090,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
 
         .amiri-ctl-logo {
-          font-family: var(--font-serif), Georgia, serif;
+          font-family: 'Big Noodle Titling', sans-serif;
           font-size: 26px;
           font-weight: 500;
           letter-spacing: 0.1em;
