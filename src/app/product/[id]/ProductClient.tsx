@@ -801,7 +801,6 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
               <div className="tonet-product-price-row">
                 <div className="tonet-price-wrapper">
                   <span className="tonet-price-amount">{priceFormatted}</span>
-                  <span className="tonet-price-per-kg">(7636.36€/KG)</span>
                 </div>
                 <button
                   type="button"
