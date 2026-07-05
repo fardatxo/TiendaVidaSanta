@@ -188,9 +188,9 @@ export default function Navbar() {
           <Link href="/" className="acne-logo">
             <span 
               className="acne-logo-text"
-              style={{ fontFamily: "'Big Noodle Titling', sans-serif", fontWeight: 'normal' }}
+              style={{ fontFamily: "'Saint Carell', sans-serif", fontWeight: 'normal' }}
             >
-              tonet torrentinni
+              tonet<span className="acne-desktop-only"> torrentinni</span>
             </span>
           </Link>
 
@@ -588,7 +588,7 @@ export default function Navbar() {
           justify-content: center;
         }
         .acne-logo-text {
-          font-family: 'Coolvetica Condensed', var(--font-brand), sans-serif;
+          font-family: 'Saint Carell', sans-serif;
           font-size: 32px;
           font-weight: normal;
           letter-spacing: 0.03em;

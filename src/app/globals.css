@@ -7,6 +7,102 @@
 }
 
 @font-face {
+  font-family: 'Louis George Cafe';
+  src: url('/fonts/Louis%20George%20Cafe.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Louis George Cafe';
+  src: url('/fonts/Louis%20George%20Cafe%20Italic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Louis George Cafe';
+  src: url('/fonts/Louis%20George%20Cafe%20Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Louis George Cafe';
+  src: url('/fonts/Louis%20George%20Cafe%20Bold%20Italic.ttf') format('truetype');
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Louis George Cafe';
+  src: url('/fonts/Louis%20George%20Cafe%20Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Louis George Cafe';
+  src: url('/fonts/Louis%20George%20Cafe%20Light%20Italic.ttf') format('truetype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Louis George Café';
+  src: url('/fonts/Louis%20George%20Cafe.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Louis George Café';
+  src: url('/fonts/Louis%20George%20Cafe%20Italic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Louis George Café';
+  src: url('/fonts/Louis%20George%20Cafe%20Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Louis George Café';
+  src: url('/fonts/Louis%20George%20Cafe%20Bold%20Italic.ttf') format('truetype');
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Louis George Café';
+  src: url('/fonts/Louis%20George%20Cafe%20Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Louis George Café';
+  src: url('/fonts/Louis%20George%20Cafe%20Light%20Italic.ttf') format('truetype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
   font-family: 'Big Noodle Titling';
   src: url('/fonts/big_noodle_titling.ttf') format('truetype');
   font-weight: normal;

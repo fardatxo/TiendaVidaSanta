@@ -63,7 +63,7 @@ export default async function Home() {
       <section className="am-landscape">
         <div className="am-landscape-media">
           <img 
-            src="/photo_2026-06-30_18-27-24.jpg" 
+            src="/Shot_-_👁️_extreme_detail_202607032250.jpg" 
             alt="New Arrivals Highlight" 
             className="am-landscape-img" 
           />
