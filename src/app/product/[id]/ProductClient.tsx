@@ -481,6 +481,11 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
     })?.value ?? ''
   );
   const [selectedSize, setSelectedSize] = useState<string>('');
+  const [desktopImageIndex, setDesktopImageIndex] = useState(0);
+
+  useEffect(() => {
+    setDesktopImageIndex(0);
+  }, [selectedColor]);
 
   const [selectedOptionsState, setSelectedOptionsState] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {};
@@ -727,23 +732,37 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
               )}
             </div>
 
-            {/* Desktop Gallery (Minimal vertical stack of images, no controls/arrows/sliders) */}
-            <div className="tonet-desktop-gallery">
-              {images.map((img, i) => (
-                <div key={i} className="tonet-desktop-img-wrapper">
+            {/* Desktop Gallery with Vertical dots on the left */}
+            <div className="tonet-desktop-gallery-slider">
+              {images.length > 1 && (
+                <div className="tonet-desktop-slider-dots">
+                  {images.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      className={`tonet-desktop-slider-dot ${desktopImageIndex === i ? 'active' : ''}`}
+                      onClick={() => setDesktopImageIndex(i)}
+                      aria-label={`Go to slide ${i + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+              <div className="tonet-desktop-img-wrapper">
+                {images[desktopImageIndex] && (
                   <img 
-                    src={getOptimizedImageUrl(img, 1600)} 
-                    alt={`${product.title} - ${i}`} 
+                    src={getOptimizedImageUrl(images[desktopImageIndex], 1600)} 
+                    alt={`${product.title} - ${desktopImageIndex}`} 
                     className="tonet-pdp-img amiri-fade-in" 
-                    loading={i === 0 ? "eager" : "lazy"}
+                    loading="eager"
                     decoding="async"
+                    key={images[desktopImageIndex]}
                     onLoad={(e) => e.currentTarget.classList.add('loaded')}
                     ref={(el) => {
                       if (el && el.complete) el.classList.add('loaded');
                     }}
                   />
-                </div>
-              ))}
+                )}
+              </div>
             </div>
           </div>
 
@@ -754,24 +773,72 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
               {/* Product Title (uppercase, clean sans-serif) */}
               <h1 className="tonet-product-title">{product.title.toUpperCase()}</h1>
               
-              {/* Price and Color Swatch row */}
-              <div className="tonet-product-meta-row">
-                <span className="tonet-product-price">{priceFormatted}</span>
-                
-                {/* Color swatch indicator and name */}
-                <div className="tonet-color-selector">
-                  <span className="tonet-color-swatch" style={{ background: colorNameToCSS(selectedColor) }} />
-                  <span className="tonet-color-name">{selectedColor.toUpperCase()}</span>
-                  
-                  {colorOptions.length > 1 && (
-                    <div className="tonet-color-options-inline">
+              {/* Thick divider line */}
+              <div className="tonet-product-title-divider"></div>
+
+              {/* Subtitle / Description */}
+              <div className="tonet-product-subtitle-block">
+                <p className="tonet-product-subtitle">
+                  {(product.description || "").split(/[.:!|]/)[0]?.trim()}
+                </p>
+                <a 
+                  href="#description" 
+                  className="tonet-product-more-info"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    toggleAccordion('desc');
+                    document.querySelector('.tonet-accordions')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  Más información
+                </a>
+                <span className="tonet-product-ref">
+                  Ref. {selectedVariant.sku || '158444'}
+                </span>
+              </div>
+
+              {/* Price and Favorite Star row */}
+              <div className="tonet-product-price-row">
+                <div className="tonet-price-wrapper">
+                  <span className="tonet-price-amount">{priceFormatted}</span>
+                  <span className="tonet-price-per-kg">(7636.36€/KG)</span>
+                </div>
+                <button
+                  type="button"
+                  className={`tonet-pdp-favorite-btn ${has(product.handle) ? 'is-active' : ''}`}
+                  onClick={() => toggle({
+                    handle: product.handle,
+                    title: product.title,
+                    imageUrl: product.imageUrl || '',
+                    price: product.price,
+                    currencyCode: product.currencyCode,
+                    collectionTitle: ''
+                  })}
+                >
+                  {has(product.handle) ? (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  ) : (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+
+              {/* Swatches Section */}
+              {colorOptions.length > 0 && (
+                <div className="tonet-pdp-swatches-section">
+                  <div className="tonet-pdp-swatches-row">
+                    <div className="tonet-pdp-swatches-list">
                       {colorOptions.map((co) => {
                         const isSelected = selectedColor === co.value;
                         return (
                           <button
                             key={co.value}
                             type="button"
-                            className={`tonet-color-dot-opt ${isSelected ? 'active' : ''}`}
+                            className={`tonet-pdp-swatch-circle ${isSelected ? 'active' : ''}`}
                             onClick={() => handleColorChange(co.value)}
                             aria-label={`Select color ${co.value}`}
                             style={{ background: colorNameToCSS(co.value) }}
@@ -779,9 +846,17 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                         );
                       })}
                     </div>
-                  )}
+                  </div>
+                  
+                  <div className="tonet-pdp-swatch-meta">
+                    <span className="tonet-pdp-swatch-name">
+                      <span className="tonet-pdp-swatch-dot" style={{ background: colorNameToCSS(selectedColor) }} />
+                      {selectedColor.toUpperCase()}
+                    </span>
+                    <span className="tonet-pdp-novedad-badge">NOVEDAD</span>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* SELECT SIZE / ADD TO BAG Button */}
               <div className="tonet-size-selector-wrap" ref={mainButtonWrapRef}>
@@ -791,7 +866,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                     className="tonet-select-size-btn"
                     onClick={() => setSizeDropdownOpen(true)}
                   >
-                    <span>{selectedSize ? `SIZE: ${selectedSize.toUpperCase()}` : 'SELECT SIZE'} ▾</span>
+                    <span>{selectedSize ? `TALLA: ${selectedSize.toUpperCase()}` : 'SELECCIONAR TALLA'} ▾</span>
                   </button>
                 ) : (
                   <button 
@@ -800,14 +875,23 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                     onClick={handleAddToBag}
                     disabled={adding}
                   >
-                    <span>{adding ? 'ADDING...' : 'ADD TO BAG'}</span>
+                    <span>{adding ? 'AÑADIENDO...' : 'AÑADIR A LA CESTA'}</span>
                   </button>
                 )}
               </div>
 
-              {/* Short Description (uppercase, compact) */}
-              <div className="tonet-product-description">
-                <p>{(product.description || "").split('Item Number:')[0]?.trim().toUpperCase()}</p>
+              {/* Sub-button details */}
+              <div className="tonet-pdp-delivery-info">
+                <p>Entregas y devoluciones gratuitas.</p>
+                <a 
+                  href="#reviews" 
+                  className="tonet-product-reviews-link"
+                  onClick={(e) => {
+                    e.preventDefault();
+                  }}
+                >
+                  Opiniones clientes
+                </a>
               </div>
 
               {/* Accordions */}
@@ -816,7 +900,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                 {/* DESCRIPTION */}
                 <div className="tonet-accordion-item">
                   <button className="tonet-accordion-header" onClick={() => toggleAccordion('desc')}>
-                    <span>DESCRIPTION</span>
+                    <span>DESCRIPCIÓN</span>
                     <span className="tonet-accordion-icon">{expandedAccordion === 'desc' ? '—' : '+'}</span>
                   </button>
                   {expandedAccordion === 'desc' && (
@@ -834,14 +918,14 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                 {/* SIZE AND FIT */}
                 <div className="tonet-accordion-item">
                   <button className="tonet-accordion-header" onClick={() => toggleAccordion('fit')}>
-                    <span>SIZE & FIT</span>
+                    <span>TALLA Y AJUSTE</span>
                     <span className="tonet-accordion-icon">{expandedAccordion === 'fit' ? '—' : '+'}</span>
                   </button>
                   {expandedAccordion === 'fit' && (
                     <div className="tonet-accordion-content">
-                      <p>FITS TRUE TO SIZE. WE RECOMMEND TAKING YOUR NORMAL SIZE. FITS VARY DEPENDING ON CONSTRUCTION AND MATERIAL.</p>
+                      <p>SE ADAPTA A LA TALLA REAL. RECOMENDAMOS ELEGIR TU TALLA HABITUAL. LOS AJUSTES VARÍAN SEGÚN LA CONSTRUCCIÓN Y EL MATERIAL.</p>
                       <button type="button" className="tonet-size-guide-link" onClick={() => setSizeGuideOpen(true)}>
-                        VIEW SIZE GUIDE
+                        VER GUÍA DE TALLAS
                       </button>
                     </div>
                   )}
@@ -850,12 +934,12 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                 {/* CARE AND MAINTENANCE */}
                 <div className="tonet-accordion-item">
                   <button className="tonet-accordion-header" onClick={() => toggleAccordion('care')}>
-                    <span>CARE & MAINTENANCE</span>
+                    <span>CUIDADO Y MANTENIMIENTO</span>
                     <span className="tonet-accordion-icon">{expandedAccordion === 'care' ? '—' : '+'}</span>
                   </button>
                   {expandedAccordion === 'care' && (
                     <div className="tonet-accordion-content">
-                      <p>{metadata['Care Instructions'] ? metadata['Care Instructions'].toUpperCase() : 'DRY CLEAN ONLY. HANDLE WITH CARE.'}</p>
+                      <p>{metadata['Care Instructions'] ? metadata['Care Instructions'].toUpperCase() : 'SÓLO LIMPIEZA EN SECO. TRATAR CON CUIDADO.'}</p>
                     </div>
                   )}
                 </div>
@@ -863,12 +947,12 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                 {/* SHIPPING / RETURNS */}
                 <div className="tonet-accordion-item">
                   <button className="tonet-accordion-header" onClick={() => toggleAccordion('shipping')}>
-                    <span>SHIPPING / RETURNS</span>
+                    <span>ENVÍO / DEVOLUCIONES</span>
                     <span className="tonet-accordion-icon">{expandedAccordion === 'shipping' ? '—' : '+'}</span>
                   </button>
                   {expandedAccordion === 'shipping' && (
                     <div className="tonet-accordion-content">
-                      <p>COMPLIMENTARY STANDARD SHIPPING ON ALL ORDERS. DELIVERY TIME TAKES BETWEEN 2 TO 4 BUSINESS DAYS. EASY RETURN WITHIN 14 DAYS FROM RECEIPT OF SHIPMENT.</p>
+                      <p>ENVÍO ESTÁNDAR GRATUITO EN TODOS LOS PEDIDOS. EL TIEMPO DE ENTREGA ES DE 2 A 4 DÍAS HÁBILES. DEVOLUCIÓN SENCILLA EN UN PLAZO DE 14 DÍAS A PARTIR DE LA RECEPCIÓN DEL ENVÍO.</p>
                     </div>
                   )}
                 </div>
@@ -902,8 +986,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         {completeOutfit.length > 0 && (
           <section className="amiri-ctl-section">
             <div className="amiri-ctl-header">
-              <span className="amiri-ctl-logo">TONET TORRENTINNI</span>
-              <h2 className="amiri-ctl-title">COMPLETE THE LOOK</h2>
+              <span className="amiri-ctl-logo">VIDA SANTA</span>
+              <h2 className="amiri-ctl-title">COMPLETAR EL LOOK</h2>
             </div>
             
             <div className="amiri-ctl-carousel-wrapper">
@@ -969,8 +1053,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         {arrangedRecommended.length > 0 && (
           <section className="amiri-ctl-section">
             <div className="amiri-ctl-header">
-              <span className="amiri-ctl-logo">TONET TORRENTINNI</span>
-              <h2 className="amiri-ctl-title">YOU MIGHT ALSO LIKE</h2>
+              <span className="amiri-ctl-logo">VIDA SANTA</span>
+              <h2 className="amiri-ctl-title">TAMBIÉN TE PUEDE INTERESAR</h2>
             </div>
             
             <div className="amiri-ctl-carousel-wrapper">
@@ -1069,7 +1153,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
               }}
               disabled={adding || !selectedSize}
             >
-              {adding ? 'ADDING...' : 'ADD TO BAG'}
+              {adding ? 'AÑADIENDO...' : 'AÑADIR A LA CESTA'}
             </button>
           </div>
         </div>
@@ -1278,8 +1362,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           >
             <span>
               {hasSizes 
-                ? (selectedSize ? `SIZE: ${selectedSize.toUpperCase()}` : 'SELECT SIZE') 
-                : (adding ? 'ADDING...' : 'ADD TO BAG')
+                ? (selectedSize ? `TALLA: ${selectedSize.toUpperCase()}` : 'SELECCIONAR TALLA') 
+                : (adding ? 'AÑADIENDO...' : 'AÑADIR A LA CESTA')
               }
             </span>
             {hasSizes && <span className={`tonet-sticky-arrow ${stickyDropdownOpen ? 'flipped' : ''}`}> ▾</span>}
@@ -1350,7 +1434,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
         @media (min-width: 1024px) {
           .tonet-gallery-column {
-            background-color: #f6f6f6;
+            background-color: #ffffff;
             padding-top: 100px;
           }
         }
@@ -1378,7 +1462,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           display: flex;
           justify-content: center;
           align-items: center;
-          background: #f6f6f6;
+          background: #ffffff;
           padding: 24px 20px;
           box-sizing: border-box;
           aspect-ratio: 3 / 4;
@@ -1435,7 +1519,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
         .tonet-mobile-grid-item {
           aspect-ratio: 3 / 4;
-          background-color: #f6f6f6;
+          background-color: #ffffff;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1457,7 +1541,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
         .tonet-mobile-stack-item {
           aspect-ratio: 3 / 4;
-          background-color: #f6f6f6;
+          background-color: #ffffff;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1472,28 +1556,58 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           mix-blend-mode: multiply;
         }
 
-        /* Desktop Stacked Gallery (with extreme whitespace, no controls) */
-        .tonet-desktop-gallery {
+        /* Desktop Gallery with Vertical dots on the left */
+        .tonet-desktop-gallery-slider {
+          position: relative;
+          width: 100%;
           display: none;
-          flex-direction: column;
-          gap: 40px;
-          padding-bottom: 120px;
+          align-items: center;
+          justify-content: center;
+          background-color: #ffffff;
         }
         @media (min-width: 1024px) {
           .tonet-mobile-gallery { display: none; }
-          .tonet-desktop-gallery { display: flex; }
+          .tonet-desktop-gallery-slider {
+            display: flex;
+            min-height: 500px;
+          }
+        }
+        .tonet-desktop-slider-dots {
+          position: absolute;
+          left: 48px;
+          top: 50%;
+          transform: translateY(-50%);
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          z-index: 10;
+        }
+        .tonet-desktop-slider-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          border: 1px solid #000000;
+          background-color: transparent;
+          cursor: pointer;
+          padding: 0;
+          transition: background-color 0.3s, border-color 0.3s;
+        }
+        .tonet-desktop-slider-dot.active {
+          background-color: #000000;
         }
         .tonet-desktop-img-wrapper {
           width: 100%;
-          background: #f6f6f6;
+          background: #ffffff;
           display: flex;
           justify-content: center;
           align-items: center;
           aspect-ratio: 3 / 4;
+          padding: 40px;
+          box-sizing: border-box;
         }
         .tonet-desktop-img-wrapper img {
-          width: 100%;
-          height: 100%;
+          max-height: 100%;
+          width: auto;
           object-fit: contain;
           mix-blend-mode: multiply;
         }
@@ -1514,8 +1628,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           position: relative;
           display: flex;
           flex-direction: column;
-          align-items: center;
-          text-align: center;
+          align-items: flex-start;
+          text-align: left;
           width: 100%;
         }
         @media (min-width: 1024px) {
@@ -1523,8 +1637,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
             position: sticky;
             top: 50vh;
             transform: translateY(-50%);
-            align-items: center;
-            text-align: center;
+            align-items: flex-start;
+            text-align: left;
             max-width: 460px;
             margin-left: auto;
             margin-right: auto;
@@ -1534,154 +1648,211 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         /* Title */
         .tonet-product-title {
           font-family: var(--font-primary), sans-serif;
-          font-size: 16px;
-          font-weight: 400;
+          font-size: 20px;
+          font-weight: 500;
           letter-spacing: 0.1em;
-          line-height: 1.4;
-          margin: 0 0 12px;
+          line-height: 1.3;
+          margin: 0;
           text-transform: uppercase;
           color: #000000;
-          text-align: center;
+          text-align: left;
         }
         @media (min-width: 1024px) {
           .tonet-product-title {
-            font-size: 18px;
-            margin-bottom: 16px;
-            text-align: center;
+            font-size: 24px;
+            text-align: left;
           }
         }
 
-        /* Meta Row (price + color inline) */
-        .tonet-product-meta-row {
+        .tonet-product-title-divider {
+          width: 100%;
+          height: 2px;
+          background-color: #000000;
+          margin-top: 14px;
+          margin-bottom: 14px;
+        }
+
+        /* Subtitle block */
+        .tonet-product-subtitle-block {
+          margin-bottom: 24px;
+          width: 100%;
+        }
+        .tonet-product-subtitle {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 13px;
+          line-height: 1.5;
+          color: #000000;
+          margin: 0 0 6px 0;
+        }
+        .tonet-product-more-info {
+          font-size: 11px;
+          color: #000000;
+          text-decoration: underline;
+          text-underline-offset: 3px;
+          cursor: pointer;
+          display: inline-block;
+          margin-bottom: 8px;
+        }
+        .tonet-product-ref {
+          display: block;
+          font-size: 11px;
+          color: #767676;
+        }
+
+        /* Price & Star Row */
+        .tonet-product-price-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          padding-bottom: 16px;
+          border-bottom: 1px solid #d8d8d8;
+          margin-bottom: 24px;
+        }
+        .tonet-price-wrapper {
+          display: flex;
+          align-items: baseline;
+          gap: 8px;
+        }
+        .tonet-price-amount {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 15px;
+          font-weight: 600;
+          color: #000000;
+        }
+        .tonet-price-per-kg {
+          font-size: 10.5px;
+          color: #767676;
+        }
+        .tonet-pdp-favorite-btn {
+          background: transparent;
+          border: none;
+          padding: 4px;
+          cursor: pointer;
+          color: #000000;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 16px;
-          margin-bottom: 24px;
+          transition: color 0.2s ease;
+        }
+        .tonet-pdp-favorite-btn:hover {
+          color: #767676;
+        }
+
+        /* Swatches Section */
+        .tonet-pdp-swatches-section {
           width: 100%;
+          margin-bottom: 32px;
+        }
+        .tonet-pdp-swatches-row {
+          margin-bottom: 14px;
+        }
+        .tonet-pdp-swatches-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+        .tonet-pdp-swatch-circle {
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          border: 1px solid rgba(0, 0, 0, 0.1);
+          cursor: pointer;
+          padding: 0;
+          box-sizing: border-box;
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .tonet-pdp-swatch-circle.active {
+          border: 1px solid #000000;
+          box-shadow: inset 0 0 0 3px #ffffff;
+        }
+        .tonet-pdp-swatch-meta {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+        }
+        .tonet-pdp-swatch-name {
+          font-family: var(--font-primary), sans-serif;
           font-size: 11px;
-          letter-spacing: 0.08em;
+          font-weight: 500;
           color: #000000;
-        }
-        @media (min-width: 1024px) {
-          .tonet-product-meta-row {
-            justify-content: center;
-            margin-bottom: 32px;
-          }
-        }
-        .tonet-product-price {
-          font-weight: 300;
-          text-transform: uppercase;
-        }
-        
-        .tonet-color-selector {
           display: flex;
           align-items: center;
           gap: 6px;
         }
-        .tonet-color-swatch {
-          width: 8px;
-          height: 8px;
-          display: block;
-          border: 1px solid rgba(0, 0, 0, 0.15);
-        }
-        .tonet-color-name {
-          font-weight: 400;
-        }
-        .tonet-color-options-inline {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin-left: 8px;
-        }
-        .tonet-color-dot-opt {
-          width: 10px;
-          height: 10px;
+        .tonet-pdp-swatch-dot {
+          width: 6px;
+          height: 6px;
           border-radius: 50%;
-          border: 1px solid transparent;
-          cursor: pointer;
-          padding: 0;
-          box-sizing: border-box;
-          transition: border-color 0.2s;
+          display: inline-block;
         }
-        .tonet-color-dot-opt.active {
-          border-color: #000000;
+        .tonet-pdp-novedad-badge {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 9px;
+          font-weight: 700;
+          letter-spacing: 0.1em;
+          background-color: #f2f2f2;
+          color: #000000;
+          padding: 4px 8px;
+          text-transform: uppercase;
         }
 
         /* SELECT SIZE CTA Button */
         .tonet-size-selector-wrap {
-          margin-bottom: 32px;
+          margin-bottom: 24px;
           width: 100%;
           display: flex;
-          justify-content: center;
-        }
-        @media (min-width: 1024px) {
-          .tonet-size-selector-wrap {
-            margin-bottom: 40px;
-            justify-content: center;
-          }
+          justify-content: flex-start;
         }
         .tonet-select-size-btn {
           background-color: #000000;
           color: #ffffff;
           border: none;
-          padding: 14px 24px;
-          font-size: 11px;
+          padding: 18px 28px;
+          font-size: 12px;
           font-family: var(--font-primary), sans-serif;
-          font-weight: 400;
-          letter-spacing: 0.15em;
+          font-weight: 600;
+          letter-spacing: 0.2em;
           text-transform: uppercase;
           cursor: pointer;
           display: flex;
           justify-content: center;
           align-items: center;
-          width: 80%;
-          min-width: 240px;
-          border-radius: 0;
-          transition: opacity 0.3s;
-        }
-        @media (min-width: 1024px) {
-          .tonet-select-size-btn {
-            width: 100%;
-            max-width: 100%;
-            min-width: auto;
-          }
+          width: 100%;
+          border-radius: 0 !important;
+          transition: background-color 0.3s, color 0.3s;
         }
         .tonet-select-size-btn:hover {
-          opacity: 0.85;
+          background-color: #333333;
+          color: #ffffff;
+          opacity: 1;
         }
 
-        /* Description block */
-        .tonet-product-description {
-          font-size: 10px;
-          font-weight: 300;
-          line-height: 1.6;
-          letter-spacing: 0.08em;
-          color: #000000;
+        .tonet-pdp-delivery-info {
+          width: 100%;
+          font-size: 11px;
+          line-height: 1.5;
+          color: #555555;
           margin-bottom: 32px;
-          text-transform: uppercase;
-          text-align: center;
-          width: 80%;
         }
-        @media (min-width: 1024px) {
-          .tonet-product-description {
-            font-size: 10.5px;
-            margin-bottom: 40px;
-            text-align: center;
-            width: 100%;
-          }
+        .tonet-pdp-delivery-info p {
+          margin: 0 0 6px 0;
         }
-        .tonet-product-description p {
-          margin: 0;
+        .tonet-product-reviews-link {
+          color: #000000;
+          text-decoration: underline;
+          text-underline-offset: 3px;
+          cursor: pointer;
         }
 
         /* Minimal Accordions */
         .tonet-accordions {
           width: 100%;
-          border-top: 1px solid rgba(0, 0, 0, 0.04);
+          border-top: 1px solid #d8d8d8;
         }
         .tonet-accordion-item {
-          border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+          border-bottom: 1px solid #d8d8d8;
           width: 100%;
         }
         .tonet-accordion-header {
