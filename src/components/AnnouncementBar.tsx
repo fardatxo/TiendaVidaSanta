@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 
 const ANNOUNCEMENTS = [
-  "COMPLIMENTARY SHIPPING ON ALL ORDERS",
-  "DISCOVER THE NEW COLLECTIONS"
+  "ENVÍO GRATIS EN PEDIDOS SUPERIORES A 50€",
+  "CUIDADO CAPILAR Y FACIAL DE ALTA GAMA",
+  "FÓRMULAS EXCLUSIVAS PARA TU RUTINA DIARIA"
 ];
 
 export default function AnnouncementBar() {

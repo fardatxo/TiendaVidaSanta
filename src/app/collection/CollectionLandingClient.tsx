@@ -3,6 +3,8 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Product } from '@/lib/shopify';
+import { useLocale } from '@/context/LocaleContext';
+import { useWishlist } from '@/context/WishlistContext';
 
 interface CollectionLandingClientProps {
   products: Product[];
@@ -59,6 +61,8 @@ const philosophicalQuotes = [
 ];
 
 export default function CollectionLandingClient({ products }: CollectionLandingClientProps) {
+  const { formatPrice } = useLocale();
+  const { toggle, has } = useWishlist();
   // Advanced Archive Indexing State
   const [filterGarmentType, setFilterGarmentType] = useState<'all' | 'tops' | 'bottoms' | 'outerwear'>('all');
   const [filterCollection, setFilterCollection] = useState<'all' | 'HOUSE_01' | 'HOUSE_02' | 'HOUSE_03'>('all');
@@ -154,195 +158,97 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
 
   return (
     <div className="tonet-archive">
-            {/* ── HEADER / HERO (Compact 35-45vh Viewport) ── */}
-      <section className="tonet-archive-hero">
-        <div className="tonet-archive-hero__bg-overlay" />
-        <img
-          src="/hero/collection_garden_landscape.png"
-          alt="TONER TORRENTINNI Archival Imagery"
-          className="tonet-archive-hero__image"
-          draggable={false}
-        />
-        <div className="tonet-archive-hero__content">
-          <p className="tonet-archive-hero__eyebrow">HOUSE OF TONER TORRENTINNI</p>
-          <h1 className="tonet-archive-hero__title">THE COLLECTION</h1>
-          <p className="tonet-archive-hero__subtitle">
-            A registry of garments produced and preserved by the House, inspired by the geometry of natural landscapes.
-          </p>
-          
-          {/* Subtle Museum Metadata Stats */}
-          <div className="tonet-archive-stats">
-            <span className="tonet-archive-stats__item">PIECES · {stats.total}</span>
-            <span className="tonet-archive-stats__divider">|</span>
-            <span className="tonet-archive-stats__item">COLLECTIONS · {stats.collections}</span>
-            <span className="tonet-archive-stats__divider">|</span>
-            <span className="tonet-archive-stats__item">ARCHIVED · {stats.archived}</span>
-            <span className="tonet-archive-stats__divider">|</span>
-            <span className="tonet-archive-stats__item">ACTIVE · {stats.active}</span>
-          </div>
-        </div>
+
+
+      {/* ── SECTION TITLE: LOS ESENCIALES ── */}
+      <section className="tonet-archive-section-title-wrap">
+        <h2 className="tonet-archive-section-title">LOS ESENCIALES</h2>
       </section>
 
-      {/* ── COMPACT FILTER BAR (1 Compact Row, Max Height 80-100px) ── */}
-      <section className="tonet-archive-controls" ref={registryStartRef}>
-        <div className="tonet-archive-controls__container">
-          
-          {/* Column 1: Count */}
-          <div className="tonet-archive-controls__col tonet-archive-controls__col--info">
-            <span className="tonet-archive-controls__text">
-              ALL PIECES · {filteredProducts.length} GARMENTS
-            </span>
-          </div>
-
-          <div className="tonet-archive-controls__divider-vertical" />
-
-          {/* Column 2: Garment Type */}
-          <div className="tonet-archive-controls__col tonet-archive-controls__col--types">
-            <div className="tonet-archive-filter__options">
-              {(['all', 'tops', 'bottoms', 'outerwear'] as const).map(t => (
-                <button
-                  key={t}
-                  className={`tonet-archive-filter__btn ${filterGarmentType === t ? 'active' : ''}`}
-                  onClick={() => setFilterGarmentType(t)}
-                >
-                  {t.toUpperCase()}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="tonet-archive-controls__divider-vertical" />
-
-          {/* Column 3: Collection */}
-          <div className="tonet-archive-controls__col tonet-archive-controls__col--collections">
-            <div className="tonet-archive-filter__options">
-              {(['all', 'HOUSE_01', 'HOUSE_02', 'HOUSE_03'] as const).map(c => (
-                <button
-                  key={c}
-                  className={`tonet-archive-filter__btn ${filterCollection === c ? 'active' : ''}`}
-                  onClick={() => setFilterCollection(c)}
-                >
-                  {c === 'all' ? 'ALL COLLECTIONS' : c.replace('_', ' ').toUpperCase()}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="tonet-archive-controls__divider-vertical" />
-
-          {/* Column 4: House State */}
-          <div className="tonet-archive-controls__col tonet-archive-controls__col--states">
-            <div className="tonet-archive-filter__options">
-              {(['all', 'active', 'archived'] as const).map(s => (
-                <button
-                  key={s}
-                  className={`tonet-archive-filter__btn ${filterState === s ? 'active' : ''}`}
-                  onClick={() => setFilterState(s)}
-                >
-                  {s === 'all' ? 'ALL ARCHIVE' : s.toUpperCase()}
-                </button>
-              ))}
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ── MAIN PRODUCT GRID (2-Column Architectural Layout) ── */}
+      {/* ── MAIN PRODUCT GRID ── */}
       <section className="tonet-archive-grid-section">
         <div className="tonet-archive-grid">
           {filteredProducts.length > 0 ? (
-            filteredProducts.map((product, index) => {
-              const archiveRef = getArchiveRef(product.handle);
-              const collectionInfo = getCollectionInfo(product);
-              const available = isAvailable(product);
-              const hasImage = product.imageUrl && product.imageUrl.trim().length > 0;
-              const secondImage = product.images && product.images.length > 1 ? product.images[1] : null;
+            filteredProducts.map((p) => {
+              const isExclusive = p.tags.some(t => /exclusivo|exclusive|premium/i.test(t));
+              const isNew = p.tags.some(t => /nuevo|new|novedad/i.test(t));
+              const tagLabel = isExclusive ? 'ARTÍCULO EXCLUSIVO' : isNew ? 'NOVEDAD' : null;
 
-              // Insert an editorial quote block periodically
-              const shouldShowQuote = index > 0 && index % 6 === 0;
-              const quoteIndex = Math.floor(index / 6) % philosophicalQuotes.length;
-              const quoteText = philosophicalQuotes[quoteIndex];
+              // Get clean subtitle
+              const cleanDesc = p.description ? p.description.replace(/<[^>]*>/g, '').replace(/[*#]/g, '').trim() : '';
+              const firstSentence = cleanDesc.split(/[.:!|]/)[0].trim().toUpperCase();
+              const subtitle = firstSentence.length > 50 ? firstSentence.substring(0, 47) + "..." : (firstSentence || "CUIDADO PREMIUM");
+
+              // Get shade/variant name
+              const firstVariantName = p.variants && p.variants[0] && p.variants[0].title.toLowerCase() !== 'default title' ? p.variants[0].title.toUpperCase() : '';
 
               return (
-                <div key={product.handle} className="tonet-archive-grid__wrapper">
-                  
-                  {shouldShowQuote && (
-                    <div className="tonet-archive-quote archive-reveal">
-                      <p className="tonet-archive-quote__text">"{quoteText}"</p>
-                      <span className="tonet-archive-quote__sub">TONER TORRENTINNI RESEARCH ARCHIVE</span>
-                    </div>
-                  )}
-
-                  <Link href={`/product/${product.handle}`} className="tonet-archive-card archive-reveal">
-                    {/* Architectural Image Wrapper with museum stone background */}
-                    <div className="tonet-archive-card__image-wrap">
-                      {hasImage ? (
-                        <>
-                          <img
-                            src={product.imageUrl}
-                            alt={product.title || "TONET garment"}
-                            className="tonet-archive-card__image tonet-archive-card__image--primary"
-                            loading="lazy"
-                          />
-                          {secondImage && (
-                            <img
-                              src={secondImage}
-                              alt={product.title || "TONET garment"}
-                              className="tonet-archive-card__image tonet-archive-card__image--secondary"
-                              loading="lazy"
-                            />
-                          )}
-                        </>
+                <Link
+                  href={`/product/${p.handle}`}
+                  key={p.id}
+                  className="am-chanel-card"
+                >
+                  <div className="am-chanel-tag-container">
+                    <span className="am-chanel-tag">DESTACADO</span>
+                    <button
+                      type="button"
+                      className={`am-chanel-favorite-btn ${has(p.handle) ? 'is-active' : ''}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggle({
+                          handle: p.handle,
+                          title: p.title,
+                          imageUrl: p.imageUrl || '',
+                          price: p.price,
+                          currencyCode: p.currencyCode,
+                          collectionTitle: ''
+                        });
+                      }}
+                    >
+                      {has(p.handle) ? (
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2.2">
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
                       ) : (
-                        <div className="tonet-archive-card__image-placeholder">
-                          <span>Image Unavailable</span>
-                        </div>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
                       )}
-                      
-                      {/* Minimal hover metadata overlay */}
-                      <div className="tonet-archive-hover-panel">
-                        <div className="tonet-archive-hover-panel__rows">
-                          <div className="tonet-archive-hover-panel__row">
-                            <span className="lbl">REGISTRY STATUS</span>
-                            <span className="val">{available ? 'ACTIVE ARCHIVE' : 'ARCHIVED'}</span>
-                          </div>
-                          <div className="tonet-archive-hover-panel__row">
-                            <span className="lbl">AVAILABILITY</span>
-                            <span className="val">{available ? 'AVAILABLE' : 'TEMPORARILY RECALLED'}</span>
-                          </div>
-                          <div className="tonet-archive-hover-panel__row">
-                            <span className="lbl">ARCHIVE REF.</span>
-                            <span className="val">{archiveRef}</span>
-                          </div>
-                        </div>
-                        <div className="tonet-archive-hover-panel__actions">
-                          <span className="action-btn">VIEW RECORD</span>
-                        </div>
-                      </div>
-                    </div>
+                    </button>
+                  </div>
+                  
+                  <div className="am-chanel-img-wrap">
+                    {p.imageUrl && (
+                      <img
+                        src={p.imageUrl}
+                        alt={p.title}
+                        className="am-chanel-img"
+                        loading="lazy"
+                      />
+                    )}
+                  </div>
 
-                    {/* Museum-like metadata block */}
-                    <div className="tonet-archive-card__metadata">
-                      <span className="tonet-archive-card__collection">{collectionInfo}</span>
-                      <h2 className="tonet-archive-card__title">{product.title}</h2>
-                      <div className="tonet-archive-card__bottom-row">
-                        <span className="tonet-archive-card__ref">Archive Ref. {archiveRef}</span>
-                        {!available && (
-                          <span className="tonet-archive-card__status tonet-archive-card__status--archived">
-                            PERMANENTLY ARCHIVED
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
+                  <div className="am-chanel-divider"></div>
 
-                </div>
+                  <div className="am-chanel-info">
+                    <h3 className="am-chanel-title">{p.title}</h3>
+                    <p className="am-chanel-subtitle">{subtitle}</p>
+                    {firstVariantName && <p className="am-chanel-variant">{firstVariantName}</p>}
+                    <p className="am-chanel-price">
+                      {formatPrice(p.price, p.currencyCode)}
+                    </p>
+                    
+                    <div className="am-chanel-actions">
+                      <span className="am-chanel-add">AÑADIR A LA CESTA</span>
+                    </div>
+                  </div>
+                </Link>
               );
             })
           ) : (
             <div className="tonet-archive-empty">
-              <p>NO GARMENTS REGISTERED UNDER THE SELECTED CRITERIA.</p>
+              <p>NO PRODUCTS FOUND.</p>
             </div>
           )}
         </div>
@@ -366,505 +272,313 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
       {/* ── STYLE ── */}
       <style>{`
         .tonet-archive {
-          background: #060606;
-          color: #ffffff;
+          background: #ffffff;
+          color: #000000;
           overflow-x: hidden;
           min-height: 100vh;
           font-family: var(--font-primary), sans-serif;
         }
 
-        /* Cinematic Intersection Observer Reveals */
-        .archive-reveal {
-          opacity: 0;
-          transform: translateY(20px);
-          transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
-          will-change: opacity, transform;
-        }
-        .archive-reveal.visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        /* ── HERO SECTION (Compact 35-45vh) ── */
+        /* ── HEADER / HERO (Simple, centered header) ── */
         .tonet-archive-hero {
-          position: relative;
           width: 100%;
-          height: 40vh;
-          min-height: 280px;
-          max-height: 420px;
+          padding: 80px 24px 40px;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: #060606;
-          border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-        .tonet-archive-hero__bg-overlay {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(6, 6, 6, 0.2) 50%, rgba(6, 6, 6, 0.95) 100%);
-          z-index: 1;
-        }
-        .tonet-archive-hero__image {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          opacity: 0.55;
-          filter: brightness(0.7) contrast(1.05);
+          background: #ffffff;
+          border-bottom: 1px solid #eaeaea;
         }
         .tonet-archive-hero__content {
-          position: relative;
-          z-index: 2;
           text-align: center;
-          max-width: 700px;
-          padding: 32px 24px 0;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-        .tonet-archive-hero__eyebrow {
-          font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.52em;
-          color: rgba(255,255,255,0.22);
-          margin-bottom: 10px;
-          text-transform: uppercase;
+          max-width: 600px;
         }
         .tonet-archive-hero__title {
-          font-size: clamp(20px, 3.5vw, 34px);
-          font-weight: 200;
-          letter-spacing: 0.28em;
-          line-height: 1.2;
-          margin-bottom: 10px;
-          color: #fff;
-        }
-        .tonet-archive-hero__subtitle {
-          font-size: 10.5px;
-          font-weight: 300;
-          letter-spacing: 0.08em;
-          color: rgba(255,255,255,0.38);
-          margin-bottom: 18px;
-        }
-
-        /* ── STATS (Inline Museum Metadata) ── */
-        .tonet-archive-stats {
-          display: flex;
-          align-items: center;
-          gap: 14px;
-          margin-top: 2px;
-          flex-wrap: wrap;
-          justify-content: center;
-        }
-        .tonet-archive-stats__item {
-          font-size: 8.5px;
-          font-weight: 300;
-          letter-spacing: 0.2em;
-          color: rgba(255,255,255,0.32);
-        }
-        .tonet-archive-stats__divider {
-          font-size: 8px;
-          color: rgba(255,255,255,0.08);
-        }
-
-        /* ── COMPACT FILTER BAR (Max 80-100px) ── */
-        .tonet-archive-controls {
-          background: #060606;
-          border-bottom: 1px solid rgba(255,255,255,0.04);
-          display: flex;
-          align-items: center;
-          padding: 0 40px;
-          min-height: 56px;
-        }
-        .tonet-archive-controls__container {
-          max-width: 1400px;
-          width: 100%;
-          margin: 0 auto;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          flex-wrap: wrap;
-          gap: 12px;
-          padding: 12px 0;
-        }
-        .tonet-archive-controls__col {
-          display: flex;
-          align-items: center;
-        }
-        .tonet-archive-controls__text {
-          font-size: 8.5px;
-          font-weight: 300;
-          letter-spacing: 0.28em;
-          color: rgba(255,255,255,0.4);
-        }
-        .tonet-archive-controls__divider-vertical {
-          width: 1px;
-          height: 14px;
-          background: rgba(255,255,255,0.06);
-        }
-        .tonet-archive-filter__options {
-          display: flex;
-          gap: 18px;
-          align-items: center;
-          flex-wrap: wrap;
-        }
-        .tonet-archive-filter__btn {
           font-family: var(--font-primary), sans-serif;
-          font-size: 8.5px;
-          font-weight: 300;
+          font-size: clamp(24px, 4vw, 42px);
+          font-weight: 700;
           letter-spacing: 0.25em;
-          color: rgba(255,255,255,0.35);
-          background: transparent;
-          border: none;
-          cursor: pointer;
-          padding: 4px 0;
-          transition: color 0.3s;
-          position: relative;
-        }
-        .tonet-archive-filter__btn:hover,
-        .tonet-archive-filter__btn.active {
-          color: #ffffff;
-        }
-        .tonet-archive-filter__btn.active::after {
-          content: '';
-          position: absolute;
-          bottom: -2px;
-          left: 0;
-          width: 100%;
-          height: 1px;
-          background: rgba(255,255,255,0.5);
+          color: #000000;
+          margin: 0;
+          text-transform: uppercase;
         }
 
-        /* ── ARCHITECTURAL GRID ── */
+        /* ── SECTION TITLE: PRODUCTOS ESENCIALES ── */
+        .tonet-archive-section-title-wrap {
+          width: 100%;
+          text-align: center;
+          padding: 120px 24px 32px;
+          background: #ffffff;
+        }
+        .tonet-archive-section-title {
+          font-family: var(--font-primary), sans-serif;
+          font-size: clamp(24px, 3.5vw, 36px);
+          font-weight: 700;
+          letter-spacing: 0.05em;
+          color: #000000;
+          margin: 0;
+          text-transform: uppercase;
+        }
+
+        /* ── MAIN PRODUCT GRID ── */
         .tonet-archive-grid-section {
-          background: #060606;
-          padding: 48px 40px 120px;
+          background: #ffffff;
+          padding: 24px 40px 120px;
         }
         .tonet-archive-grid {
           max-width: 1400px;
           margin: 0 auto;
           display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 64px 48px;
-        }
-        .tonet-archive-grid__wrapper {
-          display: flex;
-          flex-direction: column;
-          gap: 48px;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 48px 24px;
         }
 
-        /* ── PRODUCT CARD ── */
-        .tonet-archive-card {
+        @media (max-width: 1023px) {
+          .tonet-archive-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 36px 16px;
+          }
+        }
+        @media (max-width: 767px) {
+          .tonet-archive-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 28px 12px;
+          }
+          .tonet-archive-grid-section {
+            padding: 16px 12px 80px;
+          }
+          .tonet-archive-hero {
+            padding: 60px 16px 30px;
+          }
+        }
+
+        /* CHANEL PRODUCT CARDS */
+        .am-chanel-card {
+          background-color: #ffffff;
+          position: relative;
+          box-sizing: border-box;
+          overflow: hidden;
           display: flex;
           flex-direction: column;
+          align-items: center;
           text-decoration: none;
           color: inherit;
+          padding: 24px 16px 36px;
+          border: 1px solid transparent;
+          transition: border-color 0.3s;
+          min-height: 500px;
+          justify-content: flex-start;
         }
-        .tonet-archive-card__image-wrap {
+
+        .am-chanel-tag-container {
+          height: 18px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-bottom: 12px;
+          width: 100%;
           position: relative;
-          aspect-ratio: 4 / 5;
-          background: #E7E4DF;
-          border-radius: 2px;
-          overflow: hidden;
-          transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .tonet-archive-card__image {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
-          transition: opacity 400ms ease-in-out;
-        }
-        .tonet-archive-card__image--secondary {
+
+        .am-chanel-favorite-btn {
           position: absolute;
-          inset: 0;
+          right: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          background: transparent;
+          border: none;
+          padding: 0;
+          cursor: pointer;
+          color: #000000;
           opacity: 0;
-        }
-        .tonet-archive-card__image-placeholder {
-          width: 100%;
-          height: 100%;
-          background: rgba(231, 228, 223, 0.05);
-          border: 1px solid rgba(255,255,255,0.05);
+          transition: opacity 0.2s ease, color 0.2s ease;
           display: flex;
           align-items: center;
           justify-content: center;
+          z-index: 5;
         }
-        .tonet-archive-card__image-placeholder span {
+        .am-chanel-favorite-btn:hover {
+          color: #767676;
+        }
+        .am-chanel-card:hover .am-chanel-favorite-btn,
+        .am-chanel-favorite-btn.is-active {
+          opacity: 1;
+        }
+
+        .am-chanel-divider {
+          width: 100%;
+          height: 2px;
+          background-color: #000000;
+          margin-bottom: 16px;
+        }
+        .am-chanel-tag {
+          font-family: var(--font-primary), sans-serif;
           font-size: 10px;
-          letter-spacing: 0.3em;
+          font-weight: 700;
+          letter-spacing: 0.12em;
+          color: #000000;
+          background-color: #f2f2f2;
+          padding: 4px 10px;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.3);
         }
 
-        /* Hover behaviors */
-        .tonet-archive-card:hover .tonet-archive-card__image--primary {
-          opacity: 0;
-        }
-        .tonet-archive-card:hover .tonet-archive-card__image--secondary {
-          opacity: 1;
-        }
-
-        /* Minimal hover metadata overlay */
-        .tonet-archive-hover-panel {
-          position: absolute;
-          inset: 0;
-          background: rgba(6, 6, 6, 0.88);
-          opacity: 0;
-          z-index: 2;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          padding: 28px;
-          transition: opacity 300ms cubic-bezier(0.16, 1, 0.3, 1);
-          border-radius: 2px;
-        }
-        .tonet-archive-card:hover .tonet-archive-hover-panel {
-          opacity: 1;
-        }
-        .tonet-archive-hover-panel__rows {
-          display: flex;
-          flex-direction: column;
-          gap: 14px;
-        }
-        .tonet-archive-hover-panel__row {
-          display: flex;
-          justify-content: space-between;
-          border-bottom: 1px solid rgba(255,255,255,0.04);
-          padding-bottom: 5px;
-        }
-        .tonet-archive-hover-panel__row .lbl {
-          font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.28em;
-          color: rgba(255,255,255,0.3);
-        }
-        .tonet-archive-hover-panel__row .val {
-          font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.15em;
-          color: #ffffff;
-        }
-        .tonet-archive-hover-panel__actions {
+        .am-chanel-img-wrap {
+          width: 100%;
+          aspect-ratio: 1 / 1.1;
           display: flex;
           align-items: center;
+          justify-content: center;
+          position: relative;
+          margin-bottom: 24px;
+          background-color: #ffffff;
+        }
+
+        .am-chanel-img {
+          max-width: 90%;
+          max-height: 90%;
+          object-fit: contain;
+        }
+
+        .am-chanel-info {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          gap: 7px;
+          width: 100%;
           margin-top: auto;
         }
-        .tonet-archive-hover-panel__actions .action-btn {
-          font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.35em;
-          color: rgba(255,255,255,0.5);
-        }
 
-        /* Card Metadata labels */
-        .tonet-archive-card__metadata {
-          padding-top: 16px;
-          display: flex;
-          flex-direction: column;
-          gap: 5px;
-        }
-        .tonet-archive-card__collection {
-          font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.42em;
-          color: rgba(255,255,255,0.22);
+        .am-chanel-title {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 11px;
+          font-weight: 600;
           text-transform: uppercase;
-        }
-        .tonet-archive-card__title {
-          font-family: Georgia, serif;
-          font-size: 13px;
-          font-weight: 300;
-          font-style: italic;
-          letter-spacing: 0.04em;
-          color: rgba(255, 255, 255, 0.88);
-          line-height: 1.5;
+          letter-spacing: 0.12em;
+          color: #000000;
           margin: 0;
-          white-space: normal;
-        }
-        .tonet-archive-card__bottom-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-top: 2px;
-        }
-        .tonet-archive-card__ref {
-          font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.15em;
-          color: rgba(255,255,255,0.45);
-        }
-        .tonet-archive-card__status--archived {
-          font-size: 7.5px;
-          font-weight: 400;
-          letter-spacing: 0.2em;
-          color: #8f4b4b;
+          line-height: 1.4;
         }
 
-        /* ── EDITORIAL EXCERPT BREAKS ── */
-        .tonet-archive-quote {
-          width: 100%;
-          border-top: 1px solid rgba(255,255,255,0.03);
-          border-bottom: 1px solid rgba(255,255,255,0.03);
-          padding: 56px 0;
-          text-align: center;
+        .am-chanel-subtitle {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 9px;
+          font-weight: 400;
+          color: #767676;
+          letter-spacing: 0.08em;
+          margin: 0;
+          text-transform: uppercase;
+          line-height: 1.4;
+          max-width: 90%;
+        }
+
+        .am-chanel-variant {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 9px;
+          font-weight: 400;
+          color: #767676;
+          letter-spacing: 0.05em;
+          margin: 0 0 2px;
+        }
+
+        .am-chanel-price {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10.5px;
+          font-weight: 500;
+          color: #000000;
+          letter-spacing: 0.05em;
+          margin: 0 0 8px;
+        }
+
+        .am-chanel-actions {
           display: flex;
           flex-direction: column;
-          gap: 10px;
           align-items: center;
-          justify-content: center;
-          grid-column: 1 / -1;
-        }
-        .tonet-archive-quote__text {
-          font-family: Georgia, serif;
-          font-size: clamp(13px, 1.8vw, 18px);
-          font-weight: 300;
-          font-style: italic;
-          letter-spacing: 0.08em;
-          line-height: 1.8;
-          color: rgba(255,255,255,0.48);
-          max-width: 600px;
-          margin: 0;
-        }
-        .tonet-archive-quote__sub {
-          font-size: 7.5px;
-          font-weight: 300;
-          letter-spacing: 0.45em;
-          color: rgba(255,255,255,0.18);
+          gap: 12px;
+          width: 100%;
         }
 
-        .tonet-archive-empty {
-          grid-column: 1 / -1;
-          padding: 100px 24px;
-          text-align: center;
+        .am-chanel-tryon {
+          display: inline-flex;
+          align-items: center;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 8.5px;
+          font-weight: 400;
+          letter-spacing: 0.12em;
+          color: #000000;
+          cursor: pointer;
+          opacity: 0.8;
+          transition: opacity 0.2s;
+        }
+        .am-chanel-tryon:hover {
+          opacity: 1;
+        }
+
+        .am-chanel-add {
+          display: inline-block;
+          font-family: var(--font-primary), sans-serif;
           font-size: 9px;
-          font-weight: 300;
-          letter-spacing: 0.35em;
-          color: rgba(255,255,255,0.3);
+          font-weight: 500;
+          letter-spacing: 0.12em;
+          color: #000000;
+          text-decoration: underline;
+          text-underline-offset: 4px;
+          cursor: pointer;
+          transition: opacity 0.2s;
+        }
+        .am-chanel-add:hover {
+          opacity: 0.6;
         }
 
         /* ── FOOTER ── */
         .tonet-archive-footer {
-          background: #060606;
-          border-top: 1px solid rgba(255,255,255,0.03);
           padding: 80px 40px;
-          text-align: center;
+          background: #ffffff;
+          border-top: 1px solid #eaeaea;
         }
         .tonet-archive-footer__content {
-          max-width: 500px;
+          max-width: 1400px;
           margin: 0 auto;
           display: flex;
-          flex-direction: column;
-          gap: 16px;
+          justify-content: space-between;
           align-items: center;
+          flex-wrap: wrap;
+          gap: 24px;
         }
         .tonet-archive-footer__label {
-          font-size: 8.5px;
-          font-weight: 300;
-          letter-spacing: 0.45em;
-          color: rgba(255,255,255,0.25);
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.2em;
+          color: #000000;
+          margin: 0;
+          text-transform: uppercase;
         }
         .tonet-archive-footer__note {
-          font-size: 10.5px;
-          font-weight: 300;
-          line-height: 1.8;
-          letter-spacing: 0.06em;
-          color: rgba(255,255,255,0.35);
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10px;
+          font-weight: 400;
+          color: #767676;
+          margin: 0;
         }
         .tonet-archive-footer__socials {
           display: flex;
-          gap: 16px;
           align-items: center;
-          margin-top: 8px;
+          gap: 16px;
         }
         .tonet-archive-footer__socials a {
-          font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.35em;
-          color: rgba(255,255,255,0.3);
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10px;
+          font-weight: 400;
+          color: #000000;
           text-decoration: none;
-          transition: color 0.3s;
+          letter-spacing: 0.1em;
         }
         .tonet-archive-footer__socials a:hover {
-          color: rgba(255,255,255,0.7);
+          text-decoration: underline;
         }
         .tonet-archive-footer__sep {
-          font-size: 8px;
-          color: rgba(255,255,255,0.1);
-        }
-
-        /* ── RESPONSIVE ADAPTATIONS ── */
-        @media (max-width: 1024px) {
-          .tonet-archive-controls {
-            padding: 0 24px;
-          }
-          .tonet-archive-grid-section {
-            padding: 36px 24px 100px;
-          }
-          .tonet-archive-grid {
-            gap: 48px 32px;
-          }
-          .tonet-archive-footer {
-            padding: 60px 24px;
-          }
-        }
-
-        @media (max-width: 900px) {
-          .tonet-archive-controls__container {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
-          }
-          .tonet-archive-controls__divider-vertical {
-            display: none;
-          }
-        }
-
-        @media (max-width: 767px) {
-          .tonet-archive-hero {
-            height: 35vh;
-            min-height: 240px;
-            max-height: 340px;
-          }
-          .tonet-archive-hero__content {
-            padding-top: 20px;
-          }
-          .tonet-archive-hero__title {
-            font-size: 24px;
-            letter-spacing: 0.2em;
-          }
-          .tonet-archive-stats {
-            gap: 10px;
-          }
-          .tonet-archive-stats__item {
-            font-size: 7.5px;
-          }
-          .tonet-archive-filter__options {
-            gap: 10px;
-            flex-wrap: wrap;
-          }
-          .tonet-archive-filter__btn {
-            font-size: 7.5px;
-            letter-spacing: 0.15em;
-          }
-          .tonet-archive-controls__text {
-            font-size: 7.5px;
-          }
-          .tonet-archive-grid-section {
-            padding: 24px 16px 80px;
-          }
-          .tonet-archive-grid {
-            grid-template-columns: 1fr;
-            gap: 48px;
-          }
-          .tonet-archive-grid__wrapper {
-            gap: 48px;
-          }
-          .tonet-archive-hover-panel {
-            display: none !important;
-          }
-          .tonet-archive-footer {
-            padding: 48px 16px;
-          }
+          color: #767676;
         }
       `}</style>
     </div>

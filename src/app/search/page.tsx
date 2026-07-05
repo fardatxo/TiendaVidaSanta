@@ -1,7 +1,7 @@
 import { getProducts, getCollections } from '@/lib/shopify';
 import SearchClient from './SearchClient';
 
-export const metadata = { title: 'Search — TONET' };
+export const metadata = { title: 'Búsqueda' };
 
 export default async function SearchPage({
   searchParams,

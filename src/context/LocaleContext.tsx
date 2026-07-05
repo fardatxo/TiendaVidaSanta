@@ -43,8 +43,8 @@ function setCookie(name: string, value: string, days = 365) {
 }
 
 export function LocaleProvider({ children }: ProviderProps) {
-  const [region, setRegion] = useState<RegionCode>('US');
-  const [language, setLanguage] = useState<LanguageCode>('en');
+  const [region, setRegion] = useState<RegionCode>('ES');
+  const [language, setLanguage] = useState<LanguageCode>('es');
   const [remember, setRemember] = useState<boolean>(true);
   const [selectorOpen, setSelectorOpen] = useState<boolean>(false);
   const [hasPreference, setHasPreference] = useState<boolean>(true);
@@ -54,17 +54,21 @@ export function LocaleProvider({ children }: ProviderProps) {
     setIsMounted(true);
 
     const cookieRegion = getCookie('tonet_locale_region') as RegionCode | undefined;
+    const cookieLang = getCookie('tonet_locale_lang') as LanguageCode | undefined;
     const localRegion = typeof window !== 'undefined' ? localStorage.getItem('tonet_locale_region') as RegionCode | null : null;
+    const localLang = typeof window !== 'undefined' ? localStorage.getItem('tonet_locale_lang') as LanguageCode | null : null;
+    
     const savedRegion = cookieRegion || localRegion;
+    const savedLang = cookieLang || localLang;
 
     if (savedRegion) {
       setRegion(savedRegion);
-      setLanguage('en');
+      setLanguage(savedLang || 'es');
       setHasPreference(true);
     } else {
       const suggested = detectSuggestedLocale();
       setRegion(suggested.region);
-      setLanguage('en');
+      setLanguage(suggested.language);
       setHasPreference(false);
       setSelectorOpen(true);
     }
@@ -82,17 +86,17 @@ export function LocaleProvider({ children }: ProviderProps) {
 
   const setLocale = useCallback((pref: { region: RegionCode; language: LanguageCode; remember: boolean }) => {
     setRegion(pref.region);
-    setLanguage('en');
+    setLanguage(pref.language);
     setRemember(pref.remember);
     setHasPreference(true);
     setSelectorOpen(false);
 
     if (pref.remember) {
       setCookie('tonet_locale_region', pref.region);
-      setCookie('tonet_locale_lang', 'en');
+      setCookie('tonet_locale_lang', pref.language);
       if (typeof window !== 'undefined') {
         localStorage.setItem('tonet_locale_region', pref.region);
-        localStorage.setItem('tonet_locale_lang', 'en');
+        localStorage.setItem('tonet_locale_lang', pref.language);
       }
     } else {
       setCookie('tonet_locale_region', '', -1);

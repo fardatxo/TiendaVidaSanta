@@ -175,7 +175,7 @@ export default function AccountDrawer() {
           {user ? (
             <div className="ad-welcome-view">
               <div className="ad-welcome-block">
-                <h1 className="ad-welcome-title">{t('accountDrawer.welcome')}</h1>
+                <h1 className="ad-welcome-title">BIENVENIDO A VIDASANTA</h1>
                 <p className="ad-welcome-sub">
                   {user.firstName} {user.lastName} — {user.email}
                 </p>
@@ -245,7 +245,7 @@ export default function AccountDrawer() {
               {step === 'select' && (
                 <>
                   <div className="ad-welcome-block">
-                    <h1 className="ad-welcome-title">{t('accountDrawer.welcome')}</h1>
+                    <h1 className="ad-welcome-title">BIENVENIDO A VIDASANTA</h1>
                     <p className="ad-welcome-sub">
                       {t('accountDrawer.welcomeSub')}
                     </p>

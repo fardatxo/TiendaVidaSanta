@@ -170,7 +170,7 @@ export function getLanguageLabel(language: LanguageCode, displayLang: LanguageCo
 }
 
 export function getAvailableLanguages(region: RegionCode): LanguageCode[] {
-  return ['en'];
+  return REGIONS[region]?.languages || ['en'];
 }
 
 export function isLanguageAvailable(region: RegionCode, lang: LanguageCode): boolean {
@@ -178,15 +178,15 @@ export function isLanguageAvailable(region: RegionCode, lang: LanguageCode): boo
 }
 
 export function detectSuggestedLocale(): { region: RegionCode; language: LanguageCode } {
-  if (typeof navigator === 'undefined') return { region: 'US', language: 'en' };
+  if (typeof navigator === 'undefined') return { region: 'ES', language: 'es' };
   const navLang = navigator.language ?? '';
   
   const parts = navLang.split('-');
-  const detectedLang = parts[0]?.toLowerCase() ?? 'en';
+  const detectedLang = parts[0]?.toLowerCase() ?? 'es';
   const detectedRegion = parts[1]?.toUpperCase() ?? '';
   
-  let finalRegion: RegionCode = 'US';
-  let finalLang: LanguageCode = 'en';
+  let finalRegion: RegionCode = 'ES';
+  let finalLang: LanguageCode = 'es';
 
   if (LANGUAGE_CODES.includes(detectedLang)) {
     finalLang = detectedLang;
@@ -207,8 +207,8 @@ export function detectSuggestedLocale(): { region: RegionCode; language: Languag
     else if (finalLang === 'sv') finalRegion = 'SE';
     else if (finalLang === 'da') finalRegion = 'DK';
     else if (finalLang === 'no') finalRegion = 'NO';
-    else finalRegion = 'US';
+    else finalRegion = 'ES';
   }
 
-  return { region: finalRegion, language: 'en' };
+  return { region: finalRegion, language: finalLang };
 }

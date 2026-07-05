@@ -190,7 +190,7 @@ export default function Navbar() {
               className="acne-logo-text"
               style={{ fontFamily: "'Saint Carell', sans-serif", fontWeight: 'normal' }}
             >
-              tonet<span className="acne-desktop-only"> torrentinni</span>
+              vidasanta
             </span>
           </Link>
 

@@ -322,9 +322,18 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
     return () => el.removeEventListener('wheel', handleWheel);
   }, [completeOutfit]);
 
-  const [selectedVariant, setSelectedVariant] = useState<ShopifyVariant>(
-    product.variants[0] ?? { id: '', title: '', availableForSale: true, price: { amount: String(product.price), currencyCode: product.currencyCode }, selectedOptions: [] }
-  );
+  // Find pink variant as default if no search param is set
+  const defaultVariant = useMemo(() => {
+    const pinkMatch = product.variants.find(v =>
+      v.selectedOptions.some(opt =>
+        (opt.name.toLowerCase() === 'color' || opt.name.toLowerCase() === 'colour') &&
+        (opt.value.toLowerCase().includes('pink') || opt.value.toLowerCase().includes('rosa'))
+      )
+    );
+    return pinkMatch || product.variants[0] || { id: '', title: '', availableForSale: true, price: { amount: String(product.price), currencyCode: product.currencyCode }, selectedOptions: [] };
+  }, [product]);
+
+  const [selectedVariant, setSelectedVariant] = useState<ShopifyVariant>(defaultVariant);
 
   const searchParams = useSearchParams();
   const initialColor = searchParams.get('color');
@@ -467,7 +476,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   };
 
   const [selectedColor, setSelectedColor] = useState<string>(
-    () => product.variants[0]?.selectedOptions.find(o => {
+    () => defaultVariant.selectedOptions.find(o => {
       const n = o.name.toLowerCase(); return n === 'color' || n === 'colour';
     })?.value ?? ''
   );
@@ -475,8 +484,8 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
   const [selectedOptionsState, setSelectedOptionsState] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {};
-    if (product.variants[0]) {
-      for (const o of product.variants[0].selectedOptions) {
+    if (defaultVariant) {
+      for (const o of defaultVariant.selectedOptions) {
         initial[o.name] = o.value;
       }
     }

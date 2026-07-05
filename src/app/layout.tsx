@@ -34,8 +34,11 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "TONET TORRENTINNI",
-  description: "TONET TORRENTINNI — Online Store",
+  title: {
+    default: "VIDA SANTA | Tienda Online",
+    template: "%s — VIDA SANTA",
+  },
+  description: "VIDA SANTA — Tienda Online",
   icons: {
     icon: '/icon.png',
   },

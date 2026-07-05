@@ -5,8 +5,8 @@ import { getCollections } from "@/lib/shopify";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "TONET TORRENTINNI | Official Online Store",
-  description: "Explore the TONET TORRENTINNI Pre-Fall 2026 Collection, Men's and Women's New Arrivals, and iconic California streetwear.",
+  title: "VIDA SANTA | Tienda Online",
+  description: "Descubre la colección oficial de VIDA SANTA. Artículos de cuidado de cabello, facial y cosmética de alta calidad.",
 };
 
 export default async function Home() {
@@ -16,69 +16,43 @@ export default async function Home() {
     <div className="am-home">
       <HomeSnapInitializer />
 
-      {/* 1. HERO CAMPAIGN BANNER: PRE-FALL 2026 */}
+      {/* 1. HERO CAMPAIGN BANNER */}
       <section className="am-hero">
         <div className="am-hero-media">
           <img 
-            src="/qu_eel_logo_este_como_202606301722.jpg" 
+            src="/vidasanta_hero.jpg" 
             alt="Hero Background" 
             className="am-hero-img" 
           />
         </div>
         <div className="am-hero-overlay">
-          <Link href="/collection/summer" className="am-hero-feeling-block">
-            different collection
+          <Link href="/product/2in1-sprayer-comb-reusable-water-spray-hair-paddle-brush-soft-bristle-detangler-comb-for-daily-hair-moisturizing-styling" className="am-hero-feeling-block">
+            COMPRAR PRODUCTO
           </Link>
         </div>
       </section>
 
-      {/* 2. SHOP COLLECTIONS */}
-      <section className="am-split-grid" style={{ "--cols": collections.length || 2 } as React.CSSProperties}>
-        {collections.map((col, cIdx) => {
-          const isPrivateCapsule = col.title.toLowerCase().includes("private capsule") || col.handle.includes("private-capsule");
-          const imageUrl = isPrivateCapsule ? "/photo_2026-07-01_20-52-47.jpg" : col.imageUrl;
-          return (
-            <div key={col.id} className="am-split-col">
-              <div className="am-split-media">
-                {imageUrl && (
-                  <img 
-                    src={imageUrl} 
-                    alt={col.title} 
-                    className="am-split-img" 
-                  />
-                )}
-              </div>
-              <div className="am-split-content">
-                <h3 className="am-split-title">{col.title}</h3>
-                <Link href={`/collection/${col.handle}`} className="am-split-cta">
-                  Shop Now
-                </Link>
-              </div>
-            </div>
-          );
-        })}
-      </section>
 
-      {/* 4. LANDSCAPE HIGHLIGHT: SNEAKER MA-94 */}
+
+      {/* 4. LANDSCAPE HIGHLIGHT */}
       <section className="am-landscape">
         <div className="am-landscape-media">
           <img 
-            src="/Shot_-_👁️_extreme_detail_202607032250.jpg" 
-            alt="New Arrivals Highlight" 
+            src="/vidasanta_model.jpg" 
+            alt="Vidasanta Hydra Gloss Highlight" 
             className="am-landscape-img" 
           />
         </div>
         <div className="am-landscape-overlay">
           <div className="am-landscape-content">
-            <h2 className="am-landscape-title">NEW ARRIVALS</h2>
-            <Link href="/collection/new-arrivals" className="am-landscape-cta">SHOP NEW PIECES</Link>
+            <Link href="/collection" className="am-landscape-cta-btn">VER PRODUCTOS</Link>
           </div>
         </div>
       </section>
 
-      {/* 5. THE WORLD OF TONET */}
+      {/* 5. VIDA SANTA PRODUCTS
       <section className="am-world-tonet-section">
-        <h2 className="am-world-tonet-title">THE WORLD OF TONET</h2>
+        <h2 className="am-world-tonet-title">VIDA SANTA PRODUCTS</h2>
         <div className="am-world-tonet-grid">
           <div className="am-world-tonet-col">
             <div className="am-world-tonet-media" style={{ backgroundColor: '#3a0610' }}>
@@ -126,6 +100,7 @@ export default async function Home() {
           </div>
         </div>
       </section>
+      */}
 
       <style>{`
         html.home-snap-active {
@@ -366,40 +341,60 @@ export default async function Home() {
         .am-landscape-overlay {
           position: absolute;
           inset: 0;
-          background: rgba(0, 0, 0, 0.15);
+          background: linear-gradient(to top, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0) 60%);
           display: flex;
-          align-items: flex-end;
-          justify-content: flex-start;
+          align-items: center;
+          justify-content: center;
           padding: 48px;
           z-index: 10;
         }
         .am-landscape-content {
           display: flex;
           flex-direction: column;
-          align-items: flex-start;
-          gap: 12px;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+          text-align: center;
+          width: 100%;
         }
-        .am-landscape-title {
-          font-family: var(--font-cormorant), Georgia, serif;
-          font-size: 28px;
-          font-weight: 300;
-          color: #ffffff;
-          margin: 0;
-          letter-spacing: 0.05em;
+        .am-landscape-subtitle {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10px;
+          font-weight: 500;
+          letter-spacing: 0.2em;
+          color: rgba(255, 255, 255, 0.95);
           text-transform: uppercase;
         }
-        .am-landscape-cta {
+        .am-landscape-title {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 26px;
+          font-weight: 400;
+          color: #ffffff;
+          margin: 0;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+        }
+        .am-landscape-cta-btn {
+          display: inline-block;
+          border: 1px solid #ffffff;
+          background-color: #ffffff;
+          color: #000000;
+          padding: 12px 36px;
+          font-family: var(--font-primary), sans-serif;
           font-size: 10px;
           font-weight: 400;
           letter-spacing: 0.15em;
-          color: #ffffff;
+          text-align: center;
           text-transform: uppercase;
-          text-decoration: underline;
-          text-underline-offset: 3px;
-          transition: opacity 0.3s;
+          text-decoration: none;
+          border-radius: 0 !important; /* Rectangular borders */
+          transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+          margin-top: 8px;
         }
-        .am-landscape-cta:hover {
-          opacity: 0.7;
+        .am-landscape-cta-btn:hover {
+          background-color: transparent;
+          color: #ffffff;
+          border-color: #ffffff;
         }
 
         /* ── THE WORLD OF TONET ── */

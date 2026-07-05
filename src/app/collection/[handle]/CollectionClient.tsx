@@ -5,6 +5,7 @@ import { Plus, Minus, X } from 'lucide-react';
 import type { CollectionDetail, Product } from '@/lib/shopify';
 import { getOptimizedImageUrl } from '@/lib/shopify';
 import { useLocale } from '@/context/LocaleContext';
+import { useWishlist } from '@/context/WishlistContext';
 import Link from 'next/link';
 
 // Predefined set of ComfyUI fashion lifestyle images
@@ -65,6 +66,7 @@ function hasBlackColor(product: Product): boolean {
 
 export default function CollectionClient({ collection }: { collection: CollectionDetail }) {
   const { formatPrice } = useLocale();
+  const { toggle, has } = useWishlist();
 
   // Committed Filters State (Controls the Grid)
   const [selectedSort, setSelectedSort] = useState<string>('featured');
@@ -292,114 +294,17 @@ export default function CollectionClient({ collection }: { collection: Collectio
   // Dynamic layout generator (Interweaving lifestyle images into the grid)
   const gridItems = useMemo(() => {
     const items: GridItem[] = [];
-    let productIdx = 0;
-    let lifestyleIdx = 0;
-
-    const totalProducts = filteredAndSortedProducts.length;
-    if (totalProducts === 0) return [];
-
-    // For new arrivals, display only products as standard 1x1 grid items
-    if (collection.handle === 'new-arrivals') {
-      filteredAndSortedProducts.forEach((p) => {
-        items.push({
-          key: `prod-${p.id}`,
-          type: 'product',
-          product: p,
-          colSpan: 1,
-          rowSpan: 1
-        });
-      });
-      return items;
-    }
-
-    // Simple grid layout if very few products
-    if (totalProducts <= 3) {
-      filteredAndSortedProducts.forEach((p) => {
-        items.push({
-          key: `prod-${p.id}`,
-          type: 'product',
-          product: p,
-          colSpan: 1,
-          rowSpan: 1
-        });
-      });
+    filteredAndSortedProducts.forEach((p) => {
       items.push({
-        key: 'lifestyle-end',
-        type: 'lifestyle',
-        imageUrl: LIFESTYLE_IMAGES[0],
+        key: `prod-${p.id}`,
+        type: 'product',
+        product: p,
         colSpan: 1,
         rowSpan: 1
       });
-      return items;
-    }
-
-    // High fidelity modular pattern
-    const pattern = [
-      { type: 'product', colSpan: 1, rowSpan: 1 },
-      { type: 'product', colSpan: 1, rowSpan: 1 },
-      { type: 'product', colSpan: 1, rowSpan: 1 },
-      { type: 'product', colSpan: 1, rowSpan: 1 },
-      { type: 'product', colSpan: 1, rowSpan: 1 },
-      { type: 'product', colSpan: 1, rowSpan: 1 },
-      { type: 'lifestyle', colSpan: 2, rowSpan: 1 }, // wide lifestyle cover
-      { type: 'product', colSpan: 1, rowSpan: 1 },
-      { type: 'product', colSpan: 1, rowSpan: 1 },
-      { type: 'product', colSpan: 1, rowSpan: 1 },
-      { type: 'product', colSpan: 1, rowSpan: 1 },
-      { type: 'product', colSpan: 2, rowSpan: 2 }, // spotlight product cell
-      { type: 'lifestyle', colSpan: 1, rowSpan: 1 }, // small lifestyle cell
-      { type: 'product', colSpan: 1, rowSpan: 1 },
-      { type: 'product', colSpan: 1, rowSpan: 1 },
-      { type: 'product', colSpan: 1, rowSpan: 1 },
-      { type: 'product', colSpan: 1, rowSpan: 1 },
-      { type: 'lifestyle', colSpan: 2, rowSpan: 2 } // large lifestyle cover
-    ];
-
-    let patternIdx = 0;
-    while (productIdx < totalProducts) {
-      const pRule = pattern[patternIdx % pattern.length];
-      
-      if (pRule.type === 'product') {
-        const p = filteredAndSortedProducts[productIdx++];
-        items.push({
-          key: `prod-${p.id}-${productIdx}`,
-          type: 'product',
-          product: p,
-          colSpan: pRule.colSpan,
-          rowSpan: pRule.rowSpan
-        });
-      } else {
-        const img = LIFESTYLE_IMAGES[lifestyleIdx % LIFESTYLE_IMAGES.length];
-        lifestyleIdx++;
-        items.push({
-          key: `lifestyle-${lifestyleIdx}`,
-          type: 'lifestyle',
-          imageUrl: img,
-          colSpan: pRule.colSpan,
-          rowSpan: pRule.rowSpan
-        });
-      }
-      patternIdx++;
-    }
-
-    // Grid balancing row completion (to fill a 4-column row layout cleanly)
-    if (items.length % 4 !== 0) {
-      const remainder = 4 - (items.length % 4);
-      for (let i = 0; i < remainder; i++) {
-        const img = LIFESTYLE_IMAGES[lifestyleIdx % LIFESTYLE_IMAGES.length];
-        lifestyleIdx++;
-        items.push({
-          key: `lifestyle-fill-${lifestyleIdx}`,
-          type: 'lifestyle',
-          imageUrl: img,
-          colSpan: 1,
-          rowSpan: 1
-        });
-      }
-    }
-
+    });
     return items;
-  }, [filteredAndSortedProducts, collection.handle]);
+  }, [filteredAndSortedProducts]);
 
   const toggleAccordion = (name: string) => {
     setActiveFilterAccordion(activeFilterAccordion === name ? null : name);
@@ -434,81 +339,82 @@ export default function CollectionClient({ collection }: { collection: Collectio
           {gridItems.length > 0 ? (
             <div className="amiri-modular-grid">
               {gridItems.map((item) => {
-                if (item.type === 'product' && item.product) {
-                  const p = item.product;
-                  const isLarge = item.colSpan === 2 && item.rowSpan === 2;
-                  const imageClass = getProductImageClass(p.title, p.tags);
-                  
-                  return (
-                    <Link
-                      href={`/product/${p.handle}`}
-                      key={item.key}
-                      className={`amiri-grid-item amiri-grid-item--product ${
-                        isLarge ? 'amiri-grid-item--span-2 amiri-grid-item--row-2' : ''
-                      } ${p.images && p.images.length > 1 ? 'amiri-grid-item--has-hover' : ''}`}
-                    >
-                      <span className="amiri-product-tag">
-                        {collection.handle === 'coleccion-1' ? 'PRE-FALL' : collection.handle === 'new-arrivals' ? 'NEW ARRIVALS' : 'SUMMER'}
-                      </span>
-                      <div className="amiri-product-img-wrap">
-                        {p.imageUrl && (
-                          <img
-                            src={getOptimizedImageUrl(p.imageUrl, 800)}
-                            alt={p.title}
-                            className={`amiri-product-img amiri-product-img--primary amiri-fade-in ${imageClass}`}
-                            loading="lazy"
-                            decoding="async"
-                            onLoad={(e) => e.currentTarget.classList.add('loaded')}
-                            ref={(el) => {
-                              if (el && el.complete) el.classList.add('loaded');
-                            }}
-                          />
+                const p = item.product!;
+                const isExclusive = p.tags.some(t => /exclusivo|exclusive|premium/i.test(t));
+                const isNew = p.tags.some(t => /nuevo|new|novedad/i.test(t)) || collection.handle === 'new-arrivals';
+                const tagLabel = isExclusive ? 'ARTÍCULO EXCLUSIVO' : isNew ? 'NOVEDAD' : null;
+
+                // Get clean subtitle
+                const cleanDesc = p.description ? p.description.replace(/<[^>]*>/g, '').replace(/[*#]/g, '').trim() : '';
+                const firstSentence = cleanDesc.split(/[.:!|]/)[0].trim().toUpperCase();
+                const subtitle = firstSentence.length > 50 ? firstSentence.substring(0, 47) + "..." : (firstSentence || "CUIDADO PREMIUM");
+
+                // Get shade/variant name
+                const firstVariantName = p.variants && p.variants[0] && p.variants[0].title.toLowerCase() !== 'default title' ? p.variants[0].title.toUpperCase() : '';
+
+                return (
+                  <Link
+                    href={`/product/${p.handle}`}
+                    key={item.key}
+                    className="am-chanel-card"
+                  >
+                    <div className="am-chanel-tag-container">
+                      <span className="am-chanel-tag">DESTACADO</span>
+                      <button
+                        type="button"
+                        className={`am-chanel-favorite-btn ${has(p.handle) ? 'is-active' : ''}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggle({
+                            handle: p.handle,
+                            title: p.title,
+                            imageUrl: p.imageUrl || '',
+                            price: p.price,
+                            currencyCode: p.currencyCode,
+                            collectionTitle: ''
+                          });
+                        }}
+                      >
+                        {has(p.handle) ? (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2.2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                          </svg>
+                        ) : (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                          </svg>
                         )}
-                        {p.images && p.images.length > 1 && (
-                          <img
-                            src={getOptimizedImageUrl(p.images[1], 800)}
-                            alt={p.title}
-                            className={`amiri-product-img amiri-product-img--secondary ${imageClass}`}
-                            loading="lazy"
-                            decoding="async"
-                          />
-                        )}
-                      </div>
-                      <div className="amiri-product-info">
-                        <span className="amiri-product-name">{p.title}</span>
-                        <span className="amiri-product-price">
-                          {formatPrice(p.price, p.currencyCode)}
-                        </span>
-                      </div>
-                    </Link>
-                  );
-                } else {
-                  const isLarge = item.colSpan === 2 && item.rowSpan === 2;
-                  const isWide = item.colSpan === 2 && item.rowSpan === 1;
-                  
-                  return (
-                    <div
-                      key={item.key}
-                      className={`amiri-grid-item amiri-grid-item--lifestyle ${
-                        isLarge ? 'amiri-grid-item--span-2 amiri-grid-item--row-2' : ''
-                      } ${isWide ? 'amiri-grid-item--span-2 amiri-grid-item--wide' : ''}`}
-                    >
-                      {item.imageUrl && (
+                      </button>
+                    </div>
+                    
+                    <div className="am-chanel-img-wrap">
+                      {p.imageUrl && (
                         <img
-                          src={item.imageUrl}
-                          alt="Collection Lifestyle"
-                          className="amiri-lifestyle-img amiri-fade-in"
+                          src={getOptimizedImageUrl(p.imageUrl, 800)}
+                          alt={p.title}
+                          className="am-chanel-img"
                           loading="lazy"
-                          decoding="async"
-                          onLoad={(e) => e.currentTarget.classList.add('loaded')}
-                          ref={(el) => {
-                            if (el && el.complete) el.classList.add('loaded');
-                          }}
                         />
                       )}
                     </div>
-                  );
-                }
+
+                    <div className="am-chanel-divider"></div>
+
+                    <div className="am-chanel-info">
+                      <h3 className="am-chanel-title">{p.title}</h3>
+                      <p className="am-chanel-subtitle">{subtitle}</p>
+                      {firstVariantName && <p className="am-chanel-variant">{firstVariantName}</p>}
+                      <p className="am-chanel-price">
+                        {formatPrice(p.price, p.currencyCode)}
+                      </p>
+                      
+                      <div className="am-chanel-actions">
+                        <span className="am-chanel-add">AÑADIR A LA CESTA</span>
+                      </div>
+                    </div>
+                  </Link>
+                );
               })}
             </div>
           ) : (
@@ -802,21 +708,24 @@ export default function CollectionClient({ collection }: { collection: Collectio
         .amiri-modular-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 2px; /* tight spacing matching the carousel */
-          background-color: transparent;
+          gap: 48px 24px;
+          background-color: #ffffff;
           box-sizing: border-box;
           border: none;
+          padding: 32px 24px;
         }
         @media (max-width: 1023px) {
           .amiri-modular-grid {
             grid-template-columns: repeat(3, 1fr);
-            gap: 2px;
+            gap: 36px 16px;
+            padding: 24px 16px;
           }
         }
         @media (max-width: 767px) {
           .amiri-modular-grid {
             grid-template-columns: repeat(2, 1fr);
-            gap: 2px;
+            gap: 28px 12px;
+            padding: 16px 8px;
           }
         }
 
@@ -832,163 +741,182 @@ export default function CollectionClient({ collection }: { collection: Collectio
         }
 
         /* GRID ITEMS */
-        .amiri-grid-item {
-          background-color: #f6f6f6;
+        /* CHANEL PRODUCT CARDS */
+        .am-chanel-card {
+          background-color: #ffffff;
           position: relative;
           box-sizing: border-box;
           overflow: hidden;
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
+          align-items: center;
           text-decoration: none;
           color: inherit;
-          aspect-ratio: 3 / 5; /* narrower and longer aspect ratio */
+          padding: 24px 16px 36px;
+          border: 1px solid transparent;
+          transition: border-color 0.3s;
+          min-height: 500px;
+          justify-content: flex-start;
         }
 
-        .amiri-grid-item--span-2 {
-          grid-column: span 2;
-        }
-        .amiri-grid-item--row-2 {
-          grid-row: span 2;
-        }
-        .amiri-grid-item--wide {
-          aspect-ratio: 6 / 5; /* mathematically adjusted for wide cards under 3/5 aspect ratio */
-        }
-
-        @media (max-width: 767px) {
-          .amiri-grid-item--span-2 {
-            grid-column: span 2;
-          }
-          .amiri-grid-item--row-2 {
-            grid-row: span 2;
-          }
+        .am-chanel-tag-container {
+          height: 18px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-bottom: 12px;
+          width: 100%;
+          position: relative;
         }
 
-        /* PRODUCT CELLS INTERIOR */
-        .amiri-product-tag {
+        .am-chanel-favorite-btn {
           position: absolute;
-          top: 20px;
-          left: 20px;
-          font-family: var(--font-primary), sans-serif;
-          font-size: 8.5px;
-          font-weight: 300;
-          text-transform: uppercase;
-          letter-spacing: 0.15em;
+          right: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          background: transparent;
+          border: none;
+          padding: 0;
+          cursor: pointer;
           color: #000000;
-          z-index: 2;
-        }
-
-        .amiri-product-img-wrap {
-          flex: 1;
+          opacity: 0;
+          transition: opacity 0.2s ease, color 0.2s ease;
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 12px; /* clean spacing for garments */
-          box-sizing: border-box;
-          width: 100%;
-          height: 100%;
-          position: relative;
-          isolation: isolate;
-          background-color: #f6f6f6;
+          z-index: 5;
         }
-        @media (max-width: 767px) {
-          .amiri-product-img-wrap {
-            padding: 8px; /* optimized spacing on mobile */
-          }
+        .am-chanel-favorite-btn:hover {
+          color: #767676;
         }
-
-        .amiri-product-img {
-          width: 100%;
-          height: 100%;
-          display: block;
-          object-fit: contain; /* contained inside the wrapper */
-          mix-blend-mode: multiply;
-        }
-
-        .amiri-product-img--primary {
+        .am-chanel-card:hover .am-chanel-favorite-btn,
+        .am-chanel-favorite-btn.is-active {
           opacity: 1;
-          transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .amiri-product-img--secondary {
-          position: absolute;
-          top: 12px;
-          left: 12px;
-          right: 12px;
-          bottom: 12px;
-          width: calc(100% - 24px);
-          height: calc(100% - 24px);
-          opacity: 0;
-          pointer-events: none;
-          transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        @media (max-width: 767px) {
-          .amiri-product-img--secondary {
-            top: 8px;
-            left: 8px;
-            right: 8px;
-            bottom: 8px;
-            width: calc(100% - 16px);
-            height: calc(100% - 16px);
-          }
         }
 
-        /* Hover behaviors */
-        .amiri-grid-item--product:hover {
-          opacity: 1 !important; /* prevent transparent white overlay */
-        }
-        .amiri-grid-item--has-hover:hover .amiri-product-img--primary {
-          opacity: 0 !important;
-        }
-        .amiri-grid-item--has-hover:hover .amiri-product-img--secondary {
-          opacity: 1 !important;
-        }
-
-        /* Optical Scaling classes - Overridden for full fill */
-        .amiri-product-img--top,
-        .amiri-product-img--pants,
-        .amiri-product-img--sneaker,
-        .amiri-product-img--accessory {
+        .am-chanel-divider {
           width: 100%;
-          height: 100%;
-          max-width: 100%;
-          max-height: 100%;
+          height: 2px;
+          background-color: #000000;
+          margin-bottom: 16px;
+        }
+        .am-chanel-tag {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.12em;
+          color: #000000;
+          background-color: #f2f2f2;
+          padding: 4px 10px;
+          text-transform: uppercase;
         }
 
-        .amiri-product-info {
-          padding: 20px 24px;
-          background-color: #f6f6f6;
+        .am-chanel-img-wrap {
+          width: 100%;
+          aspect-ratio: 1 / 1.1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          margin-bottom: 24px;
+          background-color: #ffffff;
+        }
+
+        .am-chanel-img {
+          max-width: 90%;
+          max-height: 90%;
+          object-fit: contain;
+        }
+
+        .am-chanel-info {
           display: flex;
           flex-direction: column;
-          gap: 6px;
-          box-sizing: border-box;
-          z-index: 2;
+          align-items: center;
+          text-align: center;
+          gap: 7px;
           width: 100%;
-          align-items: flex-start;
-          text-align: left;
+          margin-top: auto;
         }
 
-        .amiri-product-name {
+        .am-chanel-title {
           font-family: var(--font-primary), sans-serif;
-          font-size: 9.5px;
-          font-weight: 300;
+          font-size: 11px;
+          font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.12em;
           color: #000000;
           margin: 0;
-          line-height: 1.3;
-          width: 100%;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          line-height: 1.4;
         }
 
-        .amiri-product-price {
+        .am-chanel-subtitle {
           font-family: var(--font-primary), sans-serif;
           font-size: 9px;
-          font-weight: 300;
-          color: #555555;
+          font-weight: 400;
+          color: #767676;
           letter-spacing: 0.08em;
           margin: 0;
+          text-transform: uppercase;
+          line-height: 1.4;
+          max-width: 90%;
+        }
+
+        .am-chanel-variant {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 9px;
+          font-weight: 400;
+          color: #767676;
+          letter-spacing: 0.05em;
+          margin: 0 0 2px;
+        }
+
+        .am-chanel-price {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10.5px;
+          font-weight: 500;
+          color: #000000;
+          letter-spacing: 0.05em;
+          margin: 0 0 8px;
+        }
+
+        .am-chanel-actions {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          width: 100%;
+        }
+
+        .am-chanel-tryon {
+          display: inline-flex;
+          align-items: center;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 8.5px;
+          font-weight: 400;
+          letter-spacing: 0.12em;
+          color: #000000;
+          cursor: pointer;
+          opacity: 0.8;
+          transition: opacity 0.2s;
+        }
+        .am-chanel-tryon:hover {
+          opacity: 1;
+        }
+
+        .am-chanel-add {
+          display: inline-block;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 9px;
+          font-weight: 500;
+          letter-spacing: 0.12em;
+          color: #000000;
+          text-decoration: underline;
+          text-underline-offset: 4px;
+          cursor: pointer;
+          transition: opacity 0.2s;
+        }
+        .am-chanel-add:hover {
+          opacity: 0.6;
         }
 
         /* LIFESTYLE CELLS INTERIOR */

@@ -145,54 +145,8 @@ function normalizeProduct(node: Record<string, any>): Product {
 }
 
 export function splitProductsByColor(products: Product[]): Product[] {
-  const result: Product[] = [];
-  for (const p of products) {
-    // Find all color options
-    const colors = new Set<string>();
-    for (const v of p.variants) {
-      const colorOpt = v.selectedOptions.find(
-        o => o.name.toLowerCase() === 'color' || o.name.toLowerCase() === 'colour'
-      );
-      if (colorOpt) {
-        colors.add(colorOpt.value);
-      }
-    }
-
-    if (colors.size > 1) {
-      for (const color of colors) {
-        const colorVariants = p.variants.filter(v =>
-          v.selectedOptions.some(
-            o => (o.name.toLowerCase() === 'color' || o.name.toLowerCase() === 'colour') && o.value === color
-          )
-        );
-
-        const variantImages = colorVariants
-          .map(v => v.image?.url)
-          .filter((url): url is string => !!url);
-        const uniqueVariantImages = Array.from(new Set(variantImages));
-        const otherImages = p.images.filter(img => !uniqueVariantImages.includes(img));
-        const newImages = [...uniqueVariantImages, ...otherImages];
-        const newImageUrl = newImages[0] || p.imageUrl;
-        
-        // Use the first variant's price if available
-        const newPrice = colorVariants.length > 0 ? parseFloat(colorVariants[0].price.amount) : p.price;
-
-        result.push({
-          ...p,
-          id: `${p.id}-${color}`,
-          handle: `${p.handle}?color=${encodeURIComponent(color)}`,
-          title: `${p.title} - ${color}`,
-          price: newPrice,
-          imageUrl: newImageUrl,
-          images: newImages,
-          variants: colorVariants,
-        });
-      }
-    } else {
-      result.push(p);
-    }
-  }
-  return result;
+  // Return the original products directly to prevent splitting into separate virtual items in the catalog
+  return products;
 }
 
 export async function getProducts(): Promise<Product[]> {

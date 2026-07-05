@@ -2,8 +2,8 @@ import { getProducts } from '@/lib/shopify';
 import CollectionLandingClient from './CollectionLandingClient';
 
 export const metadata = {
-  title: 'The Collection — TONET Paris',
-  description: 'A selection preserved within the House.',
+  title: 'Colecciones',
+  description: 'Una selección de productos oficiales de VIDA SANTA.',
 };
 
 export default async function CollectionLandingPage() {

@@ -15,7 +15,7 @@ interface CollectionNav {
 }
 
 export default function MenuDrawer() {
-  const { isMenuOpen, closeMenu, menuSearchMode, clearMenuSearchMode } = useUI();
+  const { isMenuOpen, closeMenu, menuSearchMode, clearMenuSearchMode, openCart, openAccount } = useUI();
   const { region, language, openSelector } = useLocale();
   const regionLabel = getRegionLabel(region, language);
   const languageLabel = getLanguageLabel(language, language);
@@ -167,12 +167,8 @@ export default function MenuDrawer() {
         {/* ── LEFT COLUMN (main nav) ── */}
         <div className={`md-col-left ${rightPanelOpen ? 'md-col-left-hidden-mobile' : ''}`}>
           {/* Top bar: search + close */}
-          <div className="md-topbar">
-            <button className="md-topbar-btn" onClick={openSearchPanel} aria-label="Search">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-                <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
-              </svg>
-            </button>
+          {/* Top bar: close button only */}
+          <div className="md-topbar" style={{ justifyContent: 'flex-end' }}>
             <button className="md-topbar-btn" onClick={closeMenu} aria-label="Close menu">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
                 <path d="M18 6L6 18M6 6l12 12"/>
@@ -181,222 +177,33 @@ export default function MenuDrawer() {
           </div>
 
           {/* Categories */}
-          {/* Categories */}
           <nav className="md-nav">
-            {/* PRIVATE SALE */}
-            <div className="md-nav-accordion-item">
-              <button 
-                type="button"
-                className={`md-nav-item md-accordion-trigger ${expandedAccordion === 'private-sale' ? 'active' : ''}`}
-                onClick={() => toggleAccordion('private-sale')}
-              >
-                <span>PRIVATE SALE</span>
-                <span className="md-accordion-toggle-icon" />
-              </button>
-              <div className={`md-accordion-wrapper ${expandedAccordion === 'private-sale' ? 'open' : ''}`}>
-                <div className="md-accordion-content">
-                  <div className="md-accordion-group">
-                    <p className="md-accordion-group-title">WOMEN</p>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>READY TO WEAR</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>ACCESSORIES</Link>
-                  </div>
-                  <div className="md-accordion-group">
-                    <p className="md-accordion-group-title">MEN</p>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>READY TO WEAR</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>ACCESSORIES</Link>
-                  </div>
-                  <div className="md-accordion-group">
-                    <Link href="/collection" className="md-accordion-link bold" onClick={closeMenu}>CHILDREN</Link>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <Link href="/collection" className="md-nav-item" onClick={closeMenu}>
+              PRODUCTOS
+            </Link>
+            
+            <button 
+              type="button"
+              className="md-nav-item"
+              onClick={() => {
+                closeMenu();
+                openCart();
+              }}
+            >
+              CARRITO
+            </button>
 
-            {/* WOMEN */}
-            <div className="md-nav-accordion-item">
-              <button 
-                type="button"
-                className={`md-nav-item md-accordion-trigger ${expandedAccordion === 'women' ? 'active' : ''}`}
-                onClick={() => toggleAccordion('women')}
-              >
-                <span>WOMEN</span>
-                <span className="md-accordion-toggle-icon" />
-              </button>
-              <div className={`md-accordion-wrapper ${expandedAccordion === 'women' ? 'open' : ''}`}>
-                <div className="md-accordion-content">
-                  <div className="md-accordion-group">
-                    <p className="md-accordion-group-title">COLLECTIONS</p>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>NEW ARRIVALS</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>SPRING 2026 COLLECTION</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>SUMMER 2026 COLLECTION</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>CHARMEUSE DRESSES</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>WEDDING DRESSES</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>GIFTS</Link>
-                  </div>
-                  <div className="md-accordion-group">
-                    <p className="md-accordion-group-title">READY TO WEAR</p>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>VIEW ALL</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>COATS & JACKETS</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>DRESSES</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>KNITWEAR</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>PANTS & SHORTS</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>SKIRTS</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>TOPS</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>T-SHIRTS & SWEATSHIRTS</Link>
-                  </div>
-                  <div className="md-accordion-group">
-                    <p className="md-accordion-group-title">BAGS</p>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>VIEW ALL</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>CAT BAGS</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>CATCH</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>CONFIDENT</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>COMPAGNON</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>CROSSBODY BAGS</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>TOTES & TOP HANDLE BAGS</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>MINI BAGS & CLUTCHES</Link>
-                  </div>
-                  <div className="md-accordion-group">
-                    <p className="md-accordion-group-title">SHOES</p>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>VIEW ALL</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>CURB</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>MIDNIGHT STEP</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>BALLERINAS</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>SANDALS & MULES</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>SNEAKERS</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>PUMPS</Link>
-                  </div>
-                  <div className="md-accordion-group">
-                    <p className="md-accordion-group-title">ACCESSORIES</p>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>VIEW ALL</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>JEWELRY</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>BELTS</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>SILKS & SCARVES</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>SUNGLASSES</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>HATS</Link>
-                    <Link href="/collection/women" className="md-accordion-link" onClick={closeMenu}>SMALL LEATHER GOODS</Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* MEN */}
-            <div className="md-nav-accordion-item">
-              <button 
-                type="button"
-                className={`md-nav-item md-accordion-trigger ${expandedAccordion === 'men' ? 'active' : ''}`}
-                onClick={() => toggleAccordion('men')}
-              >
-                <span>MEN</span>
-                <span className="md-accordion-toggle-icon" />
-              </button>
-              <div className={`md-accordion-wrapper ${expandedAccordion === 'men' ? 'open' : ''}`}>
-                <div className="md-accordion-content">
-                  <div className="md-accordion-group">
-                    <p className="md-accordion-group-title">COLLECTIONS</p>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>NEW ARRIVALS</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>SPRING 2026 COLLECTION</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>SUMMER 2026 COLLECTION</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>THE SNEAKERS EDIT</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>GIFTS</Link>
-                  </div>
-                  <div className="md-accordion-group">
-                    <p className="md-accordion-group-title">READY TO WEAR</p>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>VIEW ALL</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>COATS & JACKETS</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>KNITWEAR & POLO</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>T-SHIRTS & SWEAT-SHIRTS</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>SHIRTS & TOPS</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>PANTS & SHORTS</Link>
-                  </div>
-                  <div className="md-accordion-group">
-                    <p className="md-accordion-group-title">SHOES</p>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>VIEW ALL</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>CURB</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>DBB1</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>SNEAKERS</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>LOAFERS & DERBIES</Link>
-                  </div>
-                  <div className="md-accordion-group">
-                    <p className="md-accordion-group-title">BAGS</p>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>VIEW ALL</Link>
-                  </div>
-                  <div className="md-accordion-group">
-                    <p className="md-accordion-group-title">ACCESSORIES</p>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>VIEW ALL</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>SMALL LEATHER GOODS</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>BELTS</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>HATS</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>SCARVES & TIES</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>SOCKS</Link>
-                    <Link href="/collection/men" className="md-accordion-link" onClick={closeMenu}>SUNGLASSES</Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* CHILDREN */}
-            <Link href="/collection" className="md-nav-item" onClick={closeMenu}>CHILDREN</Link>
-
-            {/* CURB */}
-            <Link href="/collection" className="md-nav-item" onClick={closeMenu}>CURB</Link>
-
-            {/* MAISON TONET */}
-            <div className="md-nav-accordion-item">
-              <button 
-                type="button"
-                className={`md-nav-item md-accordion-trigger ${expandedAccordion === 'maison' ? 'active' : ''}`}
-                onClick={() => toggleAccordion('maison')}
-              >
-                <span>MAISON TONET</span>
-                <span className="md-accordion-toggle-icon" />
-              </button>
-              <div className={`md-accordion-wrapper ${expandedAccordion === 'maison' ? 'open' : ''}`}>
-                <div className="md-accordion-content">
-                  <div className="md-accordion-group">
-                    <p className="md-accordion-group-title">LA MAISON</p>
-                    <Link href="/about" className="md-accordion-link" onClick={closeMenu}>TONET TORRENTINNI</Link>
-                    <Link href="/about" className="md-accordion-link" onClick={closeMenu}>HISTORY OF THE HOUSE</Link>
-                    <Link href="/about" className="md-accordion-link" onClick={closeMenu}>22 RUE DU FAUBOURG SAINT-HONORÉ</Link>
-                    <Link href="/about" className="md-accordion-link" onClick={closeMenu}>855 MADISON AVENUE</Link>
-                    <Link href="/about" className="md-accordion-link" onClick={closeMenu}>65 BOULEVARD DE LA CROISETTE</Link>
-                  </div>
-                  <div className="md-accordion-group">
-                    <p className="md-accordion-group-title">SHOWS</p>
-                    <Link href="/collection" className="md-accordion-link" onClick={closeMenu}>WINTER 2026</Link>
-                    <Link href="/collection" className="md-accordion-link" onClick={closeMenu}>SUMMER 2026</Link>
-                    <Link href="/collection" className="md-accordion-link" onClick={closeMenu}>AUTUMN WINTER 2025</Link>
-                  </div>
-                  <div className="md-accordion-group">
-                    <p className="md-accordion-group-title">TONET LAB</p>
-                    <Link href="/collection" className="md-accordion-link" onClick={closeMenu}>TONET LAB BY FUTURE</Link>
-                  </div>
-                  <div className="md-accordion-group">
-                    <p className="md-accordion-group-title">PROJECTS</p>
-                    <Link href="/collection" className="md-accordion-link" onClick={closeMenu}>CRÉATIONS SPÉCIALES</Link>
-                    <Link href="/collection" className="md-accordion-link" onClick={closeMenu}>TONET X BENJAMIN MILLEPIED</Link>
-                    <Link href="/collection" className="md-accordion-link" onClick={closeMenu}>TONET ON THE RENAISSANCE WORLD TOUR</Link>
-                  </div>
-                  <div className="md-accordion-group">
-                    <p className="md-accordion-group-title">CAMPAIGNS</p>
-                    <Link href="/collection" className="md-accordion-link" onClick={closeMenu}>CHARACTER STUDIES: THE FINAL CHAPTER</Link>
-                    <Link href="/collection" className="md-accordion-link" onClick={closeMenu}>CHARACTER STUDIES: MODERN HEROES</Link>
-                    <Link href="/collection" className="md-accordion-link" onClick={closeMenu}>CHARACTER STUDIES: LE CHIC ULTIME</Link>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <button 
+              type="button"
+              className="md-nav-item"
+              onClick={() => {
+                closeMenu();
+                openAccount();
+              }}
+            >
+              PERFIL
+            </button>
           </nav>
-
-          {/* Corporate section */}
-          <div className="md-archive-links">
-            <Link href="/about" className="md-archive-link" onClick={closeMenu}>ABOUT TONET TORRENTINNI</Link>
-            <Link href="/contact" className="md-archive-link" onClick={closeMenu}>CUSTOMER SERVICE</Link>
-            <Link href="/stores" className="md-archive-link" onClick={closeMenu}>STORES</Link>
-          </div>
-
-          <div className="md-locale" onClick={() => { closeMenu(); openSelector(); }}>
-            {`${regionLabel} / ${languageLabel} / ${currency}`}
-          </div>
         </div>
 
         {/* ── RIGHT COLUMN (tags or search) ── */}
