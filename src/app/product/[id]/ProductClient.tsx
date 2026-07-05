@@ -1427,15 +1427,17 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           grid-template-columns: 1fr;
           gap: 0;
           width: 100%;
+          padding: 0 16px;
+          box-sizing: border-box;
         }
 
         @media (min-width: 1024px) {
           .tonet-pdp-layout {
-            grid-template-columns: 50% 50%;
-            column-gap: 0;
-            padding: 0;
-            max-width: none;
-            margin: 0;
+            grid-template-columns: 55% 45%;
+            column-gap: 80px;
+            padding: 80px 40px 120px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
             box-sizing: border-box;
           }
         }
@@ -1447,7 +1449,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         @media (min-width: 1024px) {
           .tonet-gallery-column {
             background-color: #ffffff;
-            padding-top: 100px;
+            padding-top: 0;
           }
         }
 
@@ -1475,13 +1477,14 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           justify-content: center;
           align-items: center;
           background: #ffffff;
-          padding: 24px 20px;
+          padding: 60px 40px;
           box-sizing: border-box;
           aspect-ratio: 3 / 4;
         }
         .tonet-mobile-slide img {
-          width: 100%;
-          max-width: 380px;
+          max-width: 70%;
+          max-height: 70%;
+          width: auto;
           height: auto;
           display: block;
           object-fit: contain;
@@ -1614,12 +1617,12 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           justify-content: center;
           align-items: center;
           aspect-ratio: 3 / 4;
-          padding: 40px;
+          padding: 80px;
           box-sizing: border-box;
         }
         .tonet-desktop-img-wrapper img {
-          max-height: 100%;
-          width: auto;
+          max-height: 80%;
+          max-width: 80%;
           object-fit: contain;
           mix-blend-mode: multiply;
         }
@@ -1633,7 +1636,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
         @media (min-width: 1024px) {
           .tonet-info-column {
-            padding: 100px 64px 120px 64px;
+            padding: 0;
           }
         }
         .tonet-info-sticky {
@@ -1647,13 +1650,12 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         @media (min-width: 1024px) {
           .tonet-info-sticky {
             position: sticky;
-            top: 50vh;
-            transform: translateY(-50%);
+            top: 100px;
             align-items: flex-start;
             text-align: left;
             max-width: 460px;
-            margin-left: auto;
-            margin-right: auto;
+            margin-left: 0;
+            margin-right: 0;
           }
         }
 
