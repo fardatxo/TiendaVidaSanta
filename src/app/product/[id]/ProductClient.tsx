@@ -552,14 +552,27 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   }, [sizeOptionName]);
 
   const allImages = product.images.length > 0 ? product.images : [product.imageUrl].filter(Boolean);
-  const activeColorIndex = colorOptionName && colorOptions.length > 0
-    ? colorOptions.findIndex(c => c.value === selectedColor)
-    : -1;
-  const activeIndex = activeColorIndex >= 0 ? activeColorIndex : 0;
-  const startIndex = activeIndex * 2;
-  const images = allImages.length >= (startIndex + 2)
-    ? allImages.slice(startIndex, startIndex + 2)
-    : (allImages.length >= (startIndex + 1) ? allImages.slice(startIndex, startIndex + 1) : allImages.slice(0, 2));
+  
+  const images = useMemo(() => {
+    const otherColorsVariantImages = new Set<string>();
+    for (const v of product.variants) {
+      const colorOpt = v.selectedOptions.find(o => {
+        const n = o.name.toLowerCase(); return n === 'color' || n === 'colour';
+      });
+      if (colorOpt && colorOpt.value.toLowerCase() !== selectedColor.toLowerCase() && v.image?.url) {
+        otherColorsVariantImages.add(v.image.url);
+      }
+    }
+    
+    const currentVariantImage = selectedVariant?.image?.url;
+    const filtered = allImages.filter(img => !otherColorsVariantImages.has(img));
+    let result = [...filtered];
+    if (currentVariantImage) {
+      result = result.filter(img => img !== currentVariantImage);
+      result.unshift(currentVariantImage);
+    }
+    return result.length > 0 ? result : allImages.slice(0, 2);
+  }, [allImages, selectedColor, selectedVariant, product.variants]);
 
   const priceNum = parseFloat(selectedVariant.price.amount);
   const currencyCode = selectedVariant.price.currencyCode || 'EUR';
