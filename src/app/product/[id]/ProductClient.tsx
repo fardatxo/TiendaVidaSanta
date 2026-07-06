@@ -692,16 +692,19 @@ Care Instructions: LIMPIAR EL DEPÓSITO DESPUÉS DE CADA USO CON AGUA TEMPLADA. 
   
   const images = useMemo(() => {
     const otherColorsVariantImages = new Set<string>();
+    const currentVariantImage = selectedVariant?.image?.url;
+
     for (const v of product.variants) {
       const colorOpt = v.selectedOptions.find(o => {
         const n = o.name.toLowerCase(); return n === 'color' || n === 'colour';
       });
       if (colorOpt && colorOpt.value.toLowerCase() !== selectedColor.toLowerCase() && v.image?.url) {
-        otherColorsVariantImages.add(v.image.url);
+        if (v.image.url !== currentVariantImage) {
+          otherColorsVariantImages.add(v.image.url);
+        }
       }
     }
     
-    const currentVariantImage = selectedVariant?.image?.url;
     const filtered = allImages.filter(img => !otherColorsVariantImages.has(img));
     let result = [...filtered];
     if (currentVariantImage) {
