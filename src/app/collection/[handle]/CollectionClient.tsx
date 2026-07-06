@@ -406,7 +406,12 @@ export default function CollectionClient({ collection }: { collection: Collectio
                       <p className="am-chanel-subtitle">{subtitle}</p>
                       {firstVariantName && <p className="am-chanel-variant">{firstVariantName}</p>}
                       <p className="am-chanel-price">
-                        {formatPrice(p.price, p.currencyCode)}
+                        <span>{formatPrice(p.price, p.currencyCode)}</span>
+                        {p.compareAtPrice && (
+                          <span style={{ textDecoration: 'line-through', marginLeft: '8px', color: '#767676', fontSize: '9.5px', fontWeight: '400' }}>
+                            {formatPrice(p.compareAtPrice, p.currencyCode)}
+                          </span>
+                        )}
                       </p>
                       
                       <div className="am-chanel-actions">
@@ -814,17 +819,17 @@ export default function CollectionClient({ collection }: { collection: Collectio
         .am-chanel-img-wrap {
           width: 100%;
           aspect-ratio: 1 / 1.1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
           position: relative;
           margin-bottom: 24px;
           background-color: #ffffff;
         }
 
         .am-chanel-img {
-          max-width: 90%;
-          max-height: 90%;
+          position: absolute;
+          top: 5%;
+          left: 5%;
+          width: 90%;
+          height: 90%;
           object-fit: contain;
         }
 

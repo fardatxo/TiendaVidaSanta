@@ -381,6 +381,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   const [stickyDropdownOpen, setStickyDropdownOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const mobileCarouselRef = useRef<HTMLDivElement>(null);
+  const desktopCarouselRef = useRef<HTMLDivElement>(null);
 
   const [stickyBarVisible, setStickyBarVisible] = useState(false);
   const mainButtonWrapRef = useRef<HTMLDivElement>(null);
@@ -418,6 +419,26 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
     const width = container.clientWidth;
     if (width > 0) {
       setCurrentSlide(Math.round(scrollLeft / width));
+    }
+  };
+
+  const handleDesktopScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const container = e.currentTarget;
+    const scrollTop = container.scrollTop;
+    const height = container.clientHeight;
+    if (height > 0) {
+      setDesktopImageIndex(Math.round(scrollTop / height));
+    }
+  };
+
+  const handleDesktopDotClick = (index: number) => {
+    setDesktopImageIndex(index);
+    if (desktopCarouselRef.current) {
+      const slides = desktopCarouselRef.current.querySelectorAll('.tonet-desktop-slide');
+      const targetSlide = slides[index];
+      if (targetSlide) {
+        targetSlide.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
     }
   };
 
@@ -485,6 +506,9 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
   useEffect(() => {
     setDesktopImageIndex(0);
+    if (desktopCarouselRef.current) {
+      desktopCarouselRef.current.scrollTop = 0;
+    }
   }, [selectedColor]);
 
   const [selectedOptionsState, setSelectedOptionsState] = useState<Record<string, string>>(() => {
@@ -575,11 +599,18 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   }, [allImages, selectedColor, selectedVariant, product.variants]);
 
   const priceNum = parseFloat(selectedVariant.price.amount);
+  const compareAtPriceNum = selectedVariant.compareAtPrice ? parseFloat(selectedVariant.compareAtPrice.amount) : null;
   const currencyCode = selectedVariant.price.currencyCode || 'EUR';
   const currencySymbol = currencyCode === 'USD' ? '$' : '€';
   const priceFormatted = Number.isInteger(priceNum)
     ? `${currencySymbol}${priceNum} ${currencyCode}`
     : `${currencySymbol}${priceNum.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currencyCode}`;
+
+  const compareAtPriceFormatted = compareAtPriceNum
+    ? (Number.isInteger(compareAtPriceNum)
+        ? `${currencySymbol}${compareAtPriceNum} ${currencyCode}`
+        : `${currencySymbol}${compareAtPriceNum.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currencyCode}`)
+    : null;
 
   const allSizes = sizeOptions;
   const hasSizes = sizeOptions.length > 0;
@@ -754,27 +785,32 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                       key={i}
                       type="button"
                       className={`tonet-desktop-slider-dot ${desktopImageIndex === i ? 'active' : ''}`}
-                      onClick={() => setDesktopImageIndex(i)}
+                      onClick={() => handleDesktopDotClick(i)}
                       aria-label={`Go to slide ${i + 1}`}
                     />
                   ))}
                 </div>
               )}
-              <div className="tonet-desktop-img-wrapper">
-                {images[desktopImageIndex] && (
-                  <img 
-                    src={getOptimizedImageUrl(images[desktopImageIndex], 1600)} 
-                    alt={`${product.title} - ${desktopImageIndex}`} 
-                    className="tonet-pdp-img amiri-fade-in" 
-                    loading="eager"
-                    decoding="async"
-                    key={images[desktopImageIndex]}
-                    onLoad={(e) => e.currentTarget.classList.add('loaded')}
-                    ref={(el) => {
-                      if (el && el.complete) el.classList.add('loaded');
-                    }}
-                  />
-                )}
+              <div 
+                className="tonet-desktop-img-wrapper-scrollable"
+                ref={desktopCarouselRef}
+                onScroll={handleDesktopScroll}
+              >
+                {images.map((img, i) => (
+                  <div key={i} className="tonet-desktop-slide">
+                    <img 
+                      src={getOptimizedImageUrl(img, 1600)} 
+                      alt={`${product.title} - ${i}`} 
+                      className="tonet-pdp-img amiri-fade-in" 
+                      loading={i === 0 ? "eager" : "lazy"}
+                      decoding="async"
+                      onLoad={(e) => e.currentTarget.classList.add('loaded')}
+                      ref={(el) => {
+                        if (el && el.complete) el.classList.add('loaded');
+                      }}
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -814,6 +850,11 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
               <div className="tonet-product-price-row">
                 <div className="tonet-price-wrapper">
                   <span className="tonet-price-amount">{priceFormatted}</span>
+                  {compareAtPriceFormatted && (
+                    <span className="tonet-price-compare" style={{ textDecoration: 'line-through', marginLeft: '12px', color: '#767676', fontSize: '14px', fontWeight: '400' }}>
+                      {compareAtPriceFormatted}
+                    </span>
+                  )}
                 </div>
                 <button
                   type="button"
@@ -846,6 +887,20 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                     <div className="tonet-pdp-swatches-list">
                       {colorOptions.map((co) => {
                         const isSelected = selectedColor === co.value;
+                        let content = '';
+                        let customBg = colorNameToCSS(co.value);
+                        let customColor = '#ffffff';
+
+                        if (co.value.toLowerCase().includes('2 x')) {
+                          content = '2';
+                          customBg = isSelected ? '#000000' : '#f5f5f5';
+                          customColor = isSelected ? '#ffffff' : '#000000';
+                        } else if (co.value.toLowerCase().includes('60pcs')) {
+                          content = '1';
+                          customBg = isSelected ? '#000000' : '#f5f5f5';
+                          customColor = isSelected ? '#ffffff' : '#000000';
+                        }
+
                         return (
                           <button
                             key={co.value}
@@ -853,8 +908,19 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                             className={`tonet-pdp-swatch-circle ${isSelected ? 'active' : ''}`}
                             onClick={() => handleColorChange(co.value)}
                             aria-label={`Select color ${co.value}`}
-                            style={{ background: colorNameToCSS(co.value) }}
-                          />
+                            style={{ 
+                              background: customBg,
+                              color: customColor,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '11px',
+                              fontWeight: '600',
+                              fontFamily: 'var(--font-primary), sans-serif',
+                            }}
+                          >
+                            {content}
+                          </button>
                         );
                       })}
                     </div>
@@ -994,72 +1060,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
         </div>
 
-        {/* COMPLETE THE LOOK SECTION */}
-        {completeOutfit.length > 0 && (
-          <section className="amiri-ctl-section">
-            <div className="amiri-ctl-header">
-              <span className="amiri-ctl-logo">VIDA SANTA</span>
-              <h2 className="amiri-ctl-title">COMPLETAR EL LOOK</h2>
-            </div>
-            
-            <div className="amiri-ctl-carousel-wrapper">
-              <div 
-                className="amiri-ctl-carousel" 
-                ref={ctlCarouselRef}
-                onScroll={handleCtlScroll}
-              >
-                {completeOutfit.map((p) => {
-                  const pType = getProductType(p);
-                  const symbol = p.currencyCode === 'USD' ? '$' : '€';
-                  const formattedPrice = Number.isInteger(p.price)
-                    ? `${symbol}${p.price} ${p.currencyCode}`
-                    : `${symbol}${p.price.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${p.currencyCode}`;
-                  
-                  return (
-                    <div className="amiri-ctl-item" key={p.handle}>
-                      <Link href={`/product/${p.handle}`} className="amiri-ctl-card">
-                        <div className="amiri-ctl-image-panel">
-                          {p.imageUrl && (
-                            <img 
-                              src={p.imageUrl} 
-                              alt={p.title} 
-                              className={`amiri-ctl-image amiri-ctl-image--${pType} amiri-fade-in`}
-                              loading="lazy"
-                              decoding="async"
-                              onLoad={(e) => e.currentTarget.classList.add('loaded')}
-                              ref={(el) => {
-                                if (el && el.complete) el.classList.add('loaded');
-                              }}
-                            />
-                          )}
-                        </div>
-                        <div className="amiri-ctl-meta">
-                          <span className="amiri-ctl-name">{p.title.toUpperCase()}</span>
-                          <span className="amiri-ctl-price">{formattedPrice}</span>
-                        </div>
-                      </Link>
-                    </div>
-                  );
-                })}
-              </div>
 
-              {/* Discreet pill indicator */}
-              {completeOutfit.length > 1 && (
-                <div className="amiri-ctl-indicator-track">
-                  <div 
-                    className="amiri-ctl-indicator-pill" 
-                    style={{
-                      width: `${100 / completeOutfit.length}%`,
-                      transform: `translateX(${ctlScrollProgress * (completeOutfit.length - 1) * 100}%)`
-                    }}
-                  />
-                </div>
-              )}
-
-
-            </div>
-          </section>
-        )}
 
         {/* RELATED CAROUSEL (YOU MIGHT ALSO LIKE) */}
         {arrangedRecommended.length > 0 && (
@@ -1363,7 +1364,14 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                 <img src={getOptimizedImageUrl(product.imageUrl, 200)} alt={product.title} />
               </div>
             )}
-            <span className="tonet-sticky-buy-price">{priceFormatted}</span>
+            <span className="tonet-sticky-buy-price">
+              {priceFormatted}
+              {compareAtPriceFormatted && (
+                <span className="tonet-sticky-buy-compare" style={{ textDecoration: 'line-through', marginLeft: '8px', color: '#767676', fontSize: '11px', fontWeight: '400' }}>
+                  {compareAtPriceFormatted}
+                </span>
+              )}
+            </span>
           </div>
           
           <button 
@@ -1576,7 +1584,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           position: relative;
           width: 100%;
           display: none;
-          align-items: center;
+          align-items: flex-start;
           justify-content: center;
           background-color: #ffffff;
         }
@@ -1600,7 +1608,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .tonet-desktop-slider-dot {
           width: 6px;
           height: 6px;
-          border-radius: 50%;
+          border-radius: 0; /* Rectangular borders */
           border: 1px solid #000000;
           background-color: transparent;
           cursor: pointer;
@@ -1610,17 +1618,33 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         .tonet-desktop-slider-dot.active {
           background-color: #000000;
         }
-        .tonet-desktop-img-wrapper {
+        .tonet-desktop-img-wrapper-scrollable {
           width: 100%;
           background: #ffffff;
           display: flex;
+          flex-direction: column;
+          overflow-y: auto;
+          scroll-snap-type: y mandatory;
+          aspect-ratio: 3 / 4;
+          box-sizing: border-box;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        .tonet-desktop-img-wrapper-scrollable::-webkit-scrollbar {
+          display: none;
+        }
+        .tonet-desktop-slide {
+          flex-shrink: 0;
+          width: 100%;
+          aspect-ratio: 3 / 4;
+          display: flex;
           justify-content: center;
           align-items: center;
-          aspect-ratio: 3 / 4;
+          scroll-snap-align: start;
           padding: 80px;
           box-sizing: border-box;
         }
-        .tonet-desktop-img-wrapper img {
+        .tonet-desktop-slide img {
           max-height: 80%;
           max-width: 80%;
           object-fit: contain;

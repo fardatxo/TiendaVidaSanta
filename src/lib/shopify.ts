@@ -17,6 +17,8 @@ export interface ShopifyVariant {
   title: string;
   availableForSale: boolean;
   price: { amount: string; currencyCode: string };
+  compareAtPrice?: { amount: string; currencyCode: string } | null;
+  sku?: string | null;
   selectedOptions: { name: string; value: string }[];
   image?: { url: string };
 }
@@ -28,6 +30,7 @@ export interface Product {
   description: string;
   tags: string[];
   price: number;
+  compareAtPrice?: number | null;
   currencyCode: string;
   imageUrl: string;
   images: string[];
@@ -80,6 +83,7 @@ const PRODUCT_FIELDS = `
   description
   tags
   priceRange { minVariantPrice { amount currencyCode } }
+  compareAtPriceRange { minVariantPrice { amount currencyCode } }
   featuredImage { url }
   images(first: 10) { edges { node { url } } }
   collections(first: 10) { edges { node { handle } } }
@@ -89,7 +93,9 @@ const PRODUCT_FIELDS = `
         id
         title
         availableForSale
+        sku
         price { amount currencyCode }
+        compareAtPrice { amount currencyCode }
         selectedOptions { name value }
         image { url }
       }
@@ -104,6 +110,7 @@ const COLLECTION_PRODUCT_FIELDS = `
   description
   tags
   priceRange { minVariantPrice { amount currencyCode } }
+  compareAtPriceRange { minVariantPrice { amount currencyCode } }
   featuredImage { url }
   images(first: 10) { edges { node { url } } }
   collections(first: 10) { edges { node { handle } } }
@@ -113,7 +120,9 @@ const COLLECTION_PRODUCT_FIELDS = `
         id
         title
         availableForSale
+        sku
         price { amount currencyCode }
+        compareAtPrice { amount currencyCode }
         selectedOptions { name value }
         image { url }
       }
@@ -122,6 +131,8 @@ const COLLECTION_PRODUCT_FIELDS = `
 `;
 
 function normalizeProduct(node: Record<string, any>): Product {
+  const compareAtAmt = node.compareAtPriceRange?.minVariantPrice?.amount;
+  const compareAtPrice = compareAtAmt ? parseFloat(compareAtAmt) : null;
   return {
     id: node.id as string,
     handle: node.handle as string,
@@ -129,6 +140,7 @@ function normalizeProduct(node: Record<string, any>): Product {
     description: (node.description as string) ?? '',
     tags: (node.tags as string[]) ?? [],
     price: parseFloat(node.priceRange?.minVariantPrice?.amount ?? '0'),
+    compareAtPrice,
     currencyCode: (node.priceRange?.minVariantPrice?.currencyCode as string) ?? 'EUR',
     imageUrl: (node.featuredImage?.url as string) ?? '',
     images: ((node.images?.edges ?? []) as { node: { url: string } }[]).map(e => e.node.url),
@@ -137,6 +149,8 @@ function normalizeProduct(node: Record<string, any>): Product {
       title: e.node.title as string,
       availableForSale: e.node.availableForSale as boolean,
       price: e.node.price as { amount: string; currencyCode: string },
+      compareAtPrice: e.node.compareAtPrice as { amount: string; currencyCode: string } | null | undefined,
+      sku: e.node.sku as string | null | undefined,
       selectedOptions: e.node.selectedOptions as { name: string; value: string }[],
       image: e.node.image as { url: string } | undefined,
     })),
