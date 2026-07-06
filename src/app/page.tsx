@@ -123,6 +123,7 @@ export default async function Home() {
           position: relative;
           width: 100%;
           height: 100vh;
+          height: 100dvh;
           overflow: hidden;
           background: #ffffff;
           scroll-snap-align: start;
@@ -170,7 +171,7 @@ export default async function Home() {
           display: flex;
           align-items: flex-end;
           justify-content: center;
-          padding: 60px 48px;
+          padding: 60px 48px 35vh 48px;
           z-index: 3;
         }
         .am-hero-feeling-block {
@@ -320,6 +321,7 @@ export default async function Home() {
           position: relative;
           width: 100%;
           height: 100vh;
+          height: 100dvh;
           overflow: hidden;
           background: #ffffff;
           border-bottom: 1px solid #eaeaea;
@@ -512,8 +514,10 @@ export default async function Home() {
         @media (max-width: 767px) {
           .am-hero {
             height: 100vh;
+            height: 100dvh;
           }
           .am-hero-overlay {
+            align-items: center;
             padding: 40px 20px;
           }
           .am-hero-title {
@@ -528,6 +532,7 @@ export default async function Home() {
           }
           .am-split-col {
             height: 100vh;
+            height: 100dvh;
             scroll-snap-align: start;
             scroll-snap-stop: always;
           }
@@ -542,6 +547,7 @@ export default async function Home() {
           }
           .am-landscape {
             height: 100vh;
+            height: 100dvh;
           }
           .am-landscape-overlay {
             padding: 32px 20px;

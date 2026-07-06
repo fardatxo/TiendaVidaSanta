@@ -2,7 +2,7 @@
 
 import { useUI } from "@/context/UIContext";
 import { useCart, CartLine } from "@/context/CartContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocale } from "@/context/LocaleContext";
 import { X, Plus, Minus } from "lucide-react";
 import { getOptimizedImageUrl } from "@/lib/shopify";
@@ -41,6 +41,43 @@ export default function CartDrawer() {
   const { formatPrice } = useLocale();
 
   const items: CartItem[] = cart.lines.map(lineToItem);
+
+  const [smsPhone, setSmsPhone] = useState("");
+  const [smsSubscribed, setSmsSubscribed] = useState(false);
+  const [smsError, setSmsError] = useState("");
+
+  useEffect(() => {
+    const isSub = localStorage.getItem("sms-subscribed") === "true";
+    setSmsSubscribed(isSub);
+
+    const handleGlobalSmsSub = () => {
+      setSmsSubscribed(true);
+    };
+    window.addEventListener("sms-subscribed-event", handleGlobalSmsSub);
+    return () => window.removeEventListener("sms-subscribed-event", handleGlobalSmsSub);
+  }, []);
+
+  const handleSmsSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!smsPhone || smsPhone.trim().length < 9) {
+      setSmsError("TELÉFONO INVÁLIDO");
+      return;
+    }
+    try {
+      await fetch("/api/sms-subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: smsPhone }),
+      }).catch(() => {});
+
+      localStorage.setItem("sms-subscribed", "true");
+      setSmsSubscribed(true);
+      setSmsError("");
+      window.dispatchEvent(new Event("sms-subscribed-event"));
+    } catch (err) {
+      setSmsError("ERROR");
+    }
+  };
 
   useEffect(() => {
     document.body.style.overflow = isCartOpen ? "hidden" : "";
@@ -122,6 +159,37 @@ export default function CartDrawer() {
               <span className="cd-subtotal-label">Subtotal</span>
               <span className="cd-subtotal-price">{totalFormatted}</span>
             </div>
+
+            {/* SMS Promo Box */}
+            <div className="cd-sms-box">
+              {!smsSubscribed ? (
+                <div className="cd-sms-form">
+                  <span className="cd-sms-tag">🎁 AHORRA UN 10% ADICIONAL</span>
+                  <p className="cd-sms-desc">SUSCRÍBETE A ALERTAS SMS PARA CONSEGUIR UN 10% DE DESCUENTO AL INSTANTE.</p>
+                  <form onSubmit={handleSmsSubmit} className="cd-sms-input-row">
+                    <input 
+                      type="tel" 
+                      placeholder="TELÉFONO" 
+                      value={smsPhone} 
+                      onChange={(e) => {
+                        setSmsPhone(e.target.value);
+                        setSmsError("");
+                      }}
+                      className="cd-sms-input"
+                      required
+                    />
+                    <button type="submit" className="cd-sms-btn">UNIRSE</button>
+                  </form>
+                  {smsError && <span className="cd-sms-error">{smsError}</span>}
+                </div>
+              ) : (
+                <div className="cd-sms-success">
+                  <span className="cd-sms-tag">✓ ¡CÓDIGO DE DESCUENTO ACTIVO!</span>
+                  <p className="cd-sms-desc">USA EL CÓDIGO <strong className="cd-sms-code">VIDASANTA10</strong> PARA OBTENER UN 10% EN ESTA COMPRA.</p>
+                </div>
+              )}
+            </div>
+
             <div className="cd-cta-group">
               <button
                 className="cd-checkout-btn"
@@ -378,6 +446,92 @@ export default function CartDrawer() {
           transition: opacity 0.3s;
         }
         .cd-checkout-btn:hover { opacity: 0.85; }
+
+        /* SMS Box Styles */
+        .cd-sms-box {
+          background-color: #000000;
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          padding: 16px;
+          margin-bottom: 4px;
+          box-sizing: border-box;
+          border-radius: 0 !important; /* Rectangular borders */
+          color: #ffffff;
+        }
+        .cd-sms-form,
+        .cd-sms-success {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .cd-sms-tag {
+          font-size: 9px;
+          font-weight: 600;
+          letter-spacing: 0.18em;
+          color: #ffffff;
+          text-transform: uppercase;
+        }
+        .cd-sms-desc {
+          font-size: 8.5px;
+          font-weight: 300;
+          line-height: 1.4;
+          letter-spacing: 0.05em;
+          color: rgba(255, 255, 255, 0.7);
+          margin: 0;
+          text-transform: uppercase;
+        }
+        .cd-sms-input-row {
+          display: flex;
+          gap: 8px;
+          margin-top: 4px;
+        }
+        .cd-sms-input {
+          flex: 1;
+          border: none;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+          padding: 10px 0;
+          font-size: 9.5px;
+          font-family: inherit;
+          letter-spacing: 0.05em;
+          background: transparent;
+          color: #ffffff;
+          border-radius: 0 !important; /* Rectangular borders */
+          outline: none;
+          text-transform: uppercase;
+        }
+        .cd-sms-input:focus {
+          border-bottom-color: #ffffff;
+        }
+        .cd-sms-input::placeholder {
+          color: rgba(255, 255, 255, 0.35);
+        }
+        .cd-sms-btn {
+          background: #ffffff;
+          color: #000000;
+          border: none;
+          padding: 10px 16px;
+          font-size: 9px;
+          font-family: inherit;
+          font-weight: 600;
+          letter-spacing: 0.1em;
+          cursor: pointer;
+          border-radius: 0 !important; /* Rectangular borders */
+          transition: background-color 0.2s;
+        }
+        .cd-sms-btn:hover {
+          background: #eaeaea;
+        }
+        .cd-sms-error {
+          font-size: 8px;
+          color: #d93838;
+          font-weight: 600;
+          letter-spacing: 0.05em;
+        }
+        .cd-sms-code {
+          font-weight: 700;
+          color: #ffffff;
+          background: rgba(255, 255, 255, 0.15);
+          padding: 2px 6px;
+        }
 
         /* ══ MOBILE ══ */
         @media (max-width: 767px) {

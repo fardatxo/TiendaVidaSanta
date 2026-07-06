@@ -256,7 +256,29 @@ const arrangeRecommendations = (pool: RecommendedProduct[]): RecommendedProduct[
   return result;
 };
 
-export default function ProductClient({ product, relatedProductsByTag }: Props) {
+export default function ProductClient({ product: rawProduct, relatedProductsByTag }: Props) {
+  const product = useMemo(() => {
+    if (rawProduct.handle.includes('sprayer-comb') || rawProduct.handle.includes('brush')) {
+      return {
+        ...rawProduct,
+        title: "CEPILLO DESENREDANTE 2 EN 1 CON PULVERIZADOR",
+        description: `CEPILLO Y PEINE DE PELUQUERÍA PROFESIONAL 2 EN 1 CON PULVERIZADOR DE AGUA REUTILIZABLE. DISEÑADO CON CERDAS SUAVES DESENREDANTES, IDEAL PARA LA HIDRATACIÓN DIARIA Y EL PEINADO DEL CABELLO. APLICA UNA BRUMA ULTRA FINA QUE FACILITA EL PEINADO Y REHIDRATA SIN EMPAPAR EL CABELLO. PERMITE AÑADIR AGUA, TÓNICOS CAPILARES O ACEITES ESENCIALES PARA UN CUIDADO CAPILAR DE LUJO EN CUALQUIER MOMENTO.
+
+Item Number: VS-2026-SC01
+Features: Bruma Ultrafina, Cerdas Suaves Desenredantes, Depósito Reutilizable
+Care Instructions: LIMPIAR EL DEPÓSITO DESPUÉS DE CADA USO CON AGUA TEMPLADA. EVITAR SUMERGIR LAS CERDAS EN AGUA HIRVIENDO.`
+      };
+    }
+    if (rawProduct.handle.includes('patch') || rawProduct.handle.includes('parche') || rawProduct.title.toLowerCase().includes('patch')) {
+      return {
+        ...rawProduct,
+        title: "PARCHES DE COLÁGENO PARA OJOS (60 UNIDADES)",
+        description: `PARCHES DE COLÁGENO PARA OJOS ENRIQUECIDOS CON PÉPTIDOS Y NIACINAMIDA. HIDRATAN, SUAVIZAN Y REVITALIZAN EL CONTORNO DE OJOS, REDUCIENDO VISIBLEMENTE LA APARIENCIA DE OJERAS, BOLSAS Y LÍNEAS DE EXPRESIÓN. APTOS PARA TODO TIPO DE PIELES. CONTENIDO: 60 PARCHES (30 PARES).`
+      };
+    }
+    return rawProduct;
+  }, [rawProduct]);
+
   const router = useRouter();
   const [recommended, setRecommended] = useState<RecommendedProduct[]>([]);
   const [recentlyViewed, setRecentlyViewed] = useState<RecentProduct[]>([]);
@@ -386,6 +408,43 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   const [stickyBarVisible, setStickyBarVisible] = useState(false);
   const mainButtonWrapRef = useRef<HTMLDivElement>(null);
 
+  const [smsPhone, setSmsPhone] = useState("");
+  const [smsSubscribed, setSmsSubscribed] = useState(false);
+  const [smsError, setSmsError] = useState("");
+
+  useEffect(() => {
+    const isSub = localStorage.getItem("sms-subscribed") === "true";
+    setSmsSubscribed(isSub);
+
+    const handleGlobalSmsSub = () => {
+      setSmsSubscribed(true);
+    };
+    window.addEventListener("sms-subscribed-event", handleGlobalSmsSub);
+    return () => window.removeEventListener("sms-subscribed-event", handleGlobalSmsSub);
+  }, []);
+
+  const handleSmsSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!smsPhone || smsPhone.trim().length < 9) {
+      setSmsError("TELÉFONO INVÁLIDO");
+      return;
+    }
+    try {
+      await fetch("/api/sms-subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: smsPhone }),
+      }).catch(() => {});
+
+      localStorage.setItem("sms-subscribed", "true");
+      setSmsSubscribed(true);
+      setSmsError("");
+      window.dispatchEvent(new Event("sms-subscribed-event"));
+    } catch (err) {
+      setSmsError("ERROR");
+    }
+  };
+
   useEffect(() => {
     const el = mainButtonWrapRef.current;
     if (!el) return;
@@ -462,6 +521,52 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
   const metadata = useMemo(() => parseMetadata(product.description), [product.description]);
 
   const detailsRows = useMemo(() => {
+    const title = product.title.toLowerCase();
+    const handle = product.handle.toLowerCase();
+    
+    const isSkincareOrCosmetic = 
+      title.includes('patch') || title.includes('parche') || 
+      title.includes('colágeno') || title.includes('collagen') ||
+      title.includes('comb') || title.includes('cepillo') || 
+      title.includes('brush') || title.includes('sprayer') ||
+      title.includes('gel') || title.includes('crema') || 
+      title.includes('cream') || title.includes('serum') || 
+      title.includes('sérum') || title.includes('tónico') || 
+      title.includes('toner') || title.includes('gloss') ||
+      title.includes('oil') || title.includes('aceite') ||
+      handle.includes('patch') || handle.includes('comb') || 
+      handle.includes('brush') || handle.includes('gloss') ||
+      handle.includes('serum') || handle.includes('cream');
+
+    if (isSkincareOrCosmetic) {
+      if (handle.includes('sprayer-comb') || handle.includes('brush')) {
+        return [
+          { label: 'TIPO', value: 'Cepillo desenredante 2 en 1' },
+          { label: 'USO', value: 'Hidratación y peinado diario' },
+          { label: 'BRUMA', value: 'Pulverizador recargable de agua ultra fina' },
+          { label: 'MATERIAL', value: 'Cerdas suaves y cuerpo de polímero premium' },
+          { label: 'EDICIÓN', value: 'Unidades limitadas' }
+        ];
+      }
+      
+      if (title.includes('patch') || title.includes('parche') || handle.includes('patch')) {
+        return [
+          { label: 'TIPO', value: 'Parches de colágeno para ojos' },
+          { label: 'CONTENIDO', value: '60 parches (30 pares)' },
+          { label: 'USO', value: 'Contorno de ojos hidratante y antiojeras' },
+          { label: 'INGREDIENTES', value: 'Colágeno, péptidos y niacinamida' },
+          { label: 'APTO PARA', value: 'Todo tipo de pieles' }
+        ];
+      }
+
+      return [
+        { label: 'LÍNEA', value: 'Cuidado facial y capilar Vida Santa' },
+        { label: 'EDICIÓN', value: 'Lanzamiento exclusivo' },
+        { label: 'APLICACIÓN', value: 'Uso diario recomendado' },
+        { label: 'ORIGEN', value: 'Ingredientes de alta calidad' }
+      ];
+    }
+
     const features = (metadata['Features'] || '').split(',').map(f => f.trim());
     const fitKeywords = ['loose', 'regular', 'oversized', 'slim', 'boxy', 'cropped', 'structured', 'relaxed', 'fit'];
     const foundFit = features
@@ -485,7 +590,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
       { label: 'Finish', value: finishValue },
       { label: 'Production', value: 'Limited production' }
     ].filter(r => r.value);
-  }, [metadata]);
+  }, [metadata, product.handle, product.title]);
 
   const wishlistItem = {
     handle: product.handle,
@@ -825,27 +930,6 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
               {/* Thick divider line */}
               <div className="tonet-product-title-divider"></div>
 
-              {/* Subtitle / Description */}
-              <div className="tonet-product-subtitle-block">
-                <p className="tonet-product-subtitle">
-                  {(product.description || "").split(/[.:!|]/)[0]?.trim()}
-                </p>
-                <a 
-                  href="#description" 
-                  className="tonet-product-more-info"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    toggleAccordion('desc');
-                    document.querySelector('.tonet-accordions')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                >
-                  Más información
-                </a>
-                <span className="tonet-product-ref">
-                  Ref. {selectedVariant.sku || '158444'}
-                </span>
-              </div>
-
               {/* Price and Favorite Star row */}
               <div className="tonet-product-price-row">
                 <div className="tonet-price-wrapper">
@@ -936,6 +1020,48 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                 </div>
               )}
 
+              {/* SMS PROMO BOX */}
+              <div className="tonet-pdp-sms-box">
+                {!smsSubscribed ? (
+                  <div className="tonet-pdp-sms-form">
+                    <span className="tonet-pdp-sms-tag">🎁 CONSIGUE UN 10% DE DESCUENTO</span>
+                    <p className="tonet-pdp-sms-desc">SUSCRÍBETE A NUESTRO CANAL SMS Y RECIBE UN 10% DE DESCUENTO AL INSTANTE PARA TU PRIMERA COMPRA.</p>
+                    <form onSubmit={handleSmsSubmit} className="tonet-pdp-sms-input-row">
+                      <input 
+                        type="tel" 
+                        placeholder="TU NÚMERO DE TELÉFONO" 
+                        value={smsPhone} 
+                        onChange={(e) => {
+                          setSmsPhone(e.target.value);
+                          setSmsError("");
+                        }}
+                        className="tonet-pdp-sms-input"
+                        required
+                      />
+                      <button type="submit" className="tonet-pdp-sms-btn">UNIRSE</button>
+                    </form>
+                    {smsError && <span className="tonet-pdp-sms-error">{smsError}</span>}
+                  </div>
+                ) : (
+                  <div className="tonet-pdp-sms-success">
+                    <span className="tonet-pdp-sms-tag">✓ ¡10% DESCUENTO ACTIVO!</span>
+                    <p className="tonet-pdp-sms-desc">CÓDIGO DE CUPÓN: <strong className="tonet-pdp-sms-code">VIDASANTA10</strong> (APLÍCALO EN EL CHECKOUT)</p>
+                  </div>
+                )}
+              </div>
+
+              {/* URGENCY & TRUST WIDGET */}
+              <div className="tonet-pdp-urgency-box">
+                <div className="tonet-urgency-row tonet-urgency-stock">
+                  <span className="tonet-urgency-pulse"></span>
+                  <span className="tonet-urgency-text">¡ÚLTIMAS UNIDADES! SOLO QUEDAN 3 EN STOCK</span>
+                </div>
+                <div className="tonet-urgency-row tonet-urgency-stars">
+                  <span className="tonet-urgency-star-icon">★ ★ ★ ★ ★</span>
+                  <span className="tonet-urgency-text">ESTÁ GUSTANDO MUCHO (VALORACIÓN 5/5 ESTRELLAS)</span>
+                </div>
+              </div>
+
               {/* SELECT SIZE / ADD TO BAG Button */}
               <div className="tonet-size-selector-wrap" ref={mainButtonWrapRef}>
                 {hasSizes ? (
@@ -956,6 +1082,27 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                     <span>{adding ? 'AÑADIENDO...' : 'AÑADIR A LA CESTA'}</span>
                   </button>
                 )}
+              </div>
+
+              {/* Subtitle / Description */}
+              <div className="tonet-product-subtitle-block">
+                <p className="tonet-product-subtitle">
+                  {(product.description || "").split(/[.:!|]/)[0]?.trim()}
+                </p>
+                <a 
+                  href="#description" 
+                  className="tonet-product-more-info"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    toggleAccordion('desc');
+                    document.querySelector('.tonet-accordions')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  Más información
+                </a>
+                <span className="tonet-product-ref">
+                  Ref. {selectedVariant.sku || '158444'}
+                </span>
               </div>
 
               {/* Sub-button details */}
@@ -986,25 +1133,9 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
                       <p>{product.description?.split('Item Number:')[0]?.trim().toUpperCase()}</p>
                       <ul className="tonet-specs-list">
                         {detailsRows.map((row, i) => (
-                          <li key={i}>— {row.label.toUpperCase()}: {row.value.toUpperCase()}</li>
+                           <li key={i}>— {row.label.toUpperCase()}: {row.value.toUpperCase()}</li>
                         ))}
                       </ul>
-                    </div>
-                  )}
-                </div>
-
-                {/* SIZE AND FIT */}
-                <div className="tonet-accordion-item">
-                  <button className="tonet-accordion-header" onClick={() => toggleAccordion('fit')}>
-                    <span>TALLA Y AJUSTE</span>
-                    <span className="tonet-accordion-icon">{expandedAccordion === 'fit' ? '—' : '+'}</span>
-                  </button>
-                  {expandedAccordion === 'fit' && (
-                    <div className="tonet-accordion-content">
-                      <p>SE ADAPTA A LA TALLA REAL. RECOMENDAMOS ELEGIR TU TALLA HABITUAL. LOS AJUSTES VARÍAN SEGÚN LA CONSTRUCCIÓN Y EL MATERIAL.</p>
-                      <button type="button" className="tonet-size-guide-link" onClick={() => setSizeGuideOpen(true)}>
-                        VER GUÍA DE TALLAS
-                      </button>
                     </div>
                   )}
                 </div>
@@ -1443,7 +1574,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           .tonet-pdp-layout {
             grid-template-columns: 55% 45%;
             column-gap: 80px;
-            padding: 80px 40px 120px 40px;
+            padding: 150px 40px 120px 40px;
             max-width: 1200px;
             margin: 0 auto;
             box-sizing: border-box;
@@ -1660,7 +1791,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
         }
         @media (min-width: 1024px) {
           .tonet-info-column {
-            padding: 0;
+            padding: 80px 0 0 0;
           }
         }
         .tonet-info-sticky {
@@ -2699,7 +2830,7 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
 
         @media (min-width: 1024px) {
           .tonet-sticky-buy-bar {
-            top: 64px;
+            top: calc(var(--header-height, 64px) + var(--nav-top, 0px) + 12px);
             left: auto;
             right: 64px;
             width: 400px;
@@ -2713,6 +2844,176 @@ export default function ProductClient({ product, relatedProductsByTag }: Props) 
           }
           .tonet-sticky-buy-bar-inner {
             padding: 0 24px;
+          }
+        }
+
+        /* Mobile specific layout tweaks to group title, price, swatches, and buy button closely */
+        @media (max-width: 1023px) {
+          .tonet-product-title-divider {
+            margin-top: 10px;
+            margin-bottom: 10px;
+          }
+          .tonet-product-price-row {
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+          }
+          .tonet-pdp-swatches-section {
+            margin-bottom: 14px;
+          }
+          .tonet-size-selector-wrap {
+            margin-bottom: 16px;
+          }
+        }
+
+        /* Urgency box styles */
+        .tonet-pdp-urgency-box {
+          width: 100%;
+          border: 1px solid #d8d8d8;
+          padding: 14px;
+          margin-bottom: 24px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          box-sizing: border-box;
+          border-radius: 0 !important; /* Rectangular borders */
+          background-color: #fafafa;
+        }
+        .tonet-urgency-row {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .tonet-urgency-pulse {
+          width: 8px;
+          height: 8px;
+          background-color: #d93838;
+          display: inline-block;
+          animation: tonet-pulse 1.5s infinite ease-in-out;
+          border-radius: 0 !important; /* Rectangular borders */
+        }
+        @keyframes tonet-pulse {
+          0% { transform: scale(0.9); opacity: 0.5; }
+          50% { transform: scale(1.15); opacity: 1; }
+          100% { transform: scale(0.9); opacity: 0.5; }
+        }
+        .tonet-urgency-star-icon {
+          color: #000000;
+          font-size: 11px;
+          letter-spacing: 0.1em;
+        }
+        .tonet-urgency-text {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10px;
+          font-weight: 500;
+          letter-spacing: 0.08em;
+          color: #000000;
+          text-transform: uppercase;
+        }
+        @media (max-width: 1023px) {
+          .tonet-pdp-urgency-box {
+            margin-bottom: 16px;
+            padding: 12px;
+          }
+        }
+
+        /* PDP SMS Box styles */
+        .tonet-pdp-sms-box {
+          width: 100%;
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          padding: 16px;
+          margin-bottom: 24px;
+          display: flex;
+          flex-direction: column;
+          box-sizing: border-box;
+          border-radius: 0 !important; /* Rectangular borders */
+          background-color: #000000;
+          color: #ffffff;
+        }
+        .tonet-pdp-sms-form,
+        .tonet-pdp-sms-success {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          width: 100%;
+        }
+        .tonet-pdp-sms-tag {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.15em;
+          color: #ffffff;
+          text-transform: uppercase;
+        }
+        .tonet-pdp-sms-desc {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 9px;
+          font-weight: 300;
+          line-height: 1.5;
+          letter-spacing: 0.05em;
+          color: rgba(255, 255, 255, 0.7);
+          margin: 0;
+          text-transform: uppercase;
+        }
+        .tonet-pdp-sms-input-row {
+          display: flex;
+          gap: 10px;
+          width: 100%;
+          margin-top: 4px;
+        }
+        .tonet-pdp-sms-input {
+          flex: 1;
+          border: none;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+          padding: 12px 0;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10px;
+          letter-spacing: 0.08em;
+          background: transparent;
+          color: #ffffff;
+          border-radius: 0 !important; /* Rectangular borders */
+          outline: none;
+          text-transform: uppercase;
+          transition: border-color 0.2s;
+        }
+        .tonet-pdp-sms-input:focus {
+          border-bottom-color: #ffffff;
+        }
+        .tonet-pdp-sms-input::placeholder {
+          color: rgba(255, 255, 255, 0.35);
+        }
+        .tonet-pdp-sms-btn {
+          background: #ffffff;
+          color: #000000;
+          border: none;
+          padding: 12px 20px;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.1em;
+          cursor: pointer;
+          border-radius: 0 !important; /* Rectangular borders */
+          transition: background-color 0.2s;
+        }
+        .tonet-pdp-sms-btn:hover {
+          background: #eaeaea;
+        }
+        .tonet-pdp-sms-error {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 9px;
+          color: #d93838;
+          font-weight: 600;
+          letter-spacing: 0.05em;
+        }
+        .tonet-pdp-sms-code {
+          font-weight: 700;
+          color: #ffffff;
+          background: rgba(255, 255, 255, 0.15);
+          padding: 2px 8px;
+        }
+        @media (max-width: 1023px) {
+          .tonet-pdp-sms-box {
+            margin-bottom: 16px;
+            padding: 12px;
           }
         }
       `}</style>

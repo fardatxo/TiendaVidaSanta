@@ -60,7 +60,27 @@ const philosophicalQuotes = [
   "Garments are not products. They are pieces of a cumulative archive under nature's silent watch."
 ];
 
-export default function CollectionLandingClient({ products }: CollectionLandingClientProps) {
+export default function CollectionLandingClient({ products: rawProducts }: CollectionLandingClientProps) {
+  const products = useMemo(() => {
+    return rawProducts.map(p => {
+      if (p.handle.includes('sprayer-comb') || p.handle.includes('brush')) {
+        return {
+          ...p,
+          title: "CEPILLO DESENREDANTE 2 EN 1 CON PULVERIZADOR",
+          description: `CEPILLO Y PEINE DE PELUQUERÍA PROFESIONAL 2 EN 1 CON PULVERIZADOR DE AGUA REUTILIZABLE. DISEÑADO CON CERDAS SUAVES DESENREDANTES, IDEAL PARA LA HIDRATACIÓN DIARIA Y EL PEINADO DEL CABELLO. APLICA UNA BRUMA ULTRA FINA QUE FACILITA EL PEINADO Y REHIDRATA SIN EMPAPAR EL CABELLO. PERMITE AÑADIR AGUA, TÓNICOS CAPILARES O ACEITES ESENCIALES PARA UN CUIDADO CAPILAR DE LUJO EN CUALQUIER MOMENTO.`
+        };
+      }
+      if (p.handle.includes('patch') || p.handle.includes('parche') || p.title.toLowerCase().includes('patch')) {
+        return {
+          ...p,
+          title: "PARCHES DE COLÁGENO PARA OJOS (60 UNIDADES)",
+          description: `PARCHES DE COLÁGENO PARA OJOS ENRIQUECIDOS CON PÉPTIDOS Y NIACINAMIDA. HIDRATAN, SUAVIZAN Y REVITALIZAN EL CONTORNO DE OJOS, REDUCIENDO VISIBLEMENTE LA APARIENCIA DE OJERAS, BOLSAS Y LÍNEAS DE EXPRESIÓN. APTOS PARA TODO TIPO DE PIELES. CONTENIDO: 60 PARCHES (30 PARES).`
+        };
+      }
+      return p;
+    });
+  }, [rawProducts]);
+
   const { formatPrice } = useLocale();
   const { toggle, has } = useWishlist();
   // Advanced Archive Indexing State
@@ -163,6 +183,63 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
       {/* ── SECTION TITLE: LOS ESENCIALES ── */}
       <section className="tonet-archive-section-title-wrap">
         <h2 className="tonet-archive-section-title">LOS ESENCIALES</h2>
+      </section>
+
+      {/* ── FILTER BAR ── */}
+      <section className="tonet-archive-filter-wrap">
+        <div className="tonet-archive-filter-group">
+          <span className="tonet-filter-label">TIPO:</span>
+          <div className="tonet-filter-options">
+            <button 
+              className={`tonet-filter-btn ${filterGarmentType === 'all' ? 'active' : ''}`}
+              onClick={() => setFilterGarmentType('all')}
+            >
+              TODOS
+            </button>
+            <button 
+              className={`tonet-filter-btn ${filterGarmentType === 'tops' ? 'active' : ''}`}
+              onClick={() => setFilterGarmentType('tops')}
+            >
+              PARTE SUPERIOR
+            </button>
+            <button 
+              className={`tonet-filter-btn ${filterGarmentType === 'bottoms' ? 'active' : ''}`}
+              onClick={() => setFilterGarmentType('bottoms')}
+            >
+              PARTE INFERIOR
+            </button>
+            <button 
+              className={`tonet-filter-btn ${filterGarmentType === 'outerwear' ? 'active' : ''}`}
+              onClick={() => setFilterGarmentType('outerwear')}
+            >
+              ABRIGOS Y ACCESORIOS
+            </button>
+          </div>
+        </div>
+
+        <div className="tonet-archive-filter-group">
+          <span className="tonet-filter-label">DISPONIBILIDAD:</span>
+          <div className="tonet-filter-options">
+            <button 
+              className={`tonet-filter-btn ${filterState === 'all' ? 'active' : ''}`}
+              onClick={() => setFilterState('all')}
+            >
+              TODOS
+            </button>
+            <button 
+              className={`tonet-filter-btn ${filterState === 'active' ? 'active' : ''}`}
+              onClick={() => setFilterState('active')}
+            >
+              EN STOCK
+            </button>
+            <button 
+              className={`tonet-filter-btn ${filterState === 'archived' ? 'active' : ''}`}
+              onClick={() => setFilterState('archived')}
+            >
+              AGOTADOS
+            </button>
+          </div>
+        </div>
       </section>
 
       {/* ── MAIN PRODUCT GRID ── */}
@@ -584,6 +661,91 @@ export default function CollectionLandingClient({ products }: CollectionLandingC
         }
         .tonet-archive-footer__sep {
           color: #767676;
+        }
+
+        /* Filter Bar styles */
+        .tonet-archive-filter-wrap {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 0 40px 40px 40px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 32px 48px;
+          justify-content: center;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .tonet-archive-filter-group {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+        .tonet-filter-label {
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.15em;
+          color: #888888;
+          text-transform: uppercase;
+        }
+        .tonet-filter-options {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 16px;
+        }
+        .tonet-filter-btn {
+          background: none;
+          border: none;
+          padding: 4px 0;
+          font-family: var(--font-primary), sans-serif;
+          font-size: 10px;
+          font-weight: 500;
+          letter-spacing: 0.12em;
+          color: rgba(0, 0, 0, 0.4);
+          cursor: pointer;
+          transition: color 0.3s, opacity 0.3s;
+          text-transform: uppercase;
+          position: relative;
+        }
+        .tonet-filter-btn::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 1px;
+          background-color: #000000;
+          transform: scaleX(0);
+          transform-origin: right;
+          transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .tonet-filter-btn:hover {
+          color: #000000;
+        }
+        .tonet-filter-btn.active {
+          color: #000000;
+          font-weight: 600;
+        }
+        .tonet-filter-btn.active::after {
+          transform: scaleX(1);
+          transform-origin: left;
+        }
+        @media (max-width: 767px) {
+          .tonet-archive-filter-wrap {
+            padding: 0 20px 24px 20px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+          }
+          .tonet-archive-filter-group {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            width: 100%;
+          }
+          .tonet-filter-options {
+            gap: 12px;
+            width: 100%;
+          }
         }
       `}</style>
     </div>

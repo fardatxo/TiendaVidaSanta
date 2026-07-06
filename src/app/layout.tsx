@@ -18,6 +18,8 @@ import SearchDrawer from "@/components/SearchDrawer";
 import CookieBanner from "@/components/CookieBanner";
 import TransitionProvider from "@/components/TransitionProvider";
 import LocaleSelectorModal from "@/components/LocaleSelectorModal";
+import SMSMarketingPopup from "@/components/SMSMarketingPopup";
+import CustomerChatbot from "@/components/CustomerChatbot";
 
 
 const jost = Jost({
@@ -68,6 +70,8 @@ export default function RootLayout({
                 <main>{children}</main>
                 <Footer />
                 <CookieBanner />
+                <SMSMarketingPopup />
+                <CustomerChatbot />
                 <Analytics />
               </WishlistProvider>
               </AuthProvider>

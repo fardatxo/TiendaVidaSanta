@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 
 const ANNOUNCEMENTS = [
-  "ENVÍO GRATIS EN PEDIDOS SUPERIORES A 50€",
-  "CUIDADO CAPILAR Y FACIAL DE ALTA GAMA",
-  "FÓRMULAS EXCLUSIVAS PARA TU RUTINA DIARIA"
+  "ENVÍO GRATIS EN 24/48H | UNIDADES MUY LIMITADAS",
+  "¡ÚLTIMAS UNIDADES! PIDE HOY Y RECIBE TU ENVÍO GRATIS",
+  "FÓRMULAS EXCLUSIVAS DE ALTA GAMA | STOCK LIMITADO"
 ];
 
 export default function AnnouncementBar() {
@@ -54,21 +54,21 @@ export default function AnnouncementBar() {
 
       <style>{`
         .ann-bar {
-          height: 32px;
+          height: 36px;
           background-color: #000000;
           color: #ffffff;
           display: flex;
           align-items: center;
           justify-content: center;
-          position: absolute;
+          position: fixed;
           top: 0;
           left: 0;
           right: 0;
           z-index: 600;
           font-family: var(--font-primary), sans-serif;
-          font-size: 8px;
-          font-weight: 300;
-          letter-spacing: 0.3em;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.15em;
           text-transform: uppercase;
           padding: 0 40px;
           box-sizing: border-box;
@@ -82,7 +82,7 @@ export default function AnnouncementBar() {
           text-overflow: ellipsis;
         }
         .ann-fade-in {
-          opacity: 0.85;
+          opacity: 0.95;
           transform: translateY(0);
         }
         .ann-fade-out {
@@ -110,8 +110,9 @@ export default function AnnouncementBar() {
         }
         @media (max-width: 767px) {
           .ann-bar {
-            font-size: 7.5px;
-            letter-spacing: 0.22em;
+            height: 36px;
+            font-size: 9px;
+            letter-spacing: 0.1em;
             padding: 0 32px 0 16px;
           }
           .ann-close {
