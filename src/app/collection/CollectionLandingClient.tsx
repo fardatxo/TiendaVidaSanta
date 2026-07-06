@@ -185,62 +185,7 @@ export default function CollectionLandingClient({ products: rawProducts }: Colle
         <h2 className="tonet-archive-section-title">LOS ESENCIALES</h2>
       </section>
 
-      {/* ── FILTER BAR ── */}
-      <section className="tonet-archive-filter-wrap">
-        <div className="tonet-archive-filter-group">
-          <span className="tonet-filter-label">TIPO:</span>
-          <div className="tonet-filter-options">
-            <button 
-              className={`tonet-filter-btn ${filterGarmentType === 'all' ? 'active' : ''}`}
-              onClick={() => setFilterGarmentType('all')}
-            >
-              TODOS
-            </button>
-            <button 
-              className={`tonet-filter-btn ${filterGarmentType === 'tops' ? 'active' : ''}`}
-              onClick={() => setFilterGarmentType('tops')}
-            >
-              PARTE SUPERIOR
-            </button>
-            <button 
-              className={`tonet-filter-btn ${filterGarmentType === 'bottoms' ? 'active' : ''}`}
-              onClick={() => setFilterGarmentType('bottoms')}
-            >
-              PARTE INFERIOR
-            </button>
-            <button 
-              className={`tonet-filter-btn ${filterGarmentType === 'outerwear' ? 'active' : ''}`}
-              onClick={() => setFilterGarmentType('outerwear')}
-            >
-              ABRIGOS Y ACCESORIOS
-            </button>
-          </div>
-        </div>
 
-        <div className="tonet-archive-filter-group">
-          <span className="tonet-filter-label">DISPONIBILIDAD:</span>
-          <div className="tonet-filter-options">
-            <button 
-              className={`tonet-filter-btn ${filterState === 'all' ? 'active' : ''}`}
-              onClick={() => setFilterState('all')}
-            >
-              TODOS
-            </button>
-            <button 
-              className={`tonet-filter-btn ${filterState === 'active' ? 'active' : ''}`}
-              onClick={() => setFilterState('active')}
-            >
-              EN STOCK
-            </button>
-            <button 
-              className={`tonet-filter-btn ${filterState === 'archived' ? 'active' : ''}`}
-              onClick={() => setFilterState('archived')}
-            >
-              AGOTADOS
-            </button>
-          </div>
-        </div>
-      </section>
 
       {/* ── MAIN PRODUCT GRID ── */}
       <section className="tonet-archive-grid-section">
