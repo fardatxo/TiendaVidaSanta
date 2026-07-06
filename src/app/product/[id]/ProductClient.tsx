@@ -1614,6 +1614,7 @@ Care Instructions: LIMPIAR EL DEPÓSITO DESPUÉS DE CADA USO CON AGUA TEMPLADA. 
           display: block;
           width: 100%;
           overflow: hidden;
+          padding-top: 100px; /* Offset fixed transparent navbar */
         }
         .tonet-mobile-carousel {
           display: flex;
