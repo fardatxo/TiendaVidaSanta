@@ -256,6 +256,13 @@ const arrangeRecommendations = (pool: RecommendedProduct[]): RecommendedProduct[
   return result;
 };
 
+const getMultiplier = (val: string): number => {
+  const lowercase = val.toLowerCase();
+  if (lowercase.includes('5 x') || lowercase.includes('5x')) return 5;
+  if (lowercase.includes('2 x') || lowercase.includes('2x')) return 2;
+  return 1;
+};
+
 export default function ProductClient({ product: rawProduct, relatedProductsByTag }: Props) {
   const product = useMemo(() => {
     if (rawProduct.handle.includes('sprayer-comb') || rawProduct.handle.includes('brush')) {
@@ -666,8 +673,9 @@ Care Instructions: LIMPIAR EL DEPÓSITO DESPUÉS DE CADA USO CON AGUA TEMPLADA. 
         result.push({ value: opt.value, imageUrl: v.image?.url ?? '' });
       }
     }
+    result.sort((a, b) => getMultiplier(a.value) - getMultiplier(b.value));
     return result;
-  }, [colorOptionName]);
+  }, [colorOptionName, product.variants]);
 
   const sizeOptions = useMemo(() => {
     if (!sizeOptionName) return [];
@@ -975,7 +983,13 @@ Care Instructions: LIMPIAR EL DEPÓSITO DESPUÉS DE CADA USO CON AGUA TEMPLADA. 
                         let customBg = colorNameToCSS(co.value);
                         let customColor = '#ffffff';
 
-                        if (co.value.toLowerCase().includes('2 x')) {
+                        const isEyePatch = product.handle.includes('patch') || product.handle.includes('parche') || product.title.toLowerCase().includes('patch');
+                        if (isEyePatch) {
+                          const multiplier = getMultiplier(co.value);
+                          content = String(multiplier);
+                          customBg = isSelected ? '#000000' : '#f5f5f5';
+                          customColor = isSelected ? '#ffffff' : '#000000';
+                        } else if (co.value.toLowerCase().includes('2 x')) {
                           content = '2';
                           customBg = isSelected ? '#000000' : '#f5f5f5';
                           customColor = isSelected ? '#ffffff' : '#000000';
